@@ -17,3 +17,15 @@ async fn main() {
 async fn root() -> &'static str {
     "Hello, World!"
 }
+
+/// Handler for the POST '/login_user' route.
+/// This handler will receive a JSON object with the following structure:
+/// {
+///    "email": string,
+///    "password": string
+/// }
+/// The handler will return OK if the user is authenticated, and UNAUTHORIZED if the user is not.
+/// The server will send cookies to the client to keep the user authenticated.
+async fn login_user() -> &'static str {
+    "Hello, World!"
+}
