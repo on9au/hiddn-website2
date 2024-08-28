@@ -1,20 +1,25 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUser, AuthStatus, LoginPayload } from './auth'; // Adjust imports based on your setup
-import './components/CommonLink';
-import './components/FrontpageHeader';
+import { AuthStatus } from '../auth';
+import { LoginPayload } from '../bindings';
+import FrontpageHeader from './frontpageheader';
+import CommonLink from './commonlink';
+
+import ICON from '../assets/hiddn_icon.svg';
+
+const apiURL: string = import.meta.env.VITE_API_URL;
 
 const Login: React.FC = () => {
-    const ICON = '/assets/hiddn_icon.svg'; // Update with your correct path to the icon
+    // const ICON = '../assets/hiddn_icon.svg'; // Update with your correct path to the icon
 
     const navigate = useNavigate();
 
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const [authStatus, setAuthStatus] = useState<AuthStatus>(AuthStatus.Idle);
+    const [authStatus, setAuthStatus] = useState<AuthStatus>({ type: 'Idle' });
 
     const handleLogin = async () => {
-        setAuthStatus(AuthStatus.Loading);
+        setAuthStatus({ type: 'Loading' });
 
         const payload: LoginPayload = {
             email,
@@ -22,26 +27,27 @@ const Login: React.FC = () => {
         };
 
         if (payload.email === '' || !payload.email.includes('@')) {
-            setAuthStatus(AuthStatus.Error('Please enter a valid email.'));
+            setAuthStatus({ type: 'Error', message: 'Please enter a valid email address.' });
             return;
         }
 
+        // Log into user, with API endpoint.
         try {
-            const result = await loginUser(payload);
-            switch (result) {
-                case AuthStatus.Token:
-                    setAuthStatus(AuthStatus.Success);
-                    // TODO: Cookie logic or other logic to handle login success
+            const result = await fetch(`${apiURL}/login_user`);
+            console.log(result);
+            switch (result.status) {
+                case 200:
+                    setAuthStatus({ type: 'Success' });
                     navigate('/dashboard');
                     break;
-                case AuthStatus.Error:
-                    setAuthStatus(AuthStatus.Error('Authentication failed.'));
+                case 401:
+                    setAuthStatus({ type: 'Error', message: 'Please check your credentials and try again.' });
                     break;
                 default:
-                    setAuthStatus(AuthStatus.Error('An unknown error occurred.'));
+                    setAuthStatus({ type: 'Error', message: 'An error occurred.' });
             }
         } catch (error) {
-            setAuthStatus(AuthStatus.Error(error.message || 'An error occurred.'));
+            setAuthStatus({ type: 'Error', message: 'An error occurred. ' + error });
         }
     };
 
@@ -80,14 +86,14 @@ const Login: React.FC = () => {
                     className="w-full px-4 py-2 mb-4 text-white bg-hiddn-500 hover:bg-hiddn-400 rounded-xl"
                     onClick={handleLogin}
                 >
-                    {authStatus === AuthStatus.Loading ? 'Logging in...' : 'Login'}
+                    {authStatus.type === 'Loading' ? 'Logging in...' : 'Login'}
                 </button>
-                {authStatus === AuthStatus.Error && (
+                {authStatus.type === 'Error' && (
                     <div className="mb-4 text-red-500">
-                        {authStatus === AuthStatus.Error && 'Please check your credentials and try again.'}
+                        {authStatus.type === 'Error' && authStatus.message}
                     </div>
                 )}
-                {authStatus === AuthStatus.Success && (
+                {authStatus.type === 'Success' && (
                     <div className="mb-4 text-green-500">
                         Success!
                     </div>
