@@ -4,7 +4,9 @@ import { AuthStatus, EmailVerifyStatus, RegisterPayload } from '../auth';
 import FrontpageHeader from './frontpageheader';
 import CommonLink from './commonlink';
 import ICON from '../assets/hiddn_icon.svg';
-import { verifyEmailRegister, registerUser } from '../server';
+import { VerifyEmailPayload } from '../bindings';
+
+const apiURL: string = import.meta.env.VITE_API_URL;
 
 const Register: React.FC = () => {
     const navigate = useNavigate();
@@ -26,7 +28,17 @@ const Register: React.FC = () => {
 
         setVerifyStatus({ type: 'Loading' });
 
-        const result = await verifyEmailRegister(email);
+        const payload: VerifyEmailPayload = { email };
+
+        const result = await fetch(`${apiURL}/verify_email_register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        }).then((response) => {
+            return response;
+        });
 
         if (result.type === 'Success') {
             setVerifyStatus({ type: 'Sent' });

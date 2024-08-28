@@ -1,10 +1,10 @@
 use axum::{
     http::{header::SET_COOKIE, HeaderMap, HeaderValue, StatusCode},
-    response::IntoResponse,
+    response::{AppendHeaders, IntoResponse},
     routing::{get, post},
     Json, Router,
 };
-use payloads::{LoginPayload, RegisterPayload};
+use payloads::{LoginPayload, RegisterPayload, VerifyEmailPayload};
 use tokio::net::TcpListener;
 
 mod payloads;
@@ -13,7 +13,9 @@ mod payloads;
 async fn main() {
     let app = Router::new()
         .route("/", get(root))
-        .route("/login_user", post(login_user));
+        .route("/login_user", post(login_user))
+        .route("/register_user", post(register_user))
+        .route("/verify_email", post(verify_email));
 
     let listener = TcpListener::bind("127.0.0.1:3000").await.unwrap();
     println!("listening on {}", listener.local_addr().unwrap());
@@ -50,7 +52,6 @@ async fn login_user(Json(payload): Json<LoginPayload>) -> impl IntoResponse {
     if payload.email == *"test@test.com" {
         // Set cookies on successful authentication
         // In a real application, a session token would be generated and stored in a database
-        let mut headers = HeaderMap::new();
         let header_value: HeaderValue =
             // USE HTTP ONLY AND SECURE FLAGS IN PRODUCTION
             match HeaderValue::from_str(format!("auth_token={}", "test_auth_token").as_str()) {
@@ -59,9 +60,8 @@ async fn login_user(Json(payload): Json<LoginPayload>) -> impl IntoResponse {
                     return StatusCode::INTERNAL_SERVER_ERROR.into_response();
                 }
             };
-        headers.insert(SET_COOKIE, header_value);
 
-        return (headers, StatusCode::OK).into_response();
+        return (AppendHeaders([(SET_COOKIE, header_value)]), StatusCode::OK).into_response();
     }
     StatusCode::UNAUTHORIZED.into_response()
 }
@@ -70,6 +70,14 @@ async fn login_user(Json(payload): Json<LoginPayload>) -> impl IntoResponse {
 /// This handler will receive a JSON(RegisterPayload) payload from the client.
 /// The handler will return OK if the user is registered, and BAD_REQUEST if the user is not.
 /// The server will send cookies to the client to keep the user authenticated.
-fn register_user(Json(payload): Json<RegisterPayload>) -> impl IntoResponse {
+async fn register_user(Json(payload): Json<RegisterPayload>) -> impl IntoResponse {
     todo!("Implement register_user handler");
+}
+
+/// Handler for the POST '/verify_email' route.
+/// This handler will receive a JSON(VerifyEmailPayload) payload from the client.
+/// It will send code to email to verify the email.
+/// Should have a rate limit to prevent spamming.
+async fn verify_email(Json(payload): Json<VerifyEmailPayload>) -> impl IntoResponse {
+    todo!("Implement verify_email handler");
 }

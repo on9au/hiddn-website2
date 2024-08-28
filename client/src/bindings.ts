@@ -15,3 +15,7 @@ export interface RegisterPayload {
 	invite_code: string;
 }
 
+export interface VerifyEmailPayload {
+	email: string;
+}
+
