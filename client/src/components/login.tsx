@@ -33,7 +33,15 @@ const Login: React.FC = () => {
 
         // Log into user, with API endpoint.
         try {
-            const result = await fetch(`${apiURL}/login_user`);
+            const result = await fetch(`${apiURL}/login_user`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            }).then((response) => {
+                return response;
+            });
             console.log(result);
             switch (result.status) {
                 case 200:
@@ -41,10 +49,10 @@ const Login: React.FC = () => {
                     navigate('/dashboard');
                     break;
                 case 401:
-                    setAuthStatus({ type: 'Error', message: 'Please check your credentials and try again.' });
+                    setAuthStatus({ type: 'Error', message: 'Incorrect email/password.' });
                     break;
                 default:
-                    setAuthStatus({ type: 'Error', message: 'An error occurred.' });
+                    setAuthStatus({ type: 'Error', message: 'An error occurred. (' + result.status + ')' });
             }
         } catch (error) {
             setAuthStatus({ type: 'Error', message: 'An error occurred. ' + error });
