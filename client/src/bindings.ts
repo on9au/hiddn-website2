@@ -7,3 +7,11 @@ export interface LoginPayload {
 	password: string;
 }
 
+export interface RegisterPayload {
+	email: string;
+	email_verification_code: string;
+	password: string;
+	confirm_password: string;
+	invite_code: string;
+}
+

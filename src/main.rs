@@ -4,7 +4,7 @@ use axum::{
     routing::{get, post},
     Json, Router,
 };
-use payloads::LoginPayload;
+use payloads::{LoginPayload, RegisterPayload};
 use tokio::net::TcpListener;
 
 mod payloads;
@@ -29,11 +29,7 @@ async fn root() -> &'static str {
 }
 
 /// Handler for the POST '/login_user' route.
-/// This handler will receive a JSON object with the following structure:
-/// {
-///    "email": string,
-///    "password": string
-/// }
+/// This handler will receive a JSON(LoginPayload) payload from the client.
 /// The handler will return OK if the user is authenticated, and UNAUTHORIZED if the user is not.
 /// If email is invalid, it will return BAD_REQUEST.
 /// The server will send cookies to the client to keep the user authenticated.
@@ -55,17 +51,25 @@ async fn login_user(Json(payload): Json<LoginPayload>) -> impl IntoResponse {
         // Set cookies on successful authentication
         // In a real application, a session token would be generated and stored in a database
         let mut headers = HeaderMap::new();
-        let header_value: HeaderValue = match HeaderValue::from_str(
-            format!("auth_token={}; HttpOnly; Secure", "test_auth_token").as_str(),
-        ) {
-            Ok(value) => value,
-            Err(_) => {
-                return StatusCode::INTERNAL_SERVER_ERROR.into_response();
-            }
-        };
+        let header_value: HeaderValue =
+            // USE HTTP ONLY AND SECURE FLAGS IN PRODUCTION
+            match HeaderValue::from_str(format!("auth_token={}", "test_auth_token").as_str()) {
+                Ok(value) => value,
+                Err(_) => {
+                    return StatusCode::INTERNAL_SERVER_ERROR.into_response();
+                }
+            };
         headers.insert(SET_COOKIE, header_value);
 
-        return StatusCode::OK.into_response();
+        return (headers, StatusCode::OK).into_response();
     }
     StatusCode::UNAUTHORIZED.into_response()
+}
+
+/// Handler for the POST '/register_user' route.
+/// This handler will receive a JSON(RegisterPayload) payload from the client.
+/// The handler will return OK if the user is registered, and BAD_REQUEST if the user is not.
+/// The server will send cookies to the client to keep the user authenticated.
+fn register_user(Json(payload): Json<RegisterPayload>) -> impl IntoResponse {
+    todo!("Implement register_user handler");
 }
