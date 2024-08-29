@@ -1,6 +1,8 @@
 import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 
+import ICON from '../assets/hiddn_icon.svg';
+
 // NavBarHeader Component
 interface NavBarHeaderProps {
     icon: string;
@@ -41,7 +43,7 @@ const Sidebar: React.FC = () => {
     return (
         <div className="flex w-screen h-screen">
             <div className="flex flex-col h-full px-5 py-4 text-black bg-gray-100 min-w-72">
-                <NavBarHeader icon="/path/to/icon" title="HiddN" />
+                <NavBarHeader icon={ICON} title="HiddN" />
                 <div className="flex flex-col justify-between h-full">
                     <div className="flex flex-col">
                         <SidebarLink to="/user/dashboard" label="Dashboard" />
