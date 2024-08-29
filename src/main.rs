@@ -28,6 +28,7 @@ async fn main() {
     let app = Router::new()
         .route("/", get(root))
         .route("/login_user", post(login_user))
+        .route("/logout_user", post(logout_user))
         .layer(auth_layer)
         .route("/register_user", post(register_user))
         .route("/forgot_password", post(forgot_password))
@@ -78,6 +79,19 @@ async fn login_user(
     }
 
     StatusCode::OK.into_response()
+}
+
+/// Handler for the POST '/logout_user' route.
+/// This handler will log the user out, clearing the session.
+/// axum_login will handle the session management, logging the user out.
+async fn logout_user(mut auth_session: AuthSession) -> impl IntoResponse {
+    match auth_session.logout().await {
+        Ok(_) => StatusCode::OK.into_response(),
+        Err(e) => {
+            println!("Error: {}", e);
+            StatusCode::INTERNAL_SERVER_ERROR.into_response()
+        }
+    }
 }
 
 /// Handler for the POST '/verify_email' route.
