@@ -15,6 +15,13 @@ export interface RegisterPayload {
 	invite_code: string;
 }
 
+export interface ForgotPasswordPayload {
+	email: string;
+	email_verification_code: string;
+	password: string;
+	confirm_password: string;
+}
+
 export interface VerifyEmailPayload {
 	email: string;
 }
