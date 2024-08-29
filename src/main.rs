@@ -8,7 +8,7 @@ use axum_login::{
     tower_sessions::{MemoryStore, SessionManagerLayer},
     AuthManagerLayerBuilder,
 };
-use payloads::{LoginPayload, RegisterPayload, VerifyEmailPayload};
+use payloads::{ForgotPasswordPayload, LoginPayload, RegisterPayload, VerifyEmailPayload};
 use sessions::{AuthSession, Backend};
 use tokio::net::TcpListener;
 
@@ -29,6 +29,7 @@ async fn main() {
         .route("/", get(root))
         .route("/login_user", post(login_user))
         .route("/logout_user", post(logout_user))
+        .route("/is_logged_in", get(is_logged_in))
         .layer(auth_layer)
         .route("/register_user", post(register_user))
         .route("/forgot_password", post(forgot_password))
@@ -45,6 +46,16 @@ async fn main() {
 /// Handler for the GET `/` route.
 async fn root() -> &'static str {
     "Hello, World!"
+}
+
+/// Handler for the GET '/is_logged_in' route.
+/// This handler will return OK if the user is authenticated, and UNAUTHORIZED if the user is not.
+/// The server will use axum_login to keep the user authenticated.
+async fn is_logged_in(auth_session: AuthSession) -> impl IntoResponse {
+    match auth_session.user {
+        Some(_) => StatusCode::OK.into_response(),
+        None => StatusCode::UNAUTHORIZED.into_response(),
+    }
 }
 
 /// Handler for the POST '/login_user' route.
@@ -167,7 +178,7 @@ async fn register_user(Json(payload): Json<RegisterPayload>) -> impl IntoRespons
 /// If password is too weak, it will return CONFLICT.
 /// If verification code is invalid, it will return FORBIDDEN.
 /// The server will use axum_login to keep the user authenticated.
-async fn forgot_password(Json(payload): Json<RegisterPayload>) -> impl IntoResponse {
+async fn forgot_password(Json(payload): Json<ForgotPasswordPayload>) -> impl IntoResponse {
     // TODO: Implement actual registration logic interfacing with db
 
     // Debug print the payload
