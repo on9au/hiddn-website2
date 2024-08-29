@@ -5,6 +5,13 @@ import Forgot from './pages/forgot';
 import Dashboard from './pages/user/dashboard';
 import Logout from './pages/logout';
 import UserLayout from './components/userlayout';
+import Documentation from './pages/user/documentation';
+import Plan from './pages/user/plan';
+import PlanID from './pages/user/planid';
+import Transaction from './pages/user/transaction';
+import Support from './pages/user/support';
+import TransactionID from './pages/user/transactionid';
+import Profile from './pages/user/profile';
 
 const router = createBrowserRouter([
     // Root, not logged in path
@@ -42,34 +49,34 @@ const router = createBrowserRouter([
                 path: 'dashboard',
                 element: <Dashboard />,
             },
-            // {
-            //     path: 'documentation',
-            //     element: <Documentation />,
-            // },
-            // {
-            //     path: 'plan',
-            //     element: <Plan />,
-            // },
-            // {
-            //     path: 'plan/:id',
-            //     element: <PlanID />,
-            // },
-            // {
-            //     path: 'transaction',
-            //     element: <Transaction />,
-            // },
-            // {
-            //     path: 'transaction/:id',
-            //     element: <TransactionID />,
-            // },
-            // {
-            //     path: 'support',
-            //     element: <Support />,
-            // },
-            // {
-            //     path: 'profile',
-            //     element: <Profile />,
-            // },
+            {
+                path: 'documentation',
+                element: <Documentation />,
+            },
+            {
+                path: 'plan',
+                element: <Plan />,
+            },
+            {
+                path: 'plan/:id',
+                element: <PlanID />,
+            },
+            {
+                path: 'transaction',
+                element: <Transaction />,
+            },
+            {
+                path: 'transaction/:id',
+                element: <TransactionID />,
+            },
+            {
+                path: 'support',
+                element: <Support />,
+            },
+            {
+                path: 'profile',
+                element: <Profile />,
+            },
         ]
     },
 
