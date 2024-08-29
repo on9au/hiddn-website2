@@ -1,6 +1,8 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import Login from './components/login';
 import Sidebar from './components/sidebar';
+import Register from './components/register';
+import Forgot from './components/forgot';
 // import Register from './components/register';
 // import Forgot from './components/forgot';
 
@@ -50,12 +52,24 @@ const router = createBrowserRouter([
         path: '/login',
         element: <Login />
     },
+    {
+        path: '/register',
+        element: <Register />
+    },
+    {
+        path: '/forgot',
+        element: <Forgot /> 
+    },
 
     // Logged in path
     {
         path: '/user',
         element: <Sidebar />,
         children: [
+            {
+                path: '/',
+                element: <Navigate to="/user/dashboard" />,  // Redirect to /dashboard by default
+            }
             // {
             //     path: 'dashboard',
             //     element: <Dashboard />,

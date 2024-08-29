@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthStatus, EmailVerifyStatus, RegisterPayload } from '../auth';
+import { AuthStatus, EmailVerifyStatus } from '../auth';
 import FrontpageHeader from './frontpageheader';
 import CommonLink from './commonlink';
 import ICON from '../assets/hiddn_icon.svg';
-import { VerifyEmailPayload } from '../bindings';
+import { RegisterPayload, VerifyEmailPayload } from '../bindings';
 
-const apiURL: string = import.meta.env.VITE_API_URL;
+// const apiURL: string = import.meta.env.VITE_API_URL;
 
 const Register: React.FC = () => {
     const navigate = useNavigate();
@@ -30,7 +30,7 @@ const Register: React.FC = () => {
 
         const payload: VerifyEmailPayload = { email };
 
-        const result = await fetch(`${apiURL}/verify_email_register`, {
+        const result = await fetch(`api/verify_email`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -40,7 +40,7 @@ const Register: React.FC = () => {
             return response;
         });
 
-        if (result.type === 'Success') {
+        if (result.status === 200) {
             setVerifyStatus({ type: 'Sent' });
             // Start a countdown for 60 seconds
             for (let i = 60; i > 0; i--) {
@@ -49,7 +49,7 @@ const Register: React.FC = () => {
             }
             setVerifyStatus({ type: 'Idle' });
         } else {
-            setVerifyStatus({ type: 'Error', message: result.message });
+            setVerifyStatus({ type: 'Error', message: result.statusText });
         }
     };
 
@@ -64,6 +64,29 @@ const Register: React.FC = () => {
             return;
         }
 
+        // Verify password strength
+        // Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number.
+        // Check length first
+        if (password.length < 8) {
+            setAuthStatus({ type: 'Error', message: 'Password must be at least 8 characters long.' });
+            return;
+        }
+        // Check for uppercase letter
+        if (!/[A-Z]/.test(password)) {
+            setAuthStatus({ type: 'Error', message: 'Password must contain at least one uppercase letter.' });
+            return;
+        }
+        // Check for lowercase letter
+        if (!/[a-z]/.test(password)) {
+            setAuthStatus({ type: 'Error', message: 'Password must contain at least one lowercase letter.' });
+            return;
+        }
+        // Check for number
+        if (!/[0-9]/.test(password)) {
+            setAuthStatus({ type: 'Error', message: 'Password must contain at least one number.' });
+            return;
+        }
+
         setAuthStatus({ type: 'Loading' });
 
         const payload: RegisterPayload = {
@@ -74,13 +97,51 @@ const Register: React.FC = () => {
             invite_code: inviteCode,
         };
 
-        const result = await registerUser(payload);
+        const result = await fetch(`api/register_user`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        }).then((response) => {
+            return response;
+        });
 
-        if (result.type === 'Token') {
-            setAuthStatus({ type: 'Success' });
-            navigate('/dashboard');
-        } else {
-            setAuthStatus({ type: 'Error', message: result.message });
+        switch (result.status) {
+            case 200:
+                // Automatically log in user
+                const login_result = await fetch(`api/login_user`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                }).then((response) => {
+                    return response;
+                });
+                switch (login_result.status) {
+                    case 200:
+                        setAuthStatus({ type: 'Success' });
+                        navigate('/user/dashboard');
+                        break;
+                    default:
+                        setAuthStatus({ type: 'Error', message: 'Account registered. Automatic login failed. Try logging in yourself. Redirecting in 5 seconds...' });
+                        // wait for 5 seconds before redirecting to login page
+                        await new Promise(res => setTimeout(res, 5000));
+                        navigate('/login');
+                }                
+                break;
+            case 400:
+                setAuthStatus({ type: 'Error', message: 'Email already exists.' });
+                break;
+            case 403:
+                setAuthStatus({ type: 'Error', message: 'Incorrect email verification code.' });
+                break;
+            case 409:
+                setAuthStatus({ type: 'Error', message: 'Server failed to validate passwords. Try again.' });
+                break;
+            default:
+                setAuthStatus({ type: 'Error', message: 'An error occurred. (' + result.status + ')' });
         }
     };
 
@@ -125,7 +186,7 @@ const Register: React.FC = () => {
                         }}
                         disabled={verifyStatus.type !== 'Idle' && verifyStatus.type !== 'Error'}
                     >
-                        {verifyStatus.type === 'Idle' ? 'Send' : verifyStatus.type === 'Loading' ? '...' : verifyTimeout.toString()}
+                        {verifyStatus.type === 'Idle' ? 'Send' : verifyStatus.type === 'Error' ? 'Send' : verifyStatus.type === 'Loading' ? '...' : verifyTimeout.toString()}
                     </button>
                 </div>
                 <input

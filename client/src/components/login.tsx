@@ -7,7 +7,7 @@ import CommonLink from './commonlink';
 
 import ICON from '../assets/hiddn_icon.svg';
 
-const apiURL: string = import.meta.env.VITE_API_URL;
+// const apiURL: string = import.meta.env.VITE_API_URL;
 
 const Login: React.FC = () => {
     // const ICON = '../assets/hiddn_icon.svg'; // Update with your correct path to the icon
@@ -31,9 +31,16 @@ const Login: React.FC = () => {
             return;
         }
 
+        // Abort if connection is not secure. Bypass if running on development.
+        if (!import.meta.env.DEV && !window.location.protocol.includes('https')) {
+            setAuthStatus({ type: 'Error', message: 'Connection is not secure. Please use HTTPS.' });
+            return;
+        }
+        
+
         // Log into user, with API endpoint.
         try {
-            const result = await fetch(`${apiURL}/login_user`, {
+            const result = await fetch(`api/login_user`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -42,7 +49,6 @@ const Login: React.FC = () => {
             }).then((response) => {
                 return response;
             });
-            console.log(result);
             switch (result.status) {
                 case 200:
                     setAuthStatus({ type: 'Success' });
