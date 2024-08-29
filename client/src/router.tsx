@@ -1,10 +1,10 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import Login from './components/login';
+import Login from './pages/login';
 import Sidebar from './components/sidebar';
-import Register from './components/register';
-import Forgot from './components/forgot';
-import Dashboard from './components/dashboard';
-import Logout from './components/logout';
+import Register from './pages/register';
+import Forgot from './pages/forgot';
+import Dashboard from './pages/user/dashboard';
+import Logout from './pages/logout';
 // import Register from './components/register';
 // import Forgot from './components/forgot';
 

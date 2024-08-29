@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import FrontpageHeader from "./frontpageheader";
+import FrontpageHeader from "../components/frontpageheader";
 
 import ICON from '../assets/hiddn_icon.svg';
 import { LogoutStatus } from "../auth";

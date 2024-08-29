@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthStatus } from '../auth';
 import { LoginPayload } from '../bindings';
-import FrontpageHeader from './frontpageheader';
-import CommonLink from './commonlink';
+import FrontpageHeader from '../components/frontpageheader';
+import CommonLink from '../components/commonlink';
 
 import ICON from '../assets/hiddn_icon.svg';
 
