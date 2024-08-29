@@ -19,6 +19,15 @@ pub struct RegisterPayload {
 
 #[derive(Clone, Debug, Deserialize)]
 #[typeshare::typeshare]
+pub struct ForgotPasswordPayload {
+    pub email: String,
+    pub email_verification_code: String,
+    pub password: String,
+    pub confirm_password: String,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[typeshare::typeshare]
 pub struct VerifyEmailPayload {
     pub email: String,
 }
