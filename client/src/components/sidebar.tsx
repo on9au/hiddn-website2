@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 
 import ICON from '../assets/hiddn_icon.svg';
+import { BookIcon, CreditCardIcon, GearIcon, HomeIcon, PersonIcon, QuestionIcon, SignOutIcon } from '@primer/octicons-react';
 
 // NavBarHeader Component
 interface NavBarHeaderProps {
@@ -22,19 +23,21 @@ const NavBarHeader: React.FC<NavBarHeaderProps> = ({ icon, title }) => {
 interface SidebarLinkProps {
     label: string;
     to: string;
+    icon: React.ReactNode;
 }
 
-const SidebarLink: React.FC<SidebarLinkProps> = ({ label, to }) => {
+const SidebarLink: React.FC<SidebarLinkProps> = ({ label, to, icon }) => {
     return (
         <NavLink
             to={to}
             className={({ isActive }) =>
                 isActive
-                    ? 'p-3 mb-3 rounded-xl bg-hiddn-500 text-white select-none'
-                    : 'p-3 mb-3 rounded-xl hover:bg-gray-200 select-none'
+                    ? 'p-3 mb-3 rounded-xl bg-hiddn-500 text-white select-none flex items-center'
+                    : 'p-3 mb-3 rounded-xl hover:bg-gray-200 select-none flex items-center'
             }
         >
-            {label}
+            <span className='items-center ml-3'>{icon}</span>
+            <span className="ml-6 text-base">{label}</span>
         </NavLink>
     );
 };
@@ -46,20 +49,15 @@ const Sidebar: React.FC = () => {
                 <NavBarHeader icon={ICON} title="HiddN" />
                 <div className="flex flex-col justify-between h-full">
                     <div className="flex flex-col">
-                        <SidebarLink to="/user/dashboard" label="Dashboard" />
-                        <SidebarLink to="/user/documentation" label="Documentation" />
-                        <SidebarLink to="/user/plan" label="Plan" />
-                        <SidebarLink to="/user/transaction" label="Transactions" />
-                        <SidebarLink to="/user/support" label="Support" />
-                        <SidebarLink to="/user/profile" label="Profile" />
+                        <SidebarLink to="/user/dashboard" label="Dashboard" icon={<HomeIcon size={24} />} />
+                        <SidebarLink to="/user/documentation" label="Documentation" icon={<BookIcon size={24} />} />
+                        <SidebarLink to="/user/plan" label="Plan" icon={<GearIcon size={24} />} />
+                        <SidebarLink to="/user/transaction" label="Transactions" icon={<CreditCardIcon size={24} />} />
+                        <SidebarLink to="/user/support" label="Support" icon={<QuestionIcon size={24} />} />
+                        <SidebarLink to="/user/profile" label="Profile" icon={<PersonIcon size={24} />} />
                     </div>
                     <div className="flex flex-col">
-                        <NavLink
-                            to="/logout"
-                            className="p-3 select-none rounded-xl hover:bg-gray-200"
-                        >
-                            Logout
-                        </NavLink>
+                    <SidebarLink to="/logout" label="Logout" icon={<SignOutIcon size={24} />} />
                     </div>
                 </div>
             </div>
