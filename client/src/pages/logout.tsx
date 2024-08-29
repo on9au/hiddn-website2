@@ -10,6 +10,18 @@ const Logout: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        // Is user logged in? If not, redirect to login.
+        fetch(`api/is_logged_in`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).then((response) => {
+            if (response.status !== 200) {
+                navigate('/login');
+            }
+        });
+
         // Log out user, with API endpoint.
         setLogoutStatus({ type: 'LoggingOut' });
         fetch(`api/logout_user`, {
