@@ -44,21 +44,19 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ label, to, icon }) => {
 
 const Sidebar: React.FC = React.memo(() => {
     return (
-        <div className="flex w-screen h-screen">
-            <div className="flex flex-col h-full px-5 py-4 text-black bg-gray-100 min-w-72">
-                <NavBarHeader icon={ICON} title="HiddN" />
-                <div className="flex flex-col justify-between h-full">
-                    <div className="flex flex-col">
-                        <SidebarLink to="/user/dashboard" label="Dashboard" icon={<HomeIcon size={24} />} />
-                        <SidebarLink to="/user/documentation" label="Documentation" icon={<BookIcon size={24} />} />
-                        <SidebarLink to="/user/plan" label="Plan" icon={<GearIcon size={24} />} />
-                        <SidebarLink to="/user/transaction" label="Transactions" icon={<CreditCardIcon size={24} />} />
-                        <SidebarLink to="/user/support" label="Support" icon={<QuestionIcon size={24} />} />
-                        <SidebarLink to="/user/profile" label="Profile" icon={<PersonIcon size={24} />} />
-                    </div>
-                    <div className="flex flex-col">
+        <div className="flex flex-col h-full px-5 py-4 text-black bg-gray-100 min-w-72">
+            <NavBarHeader icon={ICON} title="HiddN" />
+            <div className="flex flex-col justify-between h-full">
+                <div className="flex flex-col">
+                    <SidebarLink to="/user/dashboard" label="Dashboard" icon={<HomeIcon size={24} />} />
+                    <SidebarLink to="/user/documentation" label="Documentation" icon={<BookIcon size={24} />} />
+                    <SidebarLink to="/user/plan" label="Plan" icon={<GearIcon size={24} />} />
+                    <SidebarLink to="/user/transaction" label="Transactions" icon={<CreditCardIcon size={24} />} />
+                    <SidebarLink to="/user/support" label="Support" icon={<QuestionIcon size={24} />} />
+                    <SidebarLink to="/user/profile" label="Profile" icon={<PersonIcon size={24} />} />
+                </div>
+                <div className="flex flex-col">
                     <SidebarLink to="/logout" label="Logout" icon={<SignOutIcon size={24} />} />
-                    </div>
                 </div>
             </div>
         </div>
