@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 import ICON from '../assets/hiddn_icon.svg';
 import { BookIcon, CreditCardIcon, GearIcon, HomeIcon, PersonIcon, QuestionIcon, SignOutIcon } from '@primer/octicons-react';
@@ -42,7 +42,7 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ label, to, icon }) => {
     );
 };
 
-const Sidebar: React.FC = () => {
+const Sidebar: React.FC = React.memo(() => {
     return (
         <div className="flex w-screen h-screen">
             <div className="flex flex-col h-full px-5 py-4 text-black bg-gray-100 min-w-72">
@@ -61,11 +61,8 @@ const Sidebar: React.FC = () => {
                     </div>
                 </div>
             </div>
-            <div className="w-full h-full">
-                <Outlet />
-            </div>
         </div>
     );
-};
+});
 
 export default Sidebar;
