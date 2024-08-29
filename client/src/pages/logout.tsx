@@ -3,9 +3,11 @@ import FrontpageHeader from "../components/frontpageheader";
 
 import ICON from '../assets/hiddn_icon.svg';
 import { LogoutStatus } from "../auth";
+import { useNavigate } from "react-router-dom";
 
 const Logout: React.FC = () => {
     const [logoutStatus, setLogoutStatus] = React.useState<LogoutStatus>({ type: 'Idle' });
+    const navigate = useNavigate();
 
     useEffect(() => {
         // Log out user, with API endpoint.
@@ -18,7 +20,7 @@ const Logout: React.FC = () => {
         }).then((response) => {
             if (response.status === 200) {
                 setLogoutStatus({ type: 'Success' });
-                setTimeout(() => window.location.href = '/login', 1000);
+                setTimeout(() => navigate('/login'), 1000);
             } else {
                 setLogoutStatus({ type: 'Error', message: response.statusText });
             }
