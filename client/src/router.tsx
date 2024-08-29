@@ -3,6 +3,8 @@ import Login from './components/login';
 import Sidebar from './components/sidebar';
 import Register from './components/register';
 import Forgot from './components/forgot';
+import Dashboard from './components/dashboard';
+import Logout from './components/logout';
 // import Register from './components/register';
 // import Forgot from './components/forgot';
 
@@ -53,6 +55,10 @@ const router = createBrowserRouter([
         element: <Login />
     },
     {
+        path: '/logout',
+        element: <Logout />
+    },
+    {
         path: '/register',
         element: <Register />
     },
@@ -69,11 +75,11 @@ const router = createBrowserRouter([
             {
                 path: '',
                 element: <Navigate to="/user/dashboard" />,  // Redirect to /dashboard by default
-            }
-            // {
-            //     path: 'dashboard',
-            //     element: <Dashboard />,
-            // },
+            },
+            {
+                path: 'dashboard',
+                element: <Dashboard />,
+            },
             // {
             //     path: 'documentation',
             //     element: <Documentation />,

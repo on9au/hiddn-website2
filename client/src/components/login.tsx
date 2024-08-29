@@ -52,7 +52,7 @@ const Login: React.FC = () => {
             switch (result.status) {
                 case 200:
                     setAuthStatus({ type: 'Success' });
-                    navigate('/dashboard');
+                    navigate('/user/dashboard');
                     break;
                 case 401:
                     setAuthStatus({ type: 'Error', message: 'Incorrect email/password.' });
