@@ -67,7 +67,7 @@ const router = createBrowserRouter([
         element: <Sidebar />,
         children: [
             {
-                path: '/',
+                path: '',
                 element: <Navigate to="/user/dashboard" />,  // Redirect to /dashboard by default
             }
             // {
