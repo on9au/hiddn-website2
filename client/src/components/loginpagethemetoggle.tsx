@@ -9,7 +9,7 @@ const LoginPageThemeToggle: React.FC<DarkmodeLoginProps> = ({ toggleDarkmode, da
     return (
         // Circular button with a sun or moon icon
         <button
-            className="fixed p-3 bg-white rounded-full shadow-lg bottom-8 right-8 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
+            className="fixed p-3 bg-white rounded-full shadow-lg bottom-8 right-8 dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
             onClick={toggleDarkmode}
         >
             <span className='items-center'>{darkModeState === 'light' ? <SunIcon size={24} /> : <MoonIcon size={24} />}</span>

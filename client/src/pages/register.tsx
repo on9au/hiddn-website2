@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { AuthStatus, EmailVerifyStatus } from '../auth';
 import CommonLink from '../components/commonlink';
 import { RegisterPayload, VerifyEmailPayload } from '../bindings';
+import Loginbutton from '../components/loginbutton';
+import TextInput from '../components/logintextinput';
+import VerificationInput from '../components/loginpageverificationinput';
 
 // const apiURL: string = import.meta.env.VITE_API_URL;
 
@@ -159,14 +162,14 @@ const Register: React.FC = () => {
             <h1 className="mb-4 text-4xl">Register</h1>
 
             <div className="flex flex-col items-center justify-center w-full max-w-96">
-                <input
-                    className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-600 hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
+                <TextInput
                     type="email"
                     placeholder="Email"
                     value={email}
+                    is_last_position={false}
                     onChange={(e) => setEmail(e.target.value)}
                 />
-                <div className="relative w-full">
+                {/* <div className="relative w-full">
                     <input
                         className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-600 hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
                         type="text"
@@ -186,36 +189,38 @@ const Register: React.FC = () => {
                     >
                         {verifyStatus.type === 'Idle' ? 'Send' : verifyStatus.type === 'Error' ? 'Send' : verifyStatus.type === 'Loading' ? '...' : verifyTimeout.toString()}
                     </button>
-                </div>
-                <input
-                    className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-600 hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
+                </div> */}
+                <VerificationInput
+                    value={emailVerificationCode}
+                    onChange={(e) => setEmailVerificationCode(e.target.value)}
+                    onSendCode={handleSendCode}
+                    verifyStatus={verifyStatus}
+                    verifyTimeout={verifyTimeout}
+                />
+                <TextInput
                     type="password"
                     placeholder="Password"
                     value={password}
+                    is_last_position={false}
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                <input
-                    className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-600 hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
+                <TextInput
                     type="password"
                     placeholder="Confirm Password"
                     value={confirmPassword}
+                    is_last_position={false}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     onKeyDown={handleKeyDownRegister}
                 />
-                <input
-                    className="w-full px-4 py-2 mb-4 border border-gray-300 outline-none dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-600 hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
+                <TextInput
                     type="text"
                     placeholder="Invite Code (Optional)"
                     value={inviteCode}
+                    is_last_position={true}
                     onChange={(e) => setInviteCode(e.target.value)}
                     onKeyDown={handleKeyDownRegister}
                 />
-                <button
-                    className="w-full px-4 py-2 mb-4 text-white bg-hiddn-500 hover:bg-hiddn-400 dark:hover:bg-hiddn-600 rounded-xl"
-                    onClick={handleRegister}
-                >
-                    {authStatus.type === 'Loading' ? 'Registering account...' : 'Register'}
-                </button>
+                <Loginbutton content={authStatus.type === 'Loading' ? 'Registering account...' : 'Register'} handleLogin={handleRegister} />
                 {authStatus.type === 'Error' && (
                     <div className="mb-4 text-red-500">
                         {authStatus.message}

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { AuthStatus } from '../auth';
 import { LoginPayload } from '../bindings';
 import CommonLink from '../components/commonlink';
+import Loginbutton from '../components/loginbutton';
+import TextInput from '../components/logintextinput';
 
 // const apiURL: string = import.meta.env.VITE_API_URL;
 
@@ -76,27 +78,22 @@ const Login: React.FC = () => {
             <h1 className="mb-4 text-4xl">Login</h1>
 
             <div className="flex flex-col items-center justify-center w-full max-w-96">
-                <input
-                    className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-600 hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
+                <TextInput
                     type="email"
                     placeholder="Email"
                     value={email}
+                    is_last_position={false}
                     onChange={(e) => setEmail(e.target.value)}
                 />
-                <input
-                    className="w-full px-4 py-2 mb-4 border border-gray-300 outline-none dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-600 hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
+                <TextInput
                     type="password"
                     placeholder="Password"
                     value={password}
+                    is_last_position={true}
                     onChange={(e) => setPassword(e.target.value)}
                     onKeyDown={handleKeyDownLogin}
                 />
-                <button
-                    className="w-full px-4 py-2 mb-4 text-white bg-hiddn-500 hover:bg-hiddn-400 dark:hover:bg-hiddn-600 rounded-xl"
-                    onClick={handleLogin}
-                >
-                    {authStatus.type === 'Loading' ? 'Logging in...' : 'Login'}
-                </button>
+                <Loginbutton content={authStatus.type === 'Loading' ? 'Logging in...' : 'Login'} handleLogin={handleLogin} />
                 {authStatus.type === 'Error' && (
                     <div className="mb-4 text-red-500">
                         {authStatus.type === 'Error' && authStatus.message}

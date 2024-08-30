@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { AuthStatus, EmailVerifyStatus } from '../auth';
 import CommonLink from '../components/commonlink';
 import { ForgotPasswordPayload, VerifyEmailPayload } from '../bindings';
+import Loginbutton from '../components/loginbutton';
+import TextInput from '../components/logintextinput';
+import VerificationInput from '../components/loginpageverificationinput';
 
 // const apiURL: string = import.meta.env.VITE_API_URL;
 
@@ -155,55 +158,36 @@ const Forgot: React.FC = () => {
             <h1 className="mb-4 text-4xl">Reset Password</h1>
 
             <div className="flex flex-col items-center justify-center w-full max-w-96">
-                <input
-                    className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-600 hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
+                <TextInput
                     type="email"
                     placeholder="Email"
                     value={email}
+                    is_last_position={false}
                     onChange={(e) => setEmail(e.target.value)}
                 />
-                <div className="relative w-full">
-                    <input
-                        className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-600 hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
-                        type="text"
-                        placeholder="Verification Code"
-                        maxLength={20}
-                        value={emailVerificationCode}
-                        onChange={(e) => setEmailVerificationCode(e.target.value)}
-                    />
-                    <button
-                        className={`absolute right-0 w-20 px-4 py-2 text-white border rounded-xl ${verifyStatus.type === 'Idle' || verifyStatus.type === 'Error' ? 'bg-hiddn-500 hover:bg-hiddn-400 border-hiddn-500 hover:border-hiddn-400' : 'bg-gray-400 border-gray-400 cursor-not-allowed'}`}
-                        onClick={async () => {
-                            if (verifyStatus.type === 'Idle' || verifyStatus.type === 'Error') {
-                                await handleSendCode();
-                            }
-                        }}
-                        disabled={verifyStatus.type !== 'Idle' && verifyStatus.type !== 'Error'}
-                    >
-                        {verifyStatus.type === 'Idle' ? 'Send' : verifyStatus.type === 'Error' ? 'Send' : verifyStatus.type === 'Loading' ? '...' : verifyTimeout.toString()}
-                    </button>
-                </div>
-                <input
-                    className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-600 hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
+                <VerificationInput
+                    value={emailVerificationCode}
+                    onChange={(e) => setEmailVerificationCode(e.target.value)}
+                    onSendCode={handleSendCode}
+                    verifyStatus={verifyStatus}
+                    verifyTimeout={verifyTimeout}
+                />
+                <TextInput
                     type="password"
                     placeholder="Password"
                     value={password}
+                    is_last_position={false}
                     onChange={(e) => setPassword(e.target.value)}
                 />
-                <input
-                    className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-600 hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
+                <TextInput
                     type="password"
                     placeholder="Confirm Password"
                     value={confirmPassword}
+                    is_last_position={true}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     onKeyDown={handleKeyDownRegister}
                 />
-                <button
-                    className="w-full px-4 py-2 mb-4 text-white bg-hiddn-500 hover:bg-hiddn-400 dark:hover:bg-hiddn-600 rounded-xl"
-                    onClick={handleRegister}
-                >
-                    {authStatus.type === 'Loading' ? 'Resetting account...' : 'Reset Password'}
-                </button>
+                <Loginbutton content={authStatus.type === 'Loading' ? 'Resetting account...' : 'Reset Password'} handleLogin={handleRegister} />
                 {authStatus.type === 'Error' && (
                     <div className="mb-4 text-red-500">
                         {authStatus.message}
