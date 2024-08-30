@@ -153,14 +153,14 @@ const Forgot: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col items-center min-h-screen px-5 py-32 bg-gray-100">
+        <div className="flex flex-col items-center min-h-screen px-5 py-32 bg-gray-100 dark:bg-gray-900 dark:text-white">
             <FrontpageHeader icon={ICON} title="HiddN" />
 
             <h1 className="mb-4 text-4xl">Reset Password</h1>
 
             <div className="flex flex-col items-center justify-center w-full max-w-96">
                 <input
-                    className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
+                    className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-600 hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
                     type="email"
                     placeholder="Email"
                     value={email}
@@ -168,7 +168,7 @@ const Forgot: React.FC = () => {
                 />
                 <div className="relative w-full">
                     <input
-                        className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
+                        className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-600 hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
                         type="text"
                         placeholder="Verification Code"
                         maxLength={20}
@@ -188,14 +188,14 @@ const Forgot: React.FC = () => {
                     </button>
                 </div>
                 <input
-                    className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
+                    className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-600 hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
                     type="password"
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
                 <input
-                    className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
+                    className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-600 hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
                     type="password"
                     placeholder="Confirm Password"
                     value={confirmPassword}
@@ -203,7 +203,7 @@ const Forgot: React.FC = () => {
                     onKeyDown={handleKeyDownRegister}
                 />
                 <button
-                    className="w-full px-4 py-2 mb-4 text-white bg-hiddn-500 hover:bg-hiddn-400 rounded-xl"
+                    className="w-full px-4 py-2 mb-4 text-white bg-hiddn-500 hover:bg-hiddn-400 dark:hover:bg-hiddn-600 rounded-xl"
                     onClick={handleRegister}
                 >
                     {authStatus.type === 'Loading' ? 'Resetting account...' : 'Reset Password'}

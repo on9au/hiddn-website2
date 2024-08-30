@@ -82,14 +82,14 @@ const Login: React.FC = () => {
 
             <div className="flex flex-col items-center justify-center w-full max-w-96">
                 <input
-                    className="w-full px-4 py-2 mb-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-700 outline-none hover:border-hiddn-200  focus:border-hiddn-500 rounded-xl"
+                    className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-600 hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
                     type="email"
                     placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
                 <input
-                    className="w-full px-4 py-2 mb-4 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-700 outline-none hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
+                    className="w-full px-4 py-2 mb-4 border border-gray-300 outline-none dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-600 hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
                     type="password"
                     placeholder="Password"
                     value={password}
@@ -97,7 +97,7 @@ const Login: React.FC = () => {
                     onKeyDown={handleKeyDownLogin}
                 />
                 <button
-                    className="w-full px-4 py-2 mb-4 text-white bg-hiddn-500 hover:bg-hiddn-400 rounded-xl"
+                    className="w-full px-4 py-2 mb-4 text-white bg-hiddn-500 hover:bg-hiddn-400 dark:hover:bg-hiddn-600 rounded-xl"
                     onClick={handleLogin}
                 >
                     {authStatus.type === 'Loading' ? 'Logging in...' : 'Login'}

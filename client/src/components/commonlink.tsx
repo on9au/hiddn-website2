@@ -10,7 +10,7 @@ const CommonLink: React.FC<LinkProps> = ({ to, text }) => {
     return (
         <Link
             to={to}
-            className="text-hiddn-500 hover:text-hiddn-400"
+            className="text-hiddn-500 hover:text-hiddn-400 dark:hover:text-hiddn-600"
         >
             {text}
         </Link>
