@@ -71,7 +71,7 @@ const DarkmodeSidebarLink: React.FC<DarkmodeSidebarProps> = ({ toggleDarkmode, d
 }
 
 const Sidebar: React.FC = React.memo(() => {
-    const [isSidebarOpen, setIsSidebarOpen] = React.useState(window.innerWidth >= 768);
+    const [isSidebarOpen, setIsSidebarOpen] = React.useState(window.innerWidth >= 1024);
     const [theme, setTheme] = React.useState('light' as Theme);
 
     const changeTheme = () => {
@@ -101,7 +101,7 @@ const Sidebar: React.FC = React.memo(() => {
 
     React.useEffect(() => {
         const handleResize = () => {
-            if (window.innerWidth >= 768) {
+            if (window.innerWidth >= 1024) {
                 setIsSidebarOpen(true);
             } else {
                 setIsSidebarOpen(false);
@@ -117,7 +117,7 @@ const Sidebar: React.FC = React.memo(() => {
 
     return (
         <>
-            <button className="fixed block p-6 text-base text-white rounded-full bg-hiddn-500 md:hidden bottom-8 right-8" onClick={toggleSidebar}>
+            <button className="fixed block p-6 text-base text-white rounded-full shadow-lg bg-hiddn-500 lg:hidden bottom-8 right-8" onClick={toggleSidebar}>
                 {isSidebarOpen ? <XIcon size={24} /> : <ThreeBarsIcon size={24} />}
             </button>
             {isSidebarOpen && (
