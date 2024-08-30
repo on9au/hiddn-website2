@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 
 import ICON from '../assets/favicon.svg';
-import { BookIcon, CreditCardIcon, GearIcon, HomeIcon, MoonIcon, PersonIcon, QuestionIcon, SignOutIcon, SunIcon, ThreeBarsIcon, XIcon } from '@primer/octicons-react';
+import { BookIcon, CreditCardIcon, GearIcon, HomeIcon, InboxIcon, MoonIcon, PersonIcon, SignOutIcon, SunIcon, ThreeBarsIcon, XIcon } from '@primer/octicons-react';
 
 // NavBarHeader Component
 interface NavBarHeaderProps {
@@ -45,7 +45,7 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ label, to, icon, sidebarToggl
             onClick={handleClick}
         >
             <span className='items-center ml-3'>{icon}</span>
-            <span className="ml-6 pl-px text-base">{label}</span>
+            <span className="pl-px ml-6 text-base">{label}</span>
         </NavLink>
     );
 };
@@ -58,11 +58,11 @@ interface DarkmodeSidebarProps {
 const DarkmodeSidebarLink: React.FC<DarkmodeSidebarProps> = ({ isDarkmode, toggleDarkmode }) => {
     return (
         <button
-            className="p-3 mb-3 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 select-none flex items-center"
+            className="flex items-center p-3 mb-3 select-none rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800"
             onClick={toggleDarkmode}
         >
             <span className='items-center ml-3'>{isDarkmode ? <SunIcon size={24} /> : <MoonIcon size={24} />}</span>
-            <span className="ml-6 pl-px text-base">{isDarkmode ? "Light Mode" : "Dark Mode"}</span>
+            <span className="pl-px ml-6 text-base">{isDarkmode ? "Light Mode" : "Dark Mode"}</span>
         </button>
     );
 }
@@ -92,7 +92,7 @@ const Sidebar: React.FC = React.memo(() => {
 
     return (
         <>
-            <button className="fixed block p-6 bg-hiddn-500 rounded-full md:hidden bottom-8 right-8 text-white text-base" onClick={toggleSidebar}>
+            <button className="fixed block p-6 text-base text-white rounded-full bg-hiddn-500 md:hidden bottom-8 right-8" onClick={toggleSidebar}>
                 {isSidebarOpen ? <XIcon size={24} /> : <ThreeBarsIcon size={24} />}
             </button>
             {isSidebarOpen && (
@@ -104,7 +104,7 @@ const Sidebar: React.FC = React.memo(() => {
                             <SidebarLink to="/user/documentation" label="Documentation" icon={<BookIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
                             <SidebarLink to="/user/plan" label="Plan" icon={<GearIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
                             <SidebarLink to="/user/transaction" label="Transactions" icon={<CreditCardIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
-                            <SidebarLink to="/user/support" label="Support" icon={<QuestionIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
+                            <SidebarLink to="/user/support" label="Support" icon={<InboxIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
                             <SidebarLink to="/user/profile" label="Profile" icon={<PersonIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
                         </div>
                         <div className="flex flex-col">
