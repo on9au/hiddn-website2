@@ -25,7 +25,7 @@ const Logout: React.FC = () => {
                 setLogoutStatus({ type: 'Error', message: response.statusText });
             }
         });
-    }, []);
+    }, [navigate]);
 
 
     return (
