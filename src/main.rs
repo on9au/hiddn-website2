@@ -52,6 +52,7 @@ async fn root() -> &'static str {
 /// This handler will return OK if the user is authenticated, and UNAUTHORIZED if the user is not.
 /// The server will use axum_login to keep the user authenticated.
 async fn is_logged_in(auth_session: AuthSession) -> impl IntoResponse {
+    println!("{:?}", auth_session.user);
     match auth_session.user {
         Some(_) => StatusCode::OK.into_response(),
         None => StatusCode::UNAUTHORIZED.into_response(),
