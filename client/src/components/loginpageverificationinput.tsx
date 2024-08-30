@@ -28,7 +28,7 @@ const VerificationInput: React.FC<VerificationInputProps> = ({
                 maxLength={20}
             />
             <button
-                className={`absolute right-0 w-20 px-4 py-2 text-white border rounded-xl ${verifyStatus.type === 'Idle' || verifyStatus.type === 'Error' ? 'bg-hiddn-500 hover:bg-hiddn-400 border-hiddn-500 hover:border-hiddn-400' : 'bg-gray-400 border-gray-400 cursor-not-allowed'}`}
+                className={`absolute right-0 w-20 px-4 py-2 text-white border rounded-xl ${verifyStatus.type === 'Idle' || verifyStatus.type === 'Error' ? 'bg-hiddn-500 hover:bg-hiddn-400 dark:hover:bg-hiddn-600 border-hiddn-500 hover:border-hiddn-400 dark:hover:border-hiddn-600' : 'bg-gray-400 border-gray-400 cursor-not-allowed'}`}
                 onClick={async () => {
                     if (verifyStatus.type === 'Idle' || verifyStatus.type === 'Error') {
                         await onSendCode();
