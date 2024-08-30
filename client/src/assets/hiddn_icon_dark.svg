@@ -12,16 +12,10 @@
 
       .cls-2 {
         fill: none;
-      }  
-
-      .cls-3 {
-        fill: #222424;
       }
 
-      @media (prefers-color-scheme: dark) {
-        .cls-3 {
-          fill: #fff !important;
-        }
+      .cls-3 {
+        fill: #fff;
       }
     </style>
   </defs>
