@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthStatus, EmailVerifyStatus } from '../auth';
-import FrontpageHeader from '../components/frontpageheader';
 import CommonLink from '../components/commonlink';
-import ICON from '../assets/favicon.svg';
 import { ForgotPasswordPayload, VerifyEmailPayload } from '../bindings';
 
 // const apiURL: string = import.meta.env.VITE_API_URL;
@@ -153,9 +151,7 @@ const Forgot: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col items-center min-h-screen px-5 py-32 bg-gray-100 dark:bg-gray-900 dark:text-white">
-            <FrontpageHeader icon={ICON} title="HiddN" />
-
+        <>
             <h1 className="mb-4 text-4xl">Reset Password</h1>
 
             <div className="flex flex-col items-center justify-center w-full max-w-96">
@@ -227,7 +223,7 @@ const Forgot: React.FC = () => {
                     <CommonLink to="/login" text="Back to Login" />
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 

@@ -12,28 +12,31 @@ import Transaction from './pages/user/transaction';
 import Support from './pages/user/support';
 import TransactionID from './pages/user/transactionid';
 import Profile from './pages/user/profile';
+import LoginPageLayout from './components/loginpagelayout';
 
 const router = createBrowserRouter([
     // Root, not logged in path
     {
         path: '/',
-        element: <Navigate to="/login" />,  // Redirect to /login by default
-    },
-    {
-        path: '/login',
-        element: <Login />
-    },
-    {
-        path: '/logout',
-        element: <Logout />
-    },
-    {
-        path: '/register',
-        element: <Register />
-    },
-    {
-        path: '/forgot',
-        element: <Forgot /> 
+        element: <LoginPageLayout/>,
+        children: [
+            {
+                path: '/login',
+                element: <Login />
+            },
+            {
+                path: '/logout',
+                element: <Logout />
+            },
+            {
+                path: '/register',
+                element: <Register />
+            },
+            {
+                path: '/forgot',
+                element: <Forgot /> 
+            },
+        ]
     },
 
     // Logged in path

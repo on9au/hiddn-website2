@@ -1,8 +1,11 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
-import ICON from '../assets/favicon.svg';
 import { BookIcon, CreditCardIcon, GearIcon, HomeIcon, InboxIcon, MoonIcon, PersonIcon, SignOutIcon, SunIcon, ThreeBarsIcon, XIcon } from '@primer/octicons-react';
+import { Theme } from '../darkmode';
+
+import ICON_LIGHT from '../assets/hiddn_icon.svg';
+import ICON_DARK from '../assets/hiddn_icon_dark.svg';
 
 // NavBarHeader Component
 interface NavBarHeaderProps {
@@ -51,24 +54,46 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ label, to, icon, sidebarToggl
 };
 
 interface DarkmodeSidebarProps {
-    isDarkmode: boolean;
     toggleDarkmode: () => void;
+    darkModeState: 'light' | 'dark';
 }
 
-const DarkmodeSidebarLink: React.FC<DarkmodeSidebarProps> = ({ isDarkmode, toggleDarkmode }) => {
+const DarkmodeSidebarLink: React.FC<DarkmodeSidebarProps> = ({ toggleDarkmode, darkModeState }) => {
     return (
         <button
             className="flex items-center p-3 mb-3 select-none rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800"
             onClick={toggleDarkmode}
         >
-            <span className='items-center ml-3'>{isDarkmode ? <SunIcon size={24} /> : <MoonIcon size={24} />}</span>
-            <span className="pl-px ml-6 text-base">{isDarkmode ? "Light Mode" : "Dark Mode"}</span>
+            <span className='items-center ml-3'>{darkModeState === 'light' ? <SunIcon size={24} /> : <MoonIcon size={24} />}</span>
+            <span className="pl-px ml-6 text-base">{darkModeState === 'light' ? 'Light Mode' : 'Dark Mode'}</span>
         </button>
     );
 }
 
 const Sidebar: React.FC = React.memo(() => {
     const [isSidebarOpen, setIsSidebarOpen] = React.useState(window.innerWidth >= 768);
+    const [theme, setTheme] = React.useState('light' as Theme);
+
+    const changeTheme = () => {
+        const newTheme = theme === 'light' ? 'dark' : 'light';
+        setTheme(newTheme);
+        localStorage.setItem('theme', newTheme);
+    }
+
+    React.useEffect(() => {
+        const savedTheme = localStorage.getItem('theme') as Theme;
+        if (savedTheme) {
+            setTheme(savedTheme);
+        }
+    }, []);
+
+    React.useEffect(() => {
+        if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }, [theme]);
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
@@ -97,7 +122,7 @@ const Sidebar: React.FC = React.memo(() => {
             </button>
             {isSidebarOpen && (
                 <div className="flex flex-col h-full px-5 py-4 text-black bg-gray-100 dark:bg-gray-900 dark:text-white min-w-72">
-                    <NavBarHeader icon={ICON} title="HiddN" />
+                    <NavBarHeader icon={theme === 'light' ? ICON_LIGHT : ICON_DARK} title="HiddN" />
                     <div className="flex flex-col justify-between h-full">
                         <div className="flex flex-col">
                             <SidebarLink to="/user/dashboard" label="Dashboard" icon={<HomeIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
@@ -108,7 +133,7 @@ const Sidebar: React.FC = React.memo(() => {
                             <SidebarLink to="/user/profile" label="Profile" icon={<PersonIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
                         </div>
                         <div className="flex flex-col">
-                            <DarkmodeSidebarLink isDarkmode={false} toggleDarkmode={() => { }} />
+                            <DarkmodeSidebarLink toggleDarkmode={changeTheme} darkModeState={theme} />
                             <SidebarLink to="/logout" label="Logout" icon={<SignOutIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
                         </div>
                     </div>

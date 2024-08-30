@@ -2,10 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthStatus } from '../auth';
 import { LoginPayload } from '../bindings';
-import FrontpageHeader from '../components/frontpageheader';
 import CommonLink from '../components/commonlink';
-
-import ICON from '../assets/favicon.svg';
 
 // const apiURL: string = import.meta.env.VITE_API_URL;
 
@@ -75,9 +72,7 @@ const Login: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col items-center min-h-screen px-5 py-32 bg-gray-100 dark:bg-gray-900 dark:text-white">
-            <FrontpageHeader icon={ICON} title="HiddN" />
-
+        <>
             <h1 className="mb-4 text-4xl">Login</h1>
 
             <div className="flex flex-col items-center justify-center w-full max-w-96">
@@ -117,7 +112,7 @@ const Login: React.FC = () => {
                     <CommonLink to="/forgot" text="Forgot password" />
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 
