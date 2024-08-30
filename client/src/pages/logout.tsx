@@ -17,6 +17,7 @@ const Logout: React.FC = () => {
         }).then((response) => {
             if (response.status === 200) {
                 setLogoutStatus({ type: 'Success' });
+                localStorage.removeItem('isAuthenticated');
                 navigate('/login')
             } else {
                 setLogoutStatus({ type: 'Error', message: response.statusText });
