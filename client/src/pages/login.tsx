@@ -31,10 +31,10 @@ const Login: React.FC = () => {
         }
 
         // Abort if connection is not secure. Bypass if running on development.
-        if (!import.meta.env.DEV && !window.location.protocol.includes('https')) {
-            setAuthStatus({ type: 'Error', message: 'Connection is not secure. Please use HTTPS.' });
-            return;
-        }
+        // if (!import.meta.env.DEV && !window.location.protocol.includes('https')) {
+        //     setAuthStatus({ type: 'Error', message: 'Connection is not secure. Please use HTTPS.' });
+        //     return;
+        // }
 
 
         // Log into user, with API endpoint.

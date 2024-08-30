@@ -21,18 +21,23 @@ const LoginPageLayout: React.FC = () => {
     }
 
     React.useEffect(() => {
-        const savedTheme = localStorage.getItem('theme') as Theme;
-        if (savedTheme) {
-            setTheme(savedTheme);
+        if (typeof window !== 'undefined') {
+            const savedTheme = localStorage.getItem('theme') as Theme;
+            if (savedTheme) {
+                setTheme(savedTheme);
+            }
         }
     }, []);
 
     React.useEffect(() => {
-        if (theme === 'dark') {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
+        if (typeof window !== 'undefined') {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
         }
+
     }, [theme]);
 
     React.useEffect(() => {
@@ -45,18 +50,18 @@ const LoginPageLayout: React.FC = () => {
 
     // If user is authenticated, show the dashboard page
     if (isAuthenticated) {
-        console.log('User is authenticated');
-        // Ignore if page is '/logout'
-        if (window.location.pathname !== '/logout') {
-            navigate('/user/dashboard');
+        if (typeof window !== 'undefined') {
+            if (window.location.pathname !== '/logout') {
+                navigate('/user/dashboard');
+            }
         }
     }
-    
+
     return (
         <div className="flex flex-col items-center min-h-screen px-5 py-32 bg-gray-100 dark:bg-gray-900 dark:text-white">
             <LoginPageThemeToggle toggleDarkmode={changeTheme} darkModeState={theme} />
             <FrontpageHeader icon={theme === 'light' ? ICON_LIGHT : ICON_DARK} title="HiddN" />
-            
+
             <Outlet />
         </div>
     );
