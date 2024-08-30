@@ -5,7 +5,7 @@ import { LoginPayload } from '../bindings';
 import FrontpageHeader from '../components/frontpageheader';
 import CommonLink from '../components/commonlink';
 
-import ICON from '../assets/hiddn_icon.svg';
+import ICON from '../assets/favicon.svg';
 
 // const apiURL: string = import.meta.env.VITE_API_URL;
 
@@ -36,7 +36,7 @@ const Login: React.FC = () => {
             setAuthStatus({ type: 'Error', message: 'Connection is not secure. Please use HTTPS.' });
             return;
         }
-        
+
 
         // Log into user, with API endpoint.
         try {
@@ -75,21 +75,21 @@ const Login: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col items-center min-h-screen px-5 py-32 bg-gray-100">
+        <div className="flex flex-col items-center min-h-screen px-5 py-32 bg-gray-100 dark:bg-gray-900 dark:text-white">
             <FrontpageHeader icon={ICON} title="HiddN" />
 
             <h1 className="mb-4 text-4xl">Login</h1>
 
             <div className="flex flex-col items-center justify-center w-full max-w-96">
                 <input
-                    className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
+                    className="w-full px-4 py-2 mb-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-700 outline-none hover:border-hiddn-200  focus:border-hiddn-500 rounded-xl"
                     type="email"
                     placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
                 <input
-                    className="w-full px-4 py-2 mb-4 border border-gray-300 outline-none hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
+                    className="w-full px-4 py-2 mb-4 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-700 outline-none hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
                     type="password"
                     placeholder="Password"
                     value={password}

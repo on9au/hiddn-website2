@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthStatus, EmailVerifyStatus } from '../auth';
 import FrontpageHeader from '../components/frontpageheader';
 import CommonLink from '../components/commonlink';
-import ICON from '../assets/hiddn_icon.svg';
+import ICON from '../assets/favicon.svg';
 import { RegisterPayload, VerifyEmailPayload } from '../bindings';
 
 // const apiURL: string = import.meta.env.VITE_API_URL;
@@ -110,27 +110,29 @@ const Register: React.FC = () => {
         switch (result.status) {
             case 200:
                 // Automatically log in user
-                const login_result = await fetch(`api/login_user`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email, password }),
-                }).then((response) => {
-                    return response;
-                });
-                switch (login_result.status) {
-                    case 200:
-                        setAuthStatus({ type: 'Success' });
-                        navigate('/user/dashboard');
-                        break;
-                    default:
-                        setAuthStatus({ type: 'Error', message: 'Account registered. Automatic login failed. Try logging in yourself. Redirecting in 5 seconds...' });
-                        // wait for 5 seconds before redirecting to login page
-                        await new Promise(res => setTimeout(res, 5000));
-                        navigate('/login');
-                }                
-                break;
+                {
+                    const login_result = await fetch(`api/login_user`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email, password }),
+                    }).then((response) => {
+                        return response;
+                    });
+                    switch (login_result.status) {
+                        case 200:
+                            setAuthStatus({ type: 'Success' });
+                            navigate('/user/dashboard');
+                            break;
+                        default:
+                            setAuthStatus({ type: 'Error', message: 'Account registered. Automatic login failed. Try logging in yourself. Redirecting in 5 seconds...' });
+                            // wait for 5 seconds before redirecting to login page
+                            await new Promise(res => setTimeout(res, 5000));
+                            navigate('/login');
+                    }
+                    break;
+                }
             case 400:
                 setAuthStatus({ type: 'Error', message: 'Email already exists.' });
                 break;
@@ -155,14 +157,14 @@ const Register: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col items-center min-h-screen px-5 py-32 bg-gray-100">
+        <div className="flex flex-col items-center min-h-screen px-5 py-32 bg-gray-100 dark:bg-gray-900 dark:text-white">
             <FrontpageHeader icon={ICON} title="HiddN" />
 
             <h1 className="mb-4 text-4xl">Register</h1>
 
             <div className="flex flex-col items-center justify-center w-full max-w-96">
                 <input
-                    className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
+                    className="w-full px-4 py-2 mb-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-700 outline-none hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
                     type="email"
                     placeholder="Email"
                     value={email}
@@ -170,7 +172,7 @@ const Register: React.FC = () => {
                 />
                 <div className="relative w-full">
                     <input
-                        className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
+                        className="w-full px-4 py-2 mb-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-700 outline-none hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
                         type="text"
                         placeholder="Verification Code"
                         maxLength={20}
@@ -190,14 +192,14 @@ const Register: React.FC = () => {
                     </button>
                 </div>
                 <input
-                    className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
+                    className="w-full px-4 py-2 mb-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-700 outline-none hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
                     type="password"
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
                 <input
-                    className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
+                    className="w-full px-4 py-2 mb-2 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-700 outline-none hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
                     type="password"
                     placeholder="Confirm Password"
                     value={confirmPassword}
@@ -205,7 +207,7 @@ const Register: React.FC = () => {
                     onKeyDown={handleKeyDownRegister}
                 />
                 <input
-                    className="w-full px-4 py-2 mb-4 border border-gray-300 outline-none hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
+                    className="w-full px-4 py-2 mb-4 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-700 outline-none hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
                     type="text"
                     placeholder="Invite Code (Optional)"
                     value={inviteCode}

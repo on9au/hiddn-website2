@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthStatus, EmailVerifyStatus } from '../auth';
 import FrontpageHeader from '../components/frontpageheader';
 import CommonLink from '../components/commonlink';
-import ICON from '../assets/hiddn_icon.svg';
+import ICON from '../assets/favicon.svg';
 import { ForgotPasswordPayload, VerifyEmailPayload } from '../bindings';
 
 // const apiURL: string = import.meta.env.VITE_API_URL;
@@ -127,7 +127,7 @@ const Forgot: React.FC = () => {
                         // wait for 5 seconds before redirecting to login page
                         await new Promise(res => setTimeout(res, 5000));
                         navigate('/login');
-                }                
+                }
                 break;
             case 404:
                 setAuthStatus({ type: 'Error', message: 'User does not exist.' });
