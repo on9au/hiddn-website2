@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
-import ICON from '../assets/hiddn_icon.svg';
+import ICON from '../assets/favicon.svg';
 import { BookIcon, CreditCardIcon, GearIcon, HomeIcon, MoonIcon, PersonIcon, QuestionIcon, SignOutIcon, SunIcon, ThreeBarsIcon, XIcon } from '@primer/octicons-react';
 
 // NavBarHeader Component
@@ -40,7 +40,7 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ label, to, icon, sidebarToggl
             className={({ isActive }) =>
                 isActive
                     ? 'p-3 mb-3 rounded-xl bg-hiddn-500 text-white select-none flex items-center'
-                    : 'p-3 mb-3 rounded-xl hover:bg-gray-200 select-none flex items-center'
+                    : 'p-3 mb-3 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 select-none flex items-center'
             }
             onClick={handleClick}
         >
@@ -58,7 +58,7 @@ interface DarkmodeSidebarProps {
 const DarkmodeSidebarLink: React.FC<DarkmodeSidebarProps> = ({ isDarkmode, toggleDarkmode }) => {
     return (
         <button
-            className="p-3 mb-3 rounded-xl hover:bg-gray-200 select-none flex items-center"
+            className="p-3 mb-3 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-800 select-none flex items-center"
             onClick={toggleDarkmode}
         >
             <span className='items-center ml-3'>{isDarkmode ? <SunIcon size={24} /> : <MoonIcon size={24} />}</span>
@@ -96,7 +96,7 @@ const Sidebar: React.FC = React.memo(() => {
                 {isSidebarOpen ? <XIcon size={24} /> : <ThreeBarsIcon size={24} />}
             </button>
             {isSidebarOpen && (
-                <div className="flex flex-col h-full px-5 py-4 text-black bg-gray-100 min-w-72">
+                <div className="flex flex-col h-full px-5 py-4 text-black bg-gray-100 dark:bg-gray-900 dark:text-white min-w-72">
                     <NavBarHeader icon={ICON} title="HiddN" />
                     <div className="flex flex-col justify-between h-full">
                         <div className="flex flex-col">
