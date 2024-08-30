@@ -13,12 +13,13 @@ import Support from './pages/user/support';
 import TransactionID from './pages/user/transactionid';
 import Profile from './pages/user/profile';
 import LoginPageLayout from './components/loginpagelayout';
+import PrivateRoute from './components/privateroute';
 
 const router = createBrowserRouter([
     // Root, not logged in path
     {
         path: '/',
-        element: <LoginPageLayout/>,
+        element: <LoginPageLayout />,
         children: [
             {
                 path: '/login',
@@ -34,20 +35,20 @@ const router = createBrowserRouter([
             },
             {
                 path: '/forgot',
-                element: <Forgot /> 
+                element: <Forgot />
             },
+            {
+                path: '',
+                element: <Navigate to="/login" />,  // Redirect to /login by default
+            }
         ]
     },
 
     // Logged in path
     {
         path: '/user',
-        element: <UserLayout />,
+        element: <PrivateRoute element={UserLayout} />,  // Protect the UserLayout with PrivateRoute
         children: [
-            {
-                path: '',
-                element: <Navigate to="/user/dashboard" />,  // Redirect to /dashboard by default
-            },
             {
                 path: 'dashboard',
                 element: <Dashboard />,
