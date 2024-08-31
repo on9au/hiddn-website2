@@ -14,6 +14,7 @@ import TransactionID from './pages/user/transactionid';
 import Profile from './pages/user/profile';
 import LoginPageLayout from './components/loginpagelayout';
 import PrivateRoute from './components/privateroute';
+import Status from './pages/user/status';
 
 const Router = () => {
     return (
@@ -32,6 +33,7 @@ const Router = () => {
                 <Route path="plan/:id" element={<PlanID />} />
                 <Route path="transaction" element={<Transaction />} />
                 <Route path="transaction/:id" element={<TransactionID />} />
+                <Route path="status" element={<Status />} />
                 <Route path="support" element={<Support />} />
                 <Route path="profile" element={<Profile />} />
             </Route>
