@@ -62,11 +62,15 @@ const LoginPageLayout: React.FC = () => {
     }
 
     return (
-        <div className="flex flex-col items-center min-h-screen px-5 py-32 bg-gray-100 dark:bg-gray-900 dark:text-white">
+        <div className="flex flex-col items-center min-h-screen px-5 py-32 bg-gray-100 max-md:py-16 dark:bg-gray-900 dark:text-white">
             <LoginPageThemeToggle toggleDarkmode={changeTheme} darkModeState={theme} />
             <FrontpageHeader icon={theme === 'light' ? ICON_LIGHT : ICON_DARK} title="HiddN" />
 
             <Outlet />
+
+            <div className="fixed bottom-0 flex flex-col items-center justify-center w-auto h-16 mt-5 text-sm text-center text-gray-400 dark:text-gray-500">
+                <p>This site requires cookies to function. By using this site, you agree to the use of cookies.</p>
+            </div>
         </div>
     );
 };
