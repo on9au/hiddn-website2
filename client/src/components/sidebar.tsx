@@ -72,7 +72,11 @@ const DarkmodeSidebarLink: React.FC<DarkmodeSidebarProps> = ({ toggleDarkmode, d
 
 const Sidebar: React.FC = React.memo(() => {
     const [isSidebarOpen, setIsSidebarOpen] = React.useState(window.innerWidth >= 1024);
-    const [theme, setTheme] = React.useState('light' as Theme);
+    const getCurrentTheme = (): boolean => {
+        if (typeof window === 'undefined') return false; 
+        return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    };
+    const [theme, setTheme] = React.useState(getCurrentTheme() === true ? 'dark' : 'light' as Theme);
 
     const changeTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';

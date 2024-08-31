@@ -10,7 +10,11 @@ import { isUserAuth } from '../auth';
 import PageLoading from './pageloading';
 
 const LoginPageLayout: React.FC = () => {
-    const [theme, setTheme] = React.useState('light' as Theme);
+    const getCurrentTheme = (): boolean => {
+        if (typeof window === 'undefined') return false; 
+        return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    };
+    const [theme, setTheme] = React.useState(getCurrentTheme() === true ? 'dark' : 'light' as Theme);
     const [isAuthenticated, setIsAuthenticated] = React.useState<boolean | null>(null);
     const navigate = useNavigate();
 
