@@ -1,5 +1,6 @@
 import React from 'react';
 import { ServerStatusPayload } from '../../bindings';
+import { useNavigate } from 'react-router-dom';
 
 type FetchServerStatusEnum =
     | { 'status': 'loading' }
@@ -8,6 +9,7 @@ type FetchServerStatusEnum =
 
 const Status: React.FC = () => {
     // Server status table. Server returns a Vec<ServerStatus>.
+    const navigate = useNavigate();
     const [serverStatus, setServerStatus] = React.useState([] as ServerStatusPayload[]);
     const [fetchServerStatus, setFetchServerStatus] = React.useState({ 'status': 'loading' } as FetchServerStatusEnum);
 
@@ -25,6 +27,9 @@ const Status: React.FC = () => {
                     setFetchServerStatus({ 'status': 'success' });
                     const json = await result.json();
                     setServerStatus(json);
+                } else if (result.status === 401) {
+                    setFetchServerStatus({ 'status': 'error', message: 'Unauthorized. Please log in.' });
+                    navigate('/logout');
                 } else {
                     setFetchServerStatus({ 'status': 'error', message: result.statusText });
                 }
@@ -33,7 +38,7 @@ const Status: React.FC = () => {
             }
         };
         fetchData();
-    }, []);
+    }, [navigate]);
 
     return (
         <div className="flex flex-col items-center min-h-screen pt-7">
