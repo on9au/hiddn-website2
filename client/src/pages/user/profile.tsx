@@ -63,7 +63,6 @@ const Profile: React.FC = () => {
                     <>
                         <h3 className="mb-3 text-xl font-semibold">Hello, {userProfile?.email}</h3>
                         <p className="mb-px text-base">Created at: {userProfile?.created_at}</p>
-                        <p className="text-base">Status: {"Active"}</p>
                     </>
                 )}
             </div>
