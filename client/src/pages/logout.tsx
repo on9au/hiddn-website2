@@ -30,9 +30,13 @@ const Logout: React.FC = () => {
         }
     }, [navigate]);
 
+    const returnToLogin = () => {
+        navigate('/login');
+    }
+
 
     return (
-        <>
+        <div className="flex flex-col items-center justify-center w-full max-w-96">
             {logoutStatus.type !== 'Success' && logoutStatus.type !== 'Error' && (
                 <>
                     <h1 className="mb-4 text-4xl">Logging you out...</h1>
@@ -46,16 +50,18 @@ const Logout: React.FC = () => {
                 </>
             )}
             {logoutStatus.type === 'Error' && (
-                <p className="text-red-500">{logoutStatus.message}</p>
-                <Loginbutton 
-                    content="Return back to login."
-                    handleLogin={() => navigate('/login')}
-                />
+                <>
+                    <p className="mb-4 text-red-500">Logout Error: {logoutStatus.message}</p>
+                    <Loginbutton 
+                        content="To login page"
+                        handleLogin={returnToLogin}
+                    />
+                </>
             )}
             {logoutStatus.type === 'Success' && (
                 <p className="text-green-500">Logged out successfully. Redirecting...</p>
             )}
-        </>
+        </div>
     );
 };
 
