@@ -109,27 +109,29 @@ const Forgot: React.FC = () => {
         switch (result.status) {
             case 200:
                 // Automatically log in user
-                const login_result = await fetch(`api/login_user`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email, password }),
-                }).then((response) => {
-                    return response;
-                });
-                switch (login_result.status) {
-                    case 200:
-                        setAuthStatus({ type: 'Success' });
-                        navigate('/user/dashboard');
-                        break;
-                    default:
-                        setAuthStatus({ type: 'Error', message: 'Account password reset. Automatic login failed. Try logging in yourself. Redirecting in 5 seconds...' });
-                        // wait for 5 seconds before redirecting to login page
-                        await new Promise(res => setTimeout(res, 5000));
-                        navigate('/login');
+                {
+                    const login_result = await fetch(`api/login_user`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email, password }),
+                    }).then((response) => {
+                        return response;
+                    });
+                    switch (login_result.status) {
+                        case 200:
+                            setAuthStatus({ type: 'Success' });
+                            navigate('/user/dashboard');
+                            break;
+                        default:
+                            setAuthStatus({ type: 'Error', message: 'Account password reset. Automatic login failed. Try logging in yourself. Redirecting in 5 seconds...' });
+                            // wait for 5 seconds before redirecting to login page
+                            await new Promise(res => setTimeout(res, 5000));
+                            navigate('/login');
+                    }
+                    break;
                 }
-                break;
             case 404:
                 setAuthStatus({ type: 'Error', message: 'User does not exist.' });
                 break;
