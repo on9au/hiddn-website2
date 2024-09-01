@@ -46,3 +46,12 @@ pub struct ServerStatusPayload {
     pub server: String,
     pub status: String,
 }
+
+#[derive(Clone, Debug, Serialize)]
+#[typeshare::typeshare]
+pub struct UserProfilePayload {
+    pub email: String,
+    pub email_verified: bool,
+    pub created_at: String,
+    pub updated_at: String,
+}

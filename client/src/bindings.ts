@@ -31,6 +31,13 @@ export interface ServerStatusPayload {
 	status: string;
 }
 
+export interface UserProfilePayload {
+	email: string;
+	email_verified: boolean;
+	created_at: string;
+	updated_at: string;
+}
+
 export enum ServerStatusEnum {
 	Online = "Online",
 	Degraded = "Degraded",

@@ -31,6 +31,7 @@ async fn main() {
     let app = Router::new()
         // Protected routes
         .route("/server_status", get(server_status))
+        .route("/me", get(user_me))
         .route_layer(login_required!(Backend))
         // Routes involving authentication
         .route("/", get(root))
@@ -250,4 +251,21 @@ async fn server_status() -> impl IntoResponse {
     ];
 
     Json(server_status).into_response()
+}
+
+/// Handler for the GET '/me' route.
+/// This handler will return Json(UserProfilePayload)
+/// This handler will return the user's profile.
+/// This handler requires authentication (managed by axum_login).
+async fn user_me(auth_session: AuthSession) -> impl IntoResponse {
+    let user = auth_session.user.unwrap();
+
+    let user_profile = payloads::UserProfilePayload {
+        email: user.email,
+        email_verified: true,
+        created_at: "2021-01-01T00:00:00Z".to_string(), // Placeholder
+        updated_at: "2021-01-01T00:00:00Z".to_string(), // Placeholder
+    };
+
+    Json(user_profile).into_response()
 }

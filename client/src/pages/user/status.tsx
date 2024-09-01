@@ -42,10 +42,10 @@ const Status: React.FC = () => {
 
     return (
         <div className="flex flex-col items-center min-h-screen pt-7">
-            <span className="w-full text-left mb-6">
+            <span className="w-full mb-6 text-left">
                 <h1 className="text-4xl font-semibold">Server Status</h1>
             </span>
-            <div className="w-full mb-6 bg-gray-200 dark:bg-gray-800 p-4 rounded-2xl">
+            <div className="w-full p-4 mb-6 bg-gray-200 dark:bg-gray-800 rounded-2xl">
                 {/* Server status table. Server returns a Vec<ServerStatus>. */}
                 {fetchServerStatus.status === 'loading' && (
                     <div className="flex justify-center">
@@ -59,7 +59,7 @@ const Status: React.FC = () => {
                     </div>
                 )}
                 {fetchServerStatus.status === 'error' && (
-                    <p className="text-red-500">Failed to fetch server status. Try again later.</p>
+                    <p className="text-red-500">{fetchServerStatus.message}</p>
                 )}
                 {fetchServerStatus.status === 'success' && (
                     <table className="w-full">
