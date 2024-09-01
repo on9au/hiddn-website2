@@ -26,3 +26,14 @@ export interface VerifyEmailPayload {
 	email: string;
 }
 
+export interface ServerStatusPayload {
+	server: string;
+	status: string;
+}
+
+export enum ServerStatusEnum {
+	Online = "Online",
+	Degraded = "Degraded",
+	Unreachable = "Unreachable",
+}
+

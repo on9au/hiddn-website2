@@ -1,4 +1,4 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Deserialize)]
 #[typeshare::typeshare]
@@ -30,4 +30,19 @@ pub struct ForgotPasswordPayload {
 #[typeshare::typeshare]
 pub struct VerifyEmailPayload {
     pub email: String,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[typeshare::typeshare]
+pub enum ServerStatusEnum {
+    Online,
+    Degraded,
+    Unreachable,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[typeshare::typeshare]
+pub struct ServerStatusPayload {
+    pub server: String,
+    pub status: String,
 }

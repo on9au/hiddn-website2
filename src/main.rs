@@ -5,10 +5,13 @@ use axum::{
     Json, Router,
 };
 use axum_login::{
+    login_required,
     tower_sessions::{MemoryStore, SessionManagerLayer},
     AuthManagerLayerBuilder,
 };
-use payloads::{ForgotPasswordPayload, LoginPayload, RegisterPayload, VerifyEmailPayload};
+use payloads::{
+    ForgotPasswordPayload, LoginPayload, RegisterPayload, ServerStatusPayload, VerifyEmailPayload,
+};
 use sessions::{AuthSession, Backend};
 use tokio::net::TcpListener;
 
@@ -26,11 +29,16 @@ async fn main() {
     let auth_layer = AuthManagerLayerBuilder::new(backend, session_layer).build();
 
     let app = Router::new()
+        // Protected routes
+        .route("/server_status", get(server_status))
+        .route_layer(login_required!(Backend))
+        // Routes involving authentication
         .route("/", get(root))
         .route("/login_user", post(login_user))
         .route("/logout_user", post(logout_user))
         .route("/is_logged_in", get(is_logged_in))
         .layer(auth_layer)
+        // Unprotected routes
         .route("/register_user", post(register_user))
         .route("/forgot_password", post(forgot_password))
         .route("/verify_email", post(verify_email));
@@ -219,4 +227,27 @@ async fn forgot_password(Json(payload): Json<ForgotPasswordPayload>) -> impl Int
 
     // Return OK, user is registered, client must now login.
     StatusCode::OK.into_response()
+}
+
+/// Handler for the GET '/server_status' route.
+/// This handler will return Json(Vec<ServerStatusPayload>)
+/// This handler will return the status of the servers.
+/// This handler requires authentication (managed by axum_login).
+async fn server_status() -> impl IntoResponse {
+    let server_status: Vec<ServerStatusPayload> = vec![
+        ServerStatusPayload {
+            server: "Melbourne".to_string(),
+            status: "Online".to_string(),
+        },
+        ServerStatusPayload {
+            server: "Sydney".to_string(),
+            status: "Degraded".to_string(),
+        },
+        ServerStatusPayload {
+            server: "Singapore".to_string(),
+            status: "Unreachable".to_string(),
+        },
+    ];
+
+    Json(server_status).into_response()
 }
