@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { LogoutStatus } from "../auth";
 import { useNavigate } from "react-router-dom";
+import Loginbutton from "../components/loginbutton";
 
 const Logout: React.FC = () => {
     const [logoutStatus, setLogoutStatus] = React.useState<LogoutStatus>({ type: 'Idle' });
@@ -9,20 +10,24 @@ const Logout: React.FC = () => {
     useEffect(() => {
         // Log out user, with API endpoint.
         setLogoutStatus({ type: 'LoggingOut' });
-        fetch(`api/logout_user`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        }).then((response) => {
-            if (response.status === 200) {
-                setLogoutStatus({ type: 'Success' });
-                localStorage.removeItem('isAuthenticated');
-                navigate('/login')
-            } else {
-                setLogoutStatus({ type: 'Error', message: response.statusText });
-            }
-        });
+        try {
+            fetch(`api/logout_user`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then((response) => {
+                if (response.status === 200) {
+                    setLogoutStatus({ type: 'Success' });
+                    localStorage.removeItem('isAuthenticated');
+                    navigate('/login')
+                } else {
+                    setLogoutStatus({ type: 'Error', message: response.statusText });
+                }
+            });
+        } catch (error) {
+            setLogoutStatus({ type: 'Error', message: 'Failed to log out. Try again later. Error: ' + error });
+        }
     }, [navigate]);
 
 
@@ -42,6 +47,10 @@ const Logout: React.FC = () => {
             )}
             {logoutStatus.type === 'Error' && (
                 <p className="text-red-500">{logoutStatus.message}</p>
+                <Loginbutton 
+                    content="Return back to login."
+                    handleLogin={() => navigate('/login')}
+                />
             )}
             {logoutStatus.type === 'Success' && (
                 <p className="text-green-500">Logged out successfully. Redirecting...</p>
