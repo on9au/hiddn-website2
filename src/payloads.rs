@@ -7,6 +7,12 @@ pub struct LoginPayload {
     pub password: String,
 }
 
+#[derive(Clone, Debug, Serialize)]
+#[typeshare::typeshare]
+pub struct LoginResponsePayload {
+    pub logged_in: bool,
+}
+
 #[derive(Clone, Debug, Deserialize)]
 #[typeshare::typeshare]
 pub struct RegisterPayload {

@@ -7,6 +7,10 @@ export interface LoginPayload {
 	password: string;
 }
 
+export interface LoginResponsePayload {
+	logged_in: boolean;
+}
+
 export interface RegisterPayload {
 	email: string;
 	email_verification_code: string;
