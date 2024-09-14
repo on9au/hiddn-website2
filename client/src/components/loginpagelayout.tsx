@@ -48,10 +48,6 @@ const LoginPageLayout: React.FC = () => {
         isUserAuth(setIsAuthenticated);
     }, []);
 
-    if (isAuthenticated === null) {
-        return <PageLoading />;
-    }
-
     // If user is authenticated, show the dashboard page
     if (isAuthenticated) {
         if (typeof window !== 'undefined') {
