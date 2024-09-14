@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ServerStatusPayload } from '../../bindings';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,6 +8,7 @@ type FetchServerStatusEnum =
     | { 'status': 'error', 'message': string }
 
 const Status: React.FC = () => {
+    useEffect(() => { document.title = 'Hiddn | Server Status'; } );
     // Server status table. Server returns a Vec<ServerStatus>.
     const navigate = useNavigate();
     const [serverStatus, setServerStatus] = React.useState([] as ServerStatusPayload[]);

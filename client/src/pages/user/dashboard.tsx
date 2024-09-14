@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 const Dashboard: React.FC = () => {
+    useEffect(() => { document.title = 'Hiddn | Dashboard'; } );
+
     const currentTime = new Date();
     let greeting = '';
 

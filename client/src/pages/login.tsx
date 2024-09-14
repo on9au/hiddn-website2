@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthStatus } from '../auth';
 import { LoginPayload } from '../bindings';
@@ -10,6 +10,8 @@ import TextInput from '../components/logintextinput';
 
 const Login: React.FC = () => {
     // const ICON = '../assets/hiddn_icon.svg'; // Update with your correct path to the icon
+
+    useEffect(() => { document.title = 'Hiddn | Login'; } );
 
     const navigate = useNavigate();
 

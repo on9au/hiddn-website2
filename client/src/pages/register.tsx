@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthStatus, EmailVerifyStatus } from '../auth';
 import CommonLink from '../components/commonlink';
@@ -10,6 +10,8 @@ import VerificationInput from '../components/loginpageverificationinput';
 // const apiURL: string = import.meta.env.VITE_API_URL;
 
 const Register: React.FC = () => {
+    useEffect(() => { document.title = 'Hiddn | Register'; } );
+
     const navigate = useNavigate();
 
     const [email, setEmail] = useState<string>('');

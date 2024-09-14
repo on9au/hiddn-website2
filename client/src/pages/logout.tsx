@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import Loginbutton from "../components/loginbutton";
 
 const Logout: React.FC = () => {
+    useEffect(() => { document.title = 'Hiddn | Logout'; } );
+
     const [logoutStatus, setLogoutStatus] = React.useState<LogoutStatus>({ type: 'Idle' });
     const navigate = useNavigate();
 

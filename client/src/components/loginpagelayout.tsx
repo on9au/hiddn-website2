@@ -7,7 +7,7 @@ import FrontpageHeader from './frontpageheader';
 import ICON_LIGHT from '../assets/hiddn_icon.svg';
 import ICON_DARK from '../assets/hiddn_icon_dark.svg';
 import { isUserAuth } from '../auth';
-import PageLoading from './pageloading';
+// import PageLoading from './pageloading';
 
 const LoginPageLayout: React.FC = () => {
     const getCurrentTheme = (): boolean => {
@@ -48,6 +48,10 @@ const LoginPageLayout: React.FC = () => {
         isUserAuth(setIsAuthenticated);
     }, []);
 
+    // if (isAuthenticated === null) {
+    //     return <PageLoading />;
+    // }
+
     // If user is authenticated, show the dashboard page
     if (isAuthenticated) {
         if (typeof window !== 'undefined') {
@@ -64,7 +68,7 @@ const LoginPageLayout: React.FC = () => {
 
             <Outlet />
 
-            <div className="fixed bottom-0 flex flex-col items-center justify-center w-auto h-16 mt-5 text-sm text-center text-gray-400 dark:text-gray-500">
+            <div className="flex flex-col items-center justify-center w-auto h-16 mt-5 text-sm text-center text-gray-400 dark:text-gray-500">
                 <p>This site requires cookies to function. By using this site, you agree to the use of cookies.</p>
             </div>
         </div>

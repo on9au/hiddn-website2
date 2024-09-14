@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserProfilePayload } from '../../bindings';
 
@@ -8,6 +8,8 @@ type FetchUserStatusEnum =
     | { 'status': 'error', 'message': string }
 
 const Profile: React.FC = () => {
+    useEffect(() => { document.title = 'Hiddn | Profile'; } );
+
     const navigate = useNavigate();
     const [userProfile, setUserProfile] = React.useState(null as UserProfilePayload | null);
     const [fetchServerStatus, setFetchServerStatus] = React.useState({ 'status': 'loading' } as FetchUserStatusEnum);
