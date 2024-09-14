@@ -10,7 +10,8 @@ use axum_login::{
     AuthManagerLayerBuilder,
 };
 use payloads::{
-    ForgotPasswordPayload, LoginPayload, RegisterPayload, ServerStatusPayload, VerifyEmailPayload,
+    ForgotPasswordPayload, LoginPayload, LoginResponsePayload, RegisterPayload,
+    ServerStatusPayload, VerifyEmailPayload,
 };
 use sessions::{AuthSession, Backend};
 use tokio::net::TcpListener;
@@ -42,6 +43,7 @@ async fn main() {
         // Unprotected routes
         .route("/register_user", post(register_user))
         .route("/forgot_password", post(forgot_password))
+        .route("/generate_204", get(generate_204))
         .route("/verify_email", post(verify_email));
 
     let listener = TcpListener::bind("127.0.0.1:3000").await.unwrap();
@@ -55,6 +57,13 @@ async fn main() {
 /// Handler for the GET `/` route.
 async fn root() -> &'static str {
     "Hello, World!"
+}
+
+/// Handler for the GET '/generate_204' route.
+/// This handler will return an empty response with a status code of NO_CONTENT.
+/// This is to check if the user is connected to the internet, and if the API endpoint is live.
+async fn generate_204() -> impl IntoResponse {
+    StatusCode::NO_CONTENT.into_response()
 }
 
 /// Handler for the GET '/is_logged_in' route.
@@ -71,6 +80,7 @@ async fn is_logged_in(auth_session: AuthSession) -> impl IntoResponse {
 /// Handler for the POST '/login_user' route.
 /// This handler will receive a JSON(LoginPayload) payload from the client.
 /// The handler will return OK if the user is authenticated, and UNAUTHORIZED if the user is not.
+/// OK will be accompanied by Json(LoginResponsePayload) saying the user is authenticated.
 /// If email is invalid, it will return BAD_REQUEST.
 /// The server will use axum_login to keep the user authenticated.
 async fn login_user(
@@ -99,7 +109,11 @@ async fn login_user(
         }
     }
 
-    StatusCode::OK.into_response()
+    (
+        StatusCode::OK,
+        Json(LoginResponsePayload { logged_in: true }),
+    )
+        .into_response()
 }
 
 /// Handler for the POST '/logout_user' route.
