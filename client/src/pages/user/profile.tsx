@@ -39,7 +39,7 @@ const Profile: React.FC = () => {
 
     React.useEffect(() => {
         fetchUserProfile();
-    }, []);
+    }, [fetchUserProfile]);
 
     return (
         <div className="flex flex-col items-center min-h-screen pt-7">
@@ -69,7 +69,7 @@ const Profile: React.FC = () => {
                 )}
             </div>
             <div className="w-full mb-6">
-                hi
+                bruh
             </div>
         </div>
     );
