@@ -11,49 +11,47 @@ const Documentation: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchDocumentationOptions = async () => {
-        try {
-            const response = await axios.get('/api/documentation/options');
-            setOsList(response.data.osList);
-            setCategories(response.data.categories);
-            if (!response.data.osList.includes(selectedOs)) {
-                setSelectedOs('common');
-            }
-        } catch (err) {
-            console.error('Failed to load documentation options. Error: ' + err);
-        }
-    };
-
-    const fetchDocumentation = async () => {
-        setLoading(true);
-        try {
-            const response = await axios.get<string>('/api/documentation', {
-                params: {
-                    os: selectedOs,
-                    category: selectedCategory,
-                },
-            });
-            setContent(response.data);
-            setError(null);
-        } catch (err) {
-            setError('Failed to load documentation. Error: ' + err);
-            setContent('');
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
+        const fetchDocumentationOptions = async () => {
+            try {
+                const response = await axios.get('/api/documentation/options');
+                setOsList(response.data.osList);
+                setCategories(response.data.categories);
+                if (!response.data.osList.includes(selectedOs)) {
+                    setSelectedOs('common');
+                }
+            } catch (err) {
+                console.error('Failed to load documentation options. Error: ' + err);
+            }
+        };
         document.title = 'Hiddn | Documentation';
         detectOs();
         fetchDocumentationOptions();
-    }, [fetchDocumentationOptions]);
+    }, [selectedOs]);
 
     useEffect(() => {
+        const fetchDocumentation = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get<string>('/api/documentation', {
+                    params: {
+                        os: selectedOs,
+                        category: selectedCategory,
+                    },
+                });
+                setContent(response.data);
+                setError(null);
+            } catch (err) {
+                setError('Failed to load documentation. Error: ' + err);
+                setContent('');
+            } finally {
+                setLoading(false);
+            }
+        };
         if (osList.length > 0 && categories.length > 0) {
             fetchDocumentation();
         }
-    }, [selectedOs, selectedCategory, osList, categories, fetchDocumentation]);
+    }, [selectedOs, selectedCategory, osList, categories]);
 
     const detectOs = () => {
         const userAgent = navigator.userAgent || navigator.vendor;
