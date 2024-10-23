@@ -1,4 +1,5 @@
 fn main() {
+    println!("cargo:rerun-if-changed=src/payloads.rs");
     let output = std::process::Command::new("typeshare")
         .arg(".")
         .arg("-l")
