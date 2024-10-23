@@ -1,85 +1,100 @@
-import React, { useEffect } from 'react';
-import { ServerStatusPayload } from '../../bindings';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+interface ServerStatusPayload {
+    server: string;
+    status: string;
+}
+
 type FetchServerStatusEnum =
-    | { 'status': 'loading' }
-    | { 'status': 'success' }
-    | { 'status': 'error', 'message': string }
+    | { status: 'loading' }
+    | { status: 'success' }
+    | { status: 'error'; message: string };
 
 const Status: React.FC = () => {
-    useEffect(() => { document.title = 'Hiddn | Server Status'; } );
-    // Server status table. Server returns a Vec<ServerStatus>.
+    const [serverStatus, setServerStatus] = useState<ServerStatusPayload[]>([]);
+    const [fetchStatus, setFetchStatus] = useState<FetchServerStatusEnum>({ status: 'loading' });
     const navigate = useNavigate();
-    const [serverStatus, setServerStatus] = React.useState([] as ServerStatusPayload[]);
-    const [fetchServerStatus, setFetchServerStatus] = React.useState({ 'status': 'loading' } as FetchServerStatusEnum);
 
-    // Get server status.
-    React.useEffect(() => {
-        async function fetchData() {
+    useEffect(() => {
+        document.title = 'Hiddn | Server Status';
+
+        const fetchServerStatus = async () => {
             try {
-                const result = await fetch(`/api/server_status`, {
+                const response = await fetch('/api/server_status', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                     },
+                    credentials: 'include', // Include cookies for authentication if needed
                 });
-                if (result.ok) {
-                    setFetchServerStatus({ 'status': 'success' });
-                    const json = await result.json();
-                    setServerStatus(json);
-                } else if (result.status === 401) {
-                    setFetchServerStatus({ 'status': 'error', message: 'Unauthorized. Please log in.' });
+
+                if (response.ok) {
+                    const data: ServerStatusPayload[] = await response.json();
+                    setServerStatus(data);
+                    setFetchStatus({ status: 'success' });
+                } else if (response.status === 401) {
+                    setFetchStatus({ status: 'error', message: 'Unauthorized. Please log in.' });
                     navigate('/logout');
                 } else {
-                    setFetchServerStatus({ 'status': 'error', message: result.statusText });
+                    setFetchStatus({ status: 'error', message: response.statusText });
                 }
             } catch (error) {
-                setFetchServerStatus({ 'status': 'error', message: 'Failed to fetch server status. Try again later. Error: ' + error });
+                setFetchStatus({
+                    status: 'error',
+                    message: 'Failed to fetch server status. Please try again later. Error: ' + error,
+                });
             }
         };
-        fetchData();
+
+        fetchServerStatus();
     }, [navigate]);
+
+    if (fetchStatus.status === 'loading') {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div
+                    className="inline-block w-8 h-8 border-4 border-current border-solid rounded-full animate-spin border-r-transparent"
+                    role="status"
+                >
+                    <span className="sr-only">Loading...</span>
+                </div>
+            </div>
+        );
+    }
+
+    if (fetchStatus.status === 'error') {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <p className="text-red-500">{fetchStatus.message}</p>
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col items-center min-h-screen pt-7">
             <span className="w-full mb-6 text-left">
                 <h1 className="text-4xl font-semibold">Server Status</h1>
             </span>
-            <div className="w-full p-4 mb-6 bg-gray-200 dark:bg-gray-800 rounded-2xl">
-                {/* Server status table. Server returns a Vec<ServerStatus>. */}
-                {fetchServerStatus.status === 'loading' && (
-                    <div className="flex justify-center">
-                        <div
-                            className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
-                            role="status">
-                            <span
-                                className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
-                            >Loading...</span>
-                        </div>
-                    </div>
-                )}
-                {fetchServerStatus.status === 'error' && (
-                    <p className="text-red-500">{fetchServerStatus.message}</p>
-                )}
-                {fetchServerStatus.status === 'success' && (
-                    <table className="w-full">
-                        <thead>
+            <div className="container">
+                <div className="overflow-x-auto">
+                    <table className="min-w-full bg-white dark:bg-gray-800">
+                        <thead className="bg-gray-200 dark:bg-gray-700">
                             <tr>
-                                <th className="text-left">Server</th>
-                                <th className="text-left">Status</th>
+                                <th className="px-4 py-2 border-b">Server</th>
+                                <th className="px-4 py-2 border-b">Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             {serverStatus.map((status, index) => (
-                                <tr key={index}>
-                                    <td>{status.server}</td>
-                                    <td>{status.status}</td>
+                                <tr key={index} className="hover:bg-gray-100 dark:hover:bg-gray-900">
+                                    <td className="px-4 py-2 border-b">{status.server}</td>
+                                    <td className="px-4 py-2 border-b">{status.status}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
-                )}
+                </div>
             </div>
         </div>
     );

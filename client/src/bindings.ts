@@ -42,6 +42,22 @@ export interface UserProfilePayload {
 	updated_at: string;
 }
 
+export enum UserTransactionStatusEnum {
+	Unpaid = "unpaid",
+	Pending = "pending",
+	Completed = "completed",
+	Failed = "failed",
+	Cancelled = "cancelled",
+}
+
+export interface UserTransactionPayload {
+	transaction_id: number;
+	amount: number;
+	transaction_date: string;
+	payment_method?: string;
+	status: UserTransactionStatusEnum;
+}
+
 export enum ServerStatusEnum {
 	Online = "Online",
 	Degraded = "Degraded",

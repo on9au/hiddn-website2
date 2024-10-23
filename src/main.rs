@@ -11,7 +11,7 @@ use axum_login::{
 };
 use payloads::{
     ForgotPasswordPayload, LoginPayload, LoginResponsePayload, RegisterPayload,
-    ServerStatusPayload, VerifyEmailPayload,
+    ServerStatusPayload, UserTransactionPayload, UserTransactionStatusEnum, VerifyEmailPayload,
 };
 use sessions::{AuthSession, Backend};
 use tokio::net::TcpListener;
@@ -31,6 +31,7 @@ async fn main() {
 
     let app = Router::new()
         // Protected routes
+        .route("/transactions", get(transactions))
         .route("/server_status", get(server_status))
         .route("/me", get(user_me))
         .route_layer(login_required!(Backend))
@@ -242,6 +243,52 @@ async fn forgot_password(Json(payload): Json<ForgotPasswordPayload>) -> impl Int
 
     // Return OK, user is registered, client must now login.
     StatusCode::OK.into_response()
+}
+
+/// Handler for the GET '/transactions' route.
+/// This handler will return Json(Vec<UserTransactionPayload>)
+/// This handler will return the transactions of the user.
+/// This handler requires authentication (managed by axum_login).
+async fn transactions() -> impl IntoResponse {
+    let transactions: Vec<payloads::UserTransactionPayload> = vec![
+        UserTransactionPayload {
+            transaction_id: 1_u32.into(),
+            amount: 100.0,
+            transaction_date: "2021-01-01T00:00:00Z".to_string(), // Placeholder
+            payment_method: Some("Credit Card".to_string()),
+            status: UserTransactionStatusEnum::Completed,
+        },
+        UserTransactionPayload {
+            transaction_id: 2_u32.into(),
+            amount: 200.0,
+            transaction_date: "2021-01-01T00:00:00Z".to_string(), // Placeholder
+            payment_method: Some("Cash".to_string()),
+            status: UserTransactionStatusEnum::Pending,
+        },
+        UserTransactionPayload {
+            transaction_id: 3_u32.into(),
+            amount: 300.0,
+            transaction_date: "2021-01-01T00:00:00Z".to_string(), // Placeholder
+            payment_method: None,
+            status: UserTransactionStatusEnum::Unpaid,
+        },
+        UserTransactionPayload {
+            transaction_id: 4_u32.into(),
+            amount: 400.0,
+            transaction_date: "2021-01-01T00:00:00Z".to_string(), // Placeholder
+            payment_method: Some("Paypal".to_string()),
+            status: UserTransactionStatusEnum::Cancelled,
+        },
+        UserTransactionPayload {
+            transaction_id: 5_u32.into(),
+            amount: 500.0,
+            transaction_date: "2021-01-01T00:00:00Z".to_string(), // Placeholder
+            payment_method: Some("Credit Card".to_string()),
+            status: UserTransactionStatusEnum::Failed,
+        },
+    ];
+
+    Json(transactions).into_response()
 }
 
 /// Handler for the GET '/server_status' route.
