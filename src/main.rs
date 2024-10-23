@@ -1,8 +1,11 @@
+use std::{collections::HashMap, sync::Arc};
+
 use axum::{
+    extract::Query,
     http::StatusCode,
     response::IntoResponse,
     routing::{get, post},
-    Json, Router,
+    Extension, Json, Router,
 };
 use axum_login::{
     login_required,
@@ -13,11 +16,14 @@ use payloads::{
     ForgotPasswordPayload, LoginPayload, LoginResponsePayload, RegisterPayload,
     ServerStatusPayload, UserTransactionPayload, UserTransactionStatusEnum, VerifyEmailPayload,
 };
+use serde_json::json;
 use sessions::{AuthSession, Backend};
-use tokio::net::TcpListener;
+use tokio::{fs, net::TcpListener, sync::RwLock};
 
 mod payloads;
 mod sessions;
+
+type SharedDocs = Arc<RwLock<HashMap<String, HashMap<String, String>>>>;
 
 #[tokio::main]
 async fn main() {
@@ -31,6 +37,8 @@ async fn main() {
 
     let app = Router::new()
         // Protected routes
+        .route("/documentation", get(get_documentation))
+        .route("/documentation/options", get(list_documentation_options))
         .route("/transactions", get(transactions))
         .route("/server_status", get(server_status))
         .route("/me", get(user_me))
@@ -53,6 +61,43 @@ async fn main() {
     axum::serve(listener, app.into_make_service())
         .await
         .unwrap();
+}
+
+async fn load_docs() -> HashMap<String, HashMap<String, String>> {
+    let mut docs = HashMap::new();
+
+    let mut paths = fs::read_dir("./docs").await.unwrap();
+
+    let mut dir_entries = Vec::new();
+    while let Some(entry) = paths.next_entry().await.unwrap() {
+        dir_entries.push(entry);
+    }
+
+    for entry in dir_entries {
+        let os_name = entry.file_name().to_string_lossy().to_lowercase();
+        let mut os_docs = HashMap::new();
+
+        let os_path = entry.path();
+        let mut files = fs::read_dir(os_path).await.unwrap();
+
+        let mut file_entries = Vec::new();
+        while let Some(file) = files.next_entry().await.unwrap() {
+            file_entries.push(file);
+        }
+
+        for file in file_entries {
+            let file_name = file.file_name().to_string_lossy().to_lowercase();
+            if file_name.ends_with(".md") {
+                let category = file_name.trim_end_matches(".md").to_string();
+                let content = fs::read_to_string(file.path()).await.unwrap_or_default();
+                os_docs.insert(category, content);
+            }
+        }
+
+        docs.insert(os_name, os_docs);
+    }
+
+    docs
 }
 
 /// Handler for the GET `/` route.
@@ -243,6 +288,65 @@ async fn forgot_password(Json(payload): Json<ForgotPasswordPayload>) -> impl Int
 
     // Return OK, user is registered, client must now login.
     StatusCode::OK.into_response()
+}
+
+/// Handler for the GET '/documentation' route.
+/// This handler will return the documentation for the given OS and category.
+/// The documentation is stored in a shared state.
+/// The shared state is a HashMap<String, HashMap<String, String>>.
+/// The outer HashMap is keyed by OS.
+/// The inner HashMap is keyed by category.
+/// The value is the documentation content.
+/// The handler will return NOT_FOUND if the documentation is not found.
+/// The handler will return the documentation content if found.
+/// This handler requires authentication (managed by axum_login).
+async fn get_documentation(
+    Query(params): Query<HashMap<String, String>>,
+    Extension(docs): Extension<SharedDocs>,
+) -> impl IntoResponse {
+    let os = params
+        .get("os")
+        .unwrap_or(&"common".to_string())
+        .to_lowercase();
+    let category = params
+        .get("category")
+        .unwrap_or(&"install".to_string())
+        .to_lowercase();
+
+    let docs = docs.read().await;
+
+    if let Some(os_docs) = docs.get(&os) {
+        if let Some(content) = os_docs.get(&category) {
+            return (StatusCode::OK, content.clone()).into_response();
+        }
+    }
+
+    (StatusCode::NOT_FOUND, "Documentation not found").into_response()
+}
+
+/// Handler for the GET '/documentation_options' route.
+/// This handler will return a list of OS and categories for the documentation.
+/// The documentation is stored in a shared state.
+/// The shared state is a HashMap<String, HashMap<String, String>>.
+/// The outer HashMap is keyed by OS.
+/// The inner HashMap is keyed by category.
+/// This handler requires authentication (managed by axum_login).
+async fn list_documentation_options(Extension(docs): Extension<SharedDocs>) -> impl IntoResponse {
+    let docs = docs.read().await;
+
+    let os_list: Vec<String> = docs.keys().cloned().collect();
+    let categories: Vec<String> = if let Some(common_docs) = docs.get("common") {
+        common_docs.keys().cloned().collect()
+    } else {
+        vec![]
+    };
+
+    let response = json!({
+        "osList": os_list,
+        "categories": categories
+    });
+
+    Json(response)
 }
 
 /// Handler for the GET '/transactions' route.
