@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
-interface ServerStatusPayload {
-    server: string;
-    status: string;
-}
+import { ServerStatusPayload } from '../../bindings';
 
 type FetchServerStatusEnum =
     | { status: 'loading' }
@@ -21,29 +18,36 @@ const Status: React.FC = () => {
 
         const fetchServerStatus = async () => {
             try {
-                const response = await fetch('/api/server_status', {
-                    method: 'GET',
+                const response = await axios.get<ServerStatusPayload[]>('/api/server_status', {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    credentials: 'include', // Include cookies for authentication if needed
+                    withCredentials: true, // Include cookies for authentication if needed
                 });
 
-                if (response.ok) {
-                    const data: ServerStatusPayload[] = await response.json();
-                    setServerStatus(data);
-                    setFetchStatus({ status: 'success' });
-                } else if (response.status === 401) {
-                    setFetchStatus({ status: 'error', message: 'Unauthorized. Please log in.' });
-                    navigate('/logout');
-                } else {
-                    setFetchStatus({ status: 'error', message: response.statusText });
-                }
+                setServerStatus(response.data);
+                setFetchStatus({ status: 'success' });
             } catch (error) {
-                setFetchStatus({
-                    status: 'error',
-                    message: 'Failed to fetch server status. Please try again later. Error: ' + error,
-                });
+                if (axios.isAxiosError(error)) {
+                    if (error.response) {
+                        if (error.response.status === 401) {
+                            setFetchStatus({ status: 'error', message: 'Unauthorized. Please log in.' });
+                            navigate('/logout');
+                        } else {
+                            setFetchStatus({ status: 'error', message: error.response.statusText });
+                        }
+                    } else {
+                        setFetchStatus({
+                            status: 'error',
+                            message: 'Failed to fetch server status. Please try again later. Error: ' + error.message,
+                        });
+                    }
+                } else {
+                    setFetchStatus({
+                        status: 'error',
+                        message: 'An unexpected error occurred: ' + error,
+                    });
+                }
             }
         };
 
