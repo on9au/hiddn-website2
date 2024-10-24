@@ -114,7 +114,3 @@ We may update this Privacy Policy from time to time. Changes will be posted on t
 ## 11. Contact Us
 
 For questions about this Privacy Policy, please contact us at [privacy@hiddn.com](mailto:privacy@hiddn.com).
-
----
-
-**Disclaimer**: This Terms of Service and Privacy Policy are provided for informational purposes only and do not constitute legal advice. Please consult with a qualified attorney to ensure that these documents meet all legal requirements specific to your jurisdiction and business needs.
