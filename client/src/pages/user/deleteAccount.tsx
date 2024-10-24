@@ -57,7 +57,7 @@ const DeleteProfile: React.FC = () => {
 
     return (
         <div className="flex flex-col pt-7">
-            <span className="w-full px-4 mb-6 text-left">
+            <span className="w-full mb-6 text-left">
                 <h1 className="text-4xl font-semibold">Delete Account</h1>
             </span>
             <div className="container mx-auto">
