@@ -130,6 +130,21 @@ async fn load_announcements() -> Vec<AnnouncementPayload> {
         dir_entries.push(entry);
     }
 
+    let mut entries_with_metadata: Vec<_> =
+        futures::future::join_all(dir_entries.into_iter().map(|entry| async {
+            let metadata = entry.metadata().await.unwrap();
+            let modified = metadata.modified().unwrap();
+            (entry, modified)
+        }))
+        .await;
+
+    entries_with_metadata.sort_by_key(|&(_, modified)| std::cmp::Reverse(modified));
+
+    let dir_entries: Vec<_> = entries_with_metadata
+        .into_iter()
+        .map(|(entry, _)| entry)
+        .collect();
+
     for entry in dir_entries {
         println!("{:?}", entry.file_name());
         let file_name = entry.file_name().to_string_lossy().to_lowercase();
@@ -386,7 +401,9 @@ async fn get_documentation(
 async fn list_documentation_options(Extension(docs): Extension<SharedDocs>) -> impl IntoResponse {
     let docs = docs.read().await;
 
-    let os_list: Vec<String> = docs.keys().cloned().collect();
+    let mut os_list: Vec<String> = docs.keys().cloned().collect();
+
+    os_list.sort();
 
     let response = json!({
         "osList": os_list
