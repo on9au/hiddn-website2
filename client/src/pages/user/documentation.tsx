@@ -120,63 +120,65 @@ const Documentation: React.FC = () => {
     };
 
     return (
-        <div className="container px-4 py-8 mx-auto">
-            <h1 className="mb-8 text-4xl">Documentation</h1>
+        <div className="flex flex-col items-center min-h-screen pt-7">
+            <span className="w-full mb-6 text-left">
+                <h1 className="text-4xl font-semibold">Documentation</h1>
+            </span>
 
-            {/* OS Selector */}
-            <div className="mb-4">
-                <h2 className="mb-2 text-2xl">Select Operating System:</h2>
-                <div className="flex flex-wrap space-x-4">
-                    {osList.map((os) => (
-                        <button
-                            key={os}
-                            onClick={() => handleOsChange(os)}
-                            className={`px-4 py-2 mt-2 rounded ${
-                                selectedOs === os ? 'bg-hiddn-500 text-white' : 'dark:bg-gray-700 dark:text-white bg-gray-200 text-black'
-                            }`}
-                        >
-                            {os.charAt(0).toUpperCase() + os.slice(1)}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            {/* Category Selector */}
-            {categories.length > 0 && (
+            <div className="container mx-auto">
+                {/* OS Selector */}
                 <div className="mb-4">
-                    <h2 className="mb-2 text-2xl">Select Category:</h2>
+                    <h2 className="mb-2 text-2xl">Select Operating System:</h2>
                     <div className="flex flex-wrap space-x-4">
-                        {categories.map((category) => (
+                        {osList.map((os) => (
                             <button
-                                key={category}
-                                onClick={() => handleCategoryChange(category)}
-                                className={`px-4 py-2 mt-2 rounded ${
-                                    selectedCategory === category ? 'bg-hiddn-500 text-white' : 'dark:bg-gray-700 dark:text-white bg-gray-200 text-black'
-                                }`}
+                                key={os}
+                                onClick={() => handleOsChange(os)}
+                                className={`px-4 py-2 mt-2 rounded ${selectedOs === os ? 'bg-hiddn-500 text-white' : 'dark:bg-gray-700 dark:text-white bg-gray-200 text-black'
+                                    }`}
                             >
-                                {category.charAt(0).toUpperCase() + category.slice(1)}
+                                {os.charAt(0).toUpperCase() + os.slice(1)}
                             </button>
                         ))}
                     </div>
                 </div>
-            )}
 
-            {/* Content Display */}
-            <div className="prose max-w-none dark:prose-invert">
-                {loading ? (
-                    <div className="flex items-center justify-center">
-                        <div
-                            className="inline-block w-8 h-8 border-4 border-current border-solid rounded-full animate-spin border-r-transparent"
-                            role="status"
-                        >
-                            <span className="sr-only">Loading...</span>
+                {/* Category Selector */}
+                {categories.length > 0 && (
+                    <div className="mb-4">
+                        <h2 className="mb-2 text-2xl">Select Category:</h2>
+                        <div className="flex flex-wrap space-x-4">
+                            {categories.map((category) => (
+                                <button
+                                    key={category}
+                                    onClick={() => handleCategoryChange(category)}
+                                    className={`px-4 py-2 mt-2 rounded ${selectedCategory === category ? 'bg-hiddn-500 text-white' : 'dark:bg-gray-700 dark:text-white bg-gray-200 text-black'
+                                        }`}
+                                >
+                                    {category.charAt(0).toUpperCase() + category.slice(1)}
+                                </button>
+                            ))}
                         </div>
                     </div>
-                ) : error ? (
-                    <p className="text-red-500">{error}</p>
-                ) : (
-                    <ReactMarkdown>{content}</ReactMarkdown>
                 )}
+
+                {/* Content Display */}
+                <div className="prose max-w-none dark:prose-invert">
+                    {loading ? (
+                        <div className="flex items-center justify-center">
+                            <div
+                                className="inline-block w-8 h-8 border-4 border-current border-solid rounded-full animate-spin border-r-transparent"
+                                role="status"
+                            >
+                                <span className="sr-only">Loading...</span>
+                            </div>
+                        </div>
+                    ) : error ? (
+                        <p className="text-red-500">{error}</p>
+                    ) : (
+                        <ReactMarkdown>{content}</ReactMarkdown>
+                    )}
+                </div>
             </div>
         </div>
     );
