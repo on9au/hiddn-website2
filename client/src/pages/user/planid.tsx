@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 const PlanID: React.FC = () => {
     const { id } = useParams<{ id: string }>();
 
-    useEffect(() => { document.title = 'Hiddn | Plan ' + id; } );
+    useEffect(() => { document.title = 'Plan ' + id + ' - HiddN'; } );
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen">

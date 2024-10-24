@@ -58,6 +58,19 @@ export interface UserTransactionPayload {
 	status: UserTransactionStatusEnum;
 }
 
+export enum PlanStatusEnum {
+	Active = "Active",
+	Expired = "Expired",
+	Cancelled = "Cancelled",
+}
+
+export interface PlanDetailsPayload {
+	expiration: string;
+	status: PlanStatusEnum;
+	dataUsed: number;
+	dataLimit: number;
+}
+
 export enum ServerStatusEnum {
 	Online = "Online",
 	Degraded = "Degraded",

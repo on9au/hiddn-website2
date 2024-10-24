@@ -13,8 +13,9 @@ use axum_login::{
     AuthManagerLayerBuilder,
 };
 use payloads::{
-    ForgotPasswordPayload, LoginPayload, LoginResponsePayload, RegisterPayload,
-    ServerStatusPayload, UserTransactionPayload, UserTransactionStatusEnum, VerifyEmailPayload,
+    ForgotPasswordPayload, LoginPayload, LoginResponsePayload, PlanDetailsPayload, PlanStatusEnum,
+    RegisterPayload, ServerStatusPayload, UserTransactionPayload, UserTransactionStatusEnum,
+    VerifyEmailPayload,
 };
 use serde_json::json;
 use sessions::{AuthSession, Backend};
@@ -41,10 +42,14 @@ async fn main() {
         // Protected routes
         .route("/documentation", get(get_documentation))
         .route("/documentation/options", get(list_documentation_options))
-        .route("/documentation/categories", get(get_documentation_categories))
+        .route(
+            "/documentation/categories",
+            get(get_documentation_categories),
+        )
         .layer(Extension(docs))
         .route("/transactions", get(transactions))
         .route("/server_status", get(server_status))
+        .route("/plan_details", get(plan_details))
         .route("/me", get(user_me))
         .route_layer(login_required!(Backend))
         // Routes involving authentication
@@ -339,9 +344,7 @@ async fn get_documentation(
 /// The outer HashMap is keyed by OS.
 /// The inner HashMap is keyed by category.
 /// This handler requires authentication (managed by axum_login).
-async fn list_documentation_options(
-    Extension(docs): Extension<SharedDocs>,
-) -> impl IntoResponse {
+async fn list_documentation_options(Extension(docs): Extension<SharedDocs>) -> impl IntoResponse {
     let docs = docs.read().await;
 
     let os_list: Vec<String> = docs.keys().cloned().collect();
@@ -358,7 +361,10 @@ async fn get_documentation_categories(
     Query(params): Query<HashMap<String, String>>,
     Extension(docs): Extension<SharedDocs>,
 ) -> impl IntoResponse {
-    let os = params.get("os").unwrap_or(&"common".to_string()).to_lowercase();
+    let os = params
+        .get("os")
+        .unwrap_or(&"common".to_string())
+        .to_lowercase();
 
     let docs = docs.read().await;
 
@@ -438,6 +444,21 @@ async fn server_status() -> impl IntoResponse {
     ];
 
     Json(server_status).into_response()
+}
+
+/// Handler for the GET '/plan_details' route.
+/// This handler will return Json(PlanDetailsPayload)
+/// This handler will return the details of the user's plan.
+/// This handler requires authentication (managed by axum_login).
+async fn plan_details() -> impl IntoResponse {
+    let plan_details = PlanDetailsPayload {
+        expiration: "2021-01-01T00:00:00Z".to_string(), // Placeholder
+        status: PlanStatusEnum::Active,
+        data_used: 15.9,
+        data_limit: 40.0,
+    };
+
+    Json(plan_details).into_response()
 }
 
 /// Handler for the GET '/me' route.

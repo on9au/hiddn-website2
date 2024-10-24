@@ -10,7 +10,7 @@ import VerificationInput from '../components/loginpageverificationinput';
 // const apiURL: string = import.meta.env.VITE_API_URL;
 
 const Forgot: React.FC = () => {
-    useEffect(() => { document.title = 'Hiddn | Forgot'; } );
+    useEffect(() => { document.title = 'Forgot - HiddN'; } );
 
     const navigate = useNavigate();
 

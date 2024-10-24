@@ -14,7 +14,7 @@ const Status: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        document.title = 'Hiddn | Server Status';
+        document.title = 'Server Status - HiddN';
 
         const fetchServerStatus = async () => {
             try {
@@ -54,50 +54,74 @@ const Status: React.FC = () => {
         fetchServerStatus();
     }, [navigate]);
 
-    if (fetchStatus.status === 'loading') {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div
-                    className="inline-block w-8 h-8 border-4 border-current border-solid rounded-full animate-spin border-r-transparent"
-                    role="status"
-                >
-                    <span className="sr-only">Loading...</span>
-                </div>
-            </div>
-        );
-    }
-
-    if (fetchStatus.status === 'error') {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <p className="text-red-500">{fetchStatus.message}</p>
-            </div>
-        );
-    }
+    // Function to get status styles
+    const getStatusStyle = (status: string) => {
+        switch (status.toLowerCase()) {
+            case 'online':
+                return 'text-green-500';
+            case 'offline':
+                return 'text-red-500';
+            case 'unreachable':
+                return 'text-red-500';
+            case 'degraded':
+                return 'text-orange-500 dark:text-yellow-300';
+            case 'maintenance':
+                return 'text-orange-500 dark:text-yellow-300';
+            default:
+                return 'text-gray-700 dark:text-gray-300';
+        }
+    };
 
     return (
-        <div className="flex flex-col items-center min-h-screen pt-7">
+        <div className="flex flex-col pt-7">
             <span className="w-full mb-6 text-left">
                 <h1 className="text-4xl font-semibold">Server Status</h1>
             </span>
-            <div className="container">
-                <div className="overflow-x-auto">
-                    <table className="min-w-full bg-white dark:bg-gray-800">
-                        <thead className="bg-gray-200 dark:bg-gray-700">
-                            <tr>
-                                <th className="px-4 py-2 border-b">Server</th>
-                                <th className="px-4 py-2 border-b">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {serverStatus.map((status, index) => (
-                                <tr key={index} className="hover:bg-gray-100 dark:hover:bg-gray-900">
-                                    <td className="px-4 py-2 border-b">{status.server}</td>
-                                    <td className="px-4 py-2 border-b">{status.status}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+            <div className="container mx-auto">
+                <div className="w-full p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
+                    {fetchStatus.status === 'loading' ? (
+                        <div className="flex items-center justify-center h-full">
+                            <div
+                                className="inline-block w-12 h-12 border-4 border-current border-blue-500 border-solid rounded-full animate-spin border-r-transparent"
+                                role="status"
+                            >
+                                <span className="sr-only">Loading...</span>
+                            </div>
+                        </div>
+                    ) : fetchStatus.status === 'error' ? (
+                        <p className="text-red-500">{fetchStatus.message}</p>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead className="bg-gray-200 dark:bg-gray-700">
+                                    <tr>
+                                        <th className="px-4 py-2 font-semibold text-gray-700 border-b dark:text-gray-300">
+                                            Server
+                                        </th>
+                                        <th className="px-4 py-2 font-semibold text-gray-700 border-b dark:text-gray-300">
+                                            Status
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {serverStatus.map((status, index) => (
+                                        <tr key={index} className="hover:bg-gray-100 dark:hover:bg-gray-900">
+                                            <td className="px-4 py-2 text-gray-700 border-b dark:text-gray-300">
+                                                {status.server}
+                                            </td>
+                                            <td
+                                                className={`px-4 py-2 border-b font-semibold ${getStatusStyle(
+                                                    status.status
+                                                )}`}
+                                            >
+                                                {status.status}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

@@ -8,7 +8,7 @@ type FetchUserStatusEnum =
     | { 'status': 'error', 'message': string }
 
 const Profile: React.FC = () => {
-    useEffect(() => { document.title = 'Hiddn | Profile'; } );
+    useEffect(() => { document.title = 'Profile - HiddN'; } );
 
     const navigate = useNavigate();
     const [userProfile, setUserProfile] = React.useState(null as UserProfilePayload | null);

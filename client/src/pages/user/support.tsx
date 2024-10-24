@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 
 const Support: React.FC = () => {
-    useEffect(() => { document.title = 'Hiddn | Support'; } );
+    useEffect(() => { document.title = 'Support - HiddN'; } );
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen">

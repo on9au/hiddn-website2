@@ -121,29 +121,36 @@ const Sidebar: React.FC = React.memo(() => {
 
     return (
         <>
-            <button className="fixed block p-6 text-base text-white rounded-full shadow-lg bg-hiddn-500 xl:hidden bottom-8 right-8" onClick={toggleSidebar}>
+            <button
+                className="fixed block p-6 text-base text-white rounded-full shadow-lg bg-hiddn-500 md:hidden bottom-8 right-8"
+                onClick={toggleSidebar}
+            >
                 {isSidebarOpen ? <XIcon size={24} /> : <ThreeBarsIcon size={24} />}
             </button>
-            {isSidebarOpen && (
-                <div className="flex flex-col h-full px-5 py-4 text-black bg-gray-100 dark:bg-gray-900 dark:text-white min-w-72">
-                    <NavBarHeader icon={theme === 'light' ? ICON_LIGHT : ICON_DARK} title="HiddN" />
-                    <div className="flex flex-col justify-between h-full">
-                        <div className="flex flex-col">
-                            <SidebarLink to="/user/dashboard" label="Dashboard" icon={<HomeIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
-                            <SidebarLink to="/user/documentation" label="Documentation" icon={<BookIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
-                            <SidebarLink to="/user/plan" label="Purchase Plan" icon={<GearIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
-                            <SidebarLink to="/user/transaction" label="Transactions" icon={<CreditCardIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
-                            <SidebarLink to="/user/status" label="Server Status" icon={<ServerIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
-                            <SidebarLink to="/user/support" label="Support" icon={<InboxIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
-                            <SidebarLink to="/user/profile" label="Profile" icon={<PersonIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
-                        </div>
-                        <div className="flex flex-col">
-                            <DarkmodeSidebarLink toggleDarkmode={changeTheme} darkModeState={theme} />
-                            <SidebarLink to="/logout" label="Logout" icon={<SignOutIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
-                        </div>
+            <div
+                className={`flex flex-col bg-gray-100 dark:bg-gray-900 dark:text-white min-w-72
+                md:fixed md:h-full md:top-0 md:left-0 md:px-5 md:py-4 max-md:px-5 max-md:py-4
+                ${isSidebarOpen ? 'block' : 'hidden md:block'}
+            `}
+            >
+                <NavBarHeader icon={theme === 'light' ? ICON_LIGHT : ICON_DARK} title="HiddN" />
+                <div className="flex flex-col justify-between h-full">
+                    <div className="flex flex-col">
+                        {/* Sidebar links */}
+                        <SidebarLink to="/user/dashboard" label="Dashboard" icon={<HomeIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
+                        <SidebarLink to="/user/documentation" label="Documentation" icon={<BookIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
+                        <SidebarLink to="/user/plan" label="Purchase Plan" icon={<GearIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
+                        <SidebarLink to="/user/transaction" label="Transactions" icon={<CreditCardIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
+                        <SidebarLink to="/user/status" label="Server Status" icon={<ServerIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
+                        <SidebarLink to="/user/support" label="Support" icon={<InboxIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
+                        <SidebarLink to="/user/profile" label="Profile" icon={<PersonIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
+                    </div>
+                    <div className="flex flex-col">
+                        <DarkmodeSidebarLink toggleDarkmode={changeTheme} darkModeState={theme} />
+                        <SidebarLink to="/logout" label="Logout" icon={<SignOutIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
                     </div>
                 </div>
-            )}
+            </div>
         </>
     );
 });

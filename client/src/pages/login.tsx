@@ -11,7 +11,7 @@ import TextInput from '../components/logintextinput';
 const Login: React.FC = () => {
     // const ICON = '../assets/hiddn_icon.svg'; // Update with your correct path to the icon
 
-    useEffect(() => { document.title = 'Hiddn | Login'; } );
+    useEffect(() => { document.title = 'Login - HiddN'; } );
 
     const navigate = useNavigate();
 

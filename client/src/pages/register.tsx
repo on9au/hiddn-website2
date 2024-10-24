@@ -10,7 +10,7 @@ import VerificationInput from '../components/loginpageverificationinput';
 // const apiURL: string = import.meta.env.VITE_API_URL;
 
 const Register: React.FC = () => {
-    useEffect(() => { document.title = 'Hiddn | Register'; } );
+    useEffect(() => { document.title = 'Register - HiddN'; } );
 
     const navigate = useNavigate();
 

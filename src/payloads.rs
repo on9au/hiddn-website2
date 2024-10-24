@@ -87,3 +87,22 @@ pub enum UserTransactionStatusEnum {
     #[serde(rename = "cancelled")]
     Cancelled,
 }
+
+#[derive(Clone, Debug, Serialize)]
+#[typeshare::typeshare]
+pub struct PlanDetailsPayload {
+    pub expiration: String,
+    pub status: PlanStatusEnum,
+    #[serde(rename = "dataUsed")]
+    pub data_used: f64,
+    #[serde(rename = "dataLimit")]
+    pub data_limit: f64,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[typeshare::typeshare]
+pub enum PlanStatusEnum {
+    Active,
+    Expired,
+    Cancelled,
+}
