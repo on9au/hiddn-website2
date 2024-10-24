@@ -15,6 +15,7 @@ import Profile from './pages/user/profile';
 import LoginPageLayout from './components/loginpagelayout';
 import PrivateRoute from './components/privateroute';
 import Status from './pages/user/status';
+import DeleteProfile from './pages/user/deleteAccount';
 
 const Router = () => {
     return (
@@ -36,6 +37,7 @@ const Router = () => {
                 <Route path="status" element={<Status/>}/>
                 <Route path="support" element={<Support/>}/>
                 <Route path="profile" element={<Profile/>}/>
+                <Route path="delete-account" element={<DeleteProfile/>}/>
             </Route>
             <Route path="*" element={<Navigate to="/login"/>}/>
         </Routes>
