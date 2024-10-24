@@ -1,7 +1,5 @@
-import { typographyPlugin } from '@tailwindcss/typography';
-
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
   darkMode: 'class',
   content: [
     "./index.html",
@@ -30,7 +28,7 @@ export default {
     },
   },
   plugins: [
-    typographyPlugin,
+    require('@tailwindcss/typography'),
   ],
 }
 
