@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { FaArrowUp, FaArrowRight } from 'react-icons/fa';
 import axios from 'axios';
-import { PlanDetailsPayload } from '../../bindings';
+import ReactMarkdown from 'react-markdown';
+import { AnnouncementPayload, PlanDetailsPayload } from '../../bindings';
 import { useNavigate } from 'react-router-dom';
 
 const Dashboard: React.FC = () => {
     const [planDetails, setPlanDetails] = useState<PlanDetailsPayload | null>(null);
+    const [announcements, setAnnouncements] = useState<AnnouncementPayload[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
@@ -34,8 +36,20 @@ const Dashboard: React.FC = () => {
             }
         };
 
+        const fetchAnnouncements = async () => {
+            try {
+                const response = await axios.get('/api/announcements', {
+                    withCredentials: true,
+                });
+                setAnnouncements(response.data);
+            } catch (err) {
+                console.error('Failed to load announcements. Error:', err);
+            }
+        };
+
         document.title = 'Dashboard - HiddN';
         fetchPlanDetails();
+        fetchAnnouncements();
     }, [navigate]);
 
     const currentTime = new Date();
@@ -55,8 +69,8 @@ const Dashboard: React.FC = () => {
         : 0;
 
     return (
-        <div className="flex flex-col items-center min-h-screen pt-7">
-            <span className="w-full mb-6 text-left">
+        <div className="flex flex-col pt-7">
+            <span className="w-full px-4 mb-6 text-left">
                 <h1 className="text-4xl font-semibold">{greeting}.</h1>
             </span>
             <div className="container mx-auto">
@@ -102,33 +116,40 @@ const Dashboard: React.FC = () => {
                                 </div>
                                 {/* Quick Actions */}
                                 <div className="flex space-x-4">
-                                    <button className="flex items-center px-4 py-2 text-white align-middle bg-green-500 rounded-md hover:bg-green-600 focus:outline-none">
+                                    <button className="flex items-center px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none">
                                         <span>Upgrade Plan</span> <FaArrowUp className="inline-block ml-2" />
                                     </button>
-                                    <button className="flex items-center px-4 py-2 text-white align-middle bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none">
+                                    <button className="flex items-center px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none">
                                         <span>View Transactions</span> <FaArrowRight className="inline-block ml-2" />
                                     </button>
                                 </div>
                             </div>
                         </div>
-                        {/* Recent Activity or Notifications */}
+                        {/* Announcements Section */}
                         <div className="w-full lg:w-1/2">
                             <div className="p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
                                 <h3 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                                    Recent Activity
+                                    Announcements
                                 </h3>
-                                {/* Sample Activity List */}
-                                <ul className="space-y-4">
-                                    <li className="text-gray-700 dark:text-gray-300">
-                                        • Connected to Melbourne server on {currentTime.toLocaleDateString()}
-                                    </li>
-                                    <li className="text-gray-700 dark:text-gray-300">
-                                        • Data usage updated: {planDetails.dataUsed}GB used
-                                    </li>
-                                    <li className="text-gray-700 dark:text-gray-300">
-                                        • Plan renewed on {planDetails.expiration}
-                                    </li>
-                                </ul>
+                                {announcements.length > 0 ? (
+                                    <div className="space-y-6">
+                                        {announcements.map((announcement) => (
+                                            <div key={announcement.id} className="pb-4 border-b">
+                                                <h4 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+                                                    {announcement.title}
+                                                </h4>
+                                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                                    {new Date(announcement.date).toLocaleDateString()}
+                                                </p>
+                                                <div className="mt-2 prose max-w-none dark:prose-invert">
+                                                    <ReactMarkdown>{announcement.content}</ReactMarkdown>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-gray-700 dark:text-gray-300">No announcements at this time.</p>
+                                )}
                             </div>
                         </div>
                     </div>

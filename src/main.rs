@@ -12,10 +12,11 @@ use axum_login::{
     tower_sessions::{MemoryStore, SessionManagerLayer},
     AuthManagerLayerBuilder,
 };
+use chrono::{DateTime, Utc};
 use payloads::{
-    ForgotPasswordPayload, LoginPayload, LoginResponsePayload, PlanDetailsPayload, PlanStatusEnum,
-    RegisterPayload, ServerStatusPayload, UserTransactionPayload, UserTransactionStatusEnum,
-    VerifyEmailPayload,
+    AnnouncementPayload, ForgotPasswordPayload, LoginPayload, LoginResponsePayload,
+    PlanDetailsPayload, PlanStatusEnum, RegisterPayload, ServerStatusPayload,
+    UserTransactionPayload, UserTransactionStatusEnum, VerifyEmailPayload,
 };
 use serde_json::json;
 use sessions::{AuthSession, Backend};
@@ -38,6 +39,8 @@ async fn main() {
 
     let docs = Arc::new(RwLock::new(load_docs().await));
 
+    let announcements = Arc::new(RwLock::new(load_announcements().await));
+
     let app = Router::new()
         // Protected routes
         .route("/documentation", get(get_documentation))
@@ -47,6 +50,8 @@ async fn main() {
             get(get_documentation_categories),
         )
         .layer(Extension(docs))
+        .route("/announcements", get(get_announcements))
+        .layer(Extension(announcements))
         .route("/transactions", get(transactions))
         .route("/server_status", get(server_status))
         .route("/plan_details", get(plan_details))
@@ -111,6 +116,40 @@ async fn load_docs() -> HashMap<String, HashMap<String, String>> {
     println!("{:?}", docs);
 
     docs
+}
+
+async fn load_announcements() -> Vec<AnnouncementPayload> {
+    let mut announcements = Vec::new();
+
+    // Read announcements dir
+    let mut paths = fs::read_dir("./announcements").await.unwrap();
+
+    let mut dir_entries = Vec::new();
+
+    while let Some(entry) = paths.next_entry().await.unwrap() {
+        dir_entries.push(entry);
+    }
+
+    for entry in dir_entries {
+        println!("{:?}", entry.file_name());
+        let file_name = entry.file_name().to_string_lossy().to_lowercase();
+        if file_name.ends_with(".md") {
+            let content = fs::read_to_string(entry.path()).await.unwrap_or_default();
+            let announcement = AnnouncementPayload {
+                id: (announcements.len() as u32).into(),
+                title: file_name.trim_end_matches(".md").to_string(),
+                date: DateTime::<Utc>::from(entry.metadata().await.unwrap().modified().unwrap())
+                    .to_rfc3339()
+                    .to_string(),
+                content,
+            };
+            announcements.push(announcement);
+        }
+    }
+
+    println!("{:?}", announcements);
+
+    announcements
 }
 
 /// Handler for the GET `/` route.
@@ -459,6 +498,18 @@ async fn plan_details() -> impl IntoResponse {
     };
 
     Json(plan_details).into_response()
+}
+
+/// Handler for the GET '/announcements' route.
+/// This handler will return Json(Vec<AnnouncementPayload>)
+/// This handler will return the announcements.
+/// This handler requires authentication (managed by axum_login).
+async fn get_announcements(
+    Extension(announcements): Extension<Arc<RwLock<Vec<AnnouncementPayload>>>>,
+) -> impl IntoResponse {
+    let announcements = announcements.read().await;
+
+    Json(announcements.clone()).into_response()
 }
 
 /// Handler for the GET '/me' route.

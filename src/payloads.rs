@@ -106,3 +106,12 @@ pub enum PlanStatusEnum {
     Expired,
     Cancelled,
 }
+
+#[derive(Clone, Debug, Serialize)]
+#[typeshare::typeshare]
+pub struct AnnouncementPayload {
+    pub id: U53,
+    pub title: String,
+    pub date: String,
+    pub content: String,
+}

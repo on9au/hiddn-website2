@@ -71,6 +71,13 @@ export interface PlanDetailsPayload {
 	dataLimit: number;
 }
 
+export interface AnnouncementPayload {
+	id: number;
+	title: string;
+	date: string;
+	content: string;
+}
+
 export enum ServerStatusEnum {
 	Online = "Online",
 	Degraded = "Degraded",
