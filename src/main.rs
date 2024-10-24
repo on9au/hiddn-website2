@@ -540,7 +540,9 @@ async fn user_me(auth_session: AuthSession) -> impl IntoResponse {
         email: user.email,
         email_verified: true,
         created_at: "2021-01-01T00:00:00Z".to_string(), // Placeholder
-        updated_at: "2021-01-01T00:00:00Z".to_string(), // Placeholder
+        updated_at: "2021-01-01T00:00:00Z".to_string(),
+        email_expiration_reminder: false,
+        email_data_reminder: true, // Placeholder
     };
 
     Json(user_profile).into_response()

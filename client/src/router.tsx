@@ -16,6 +16,7 @@ import LoginPageLayout from './components/loginpagelayout';
 import PrivateRoute from './components/privateroute';
 import Status from './pages/user/status';
 import DeleteProfile from './pages/user/deleteAccount';
+import Goodbye from './pages/goodbye';
 
 const Router = () => {
     return (
@@ -25,6 +26,7 @@ const Router = () => {
                 <Route path="logout" element={<Logout/>}/>
                 <Route path="register" element={<Register/>}/>
                 <Route path="forgot" element={<Forgot/>}/>
+                <Route path="goodbye" element={<Goodbye/>}/>
                 <Route path="" element={<Navigate to="/login"/>}/>
             </Route>
             <Route path="/user" element={<PrivateRoute element={UserLayout}/>}>

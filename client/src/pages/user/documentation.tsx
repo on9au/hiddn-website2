@@ -7,6 +7,7 @@ import {
     FaLinux,
     FaWindows,
     FaAndroid,
+    FaBook,
 } from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
 import { useNavigate } from 'react-router-dom';
@@ -151,8 +152,10 @@ const Documentation: React.FC = () => {
                 return <FaAndroid className="inline-block mr-2" />;
             case 'ios':
                 return <FaMobileAlt className="inline-block mr-2" />;
-            default:
+            case 'common':
                 return <FaDesktop className="inline-block mr-2" />;
+            default:
+                return <FaBook className="inline-block mr-2" />;
         }
     };
 
