@@ -7,28 +7,84 @@ const Documentation: React.FC = () => {
     const [osList, setOsList] = useState<string[]>([]);
     const [selectedOs, setSelectedOs] = useState<string>('common');
     const [categories, setCategories] = useState<string[]>([]);
-    const [selectedCategory, setSelectedCategory] = useState<string>('install');
-    const [loading, setLoading] = useState<boolean>(true);
+    const [selectedCategory, setSelectedCategory] = useState<string>('');
+    const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
+    // Fetch OS options on mount
     useEffect(() => {
-        const fetchDocumentationOptions = async () => {
+        const fetchOsOptions = async () => {
             try {
                 const response = await axios.get('/api/documentation/options');
-                setOsList(response.data.osList);
-                setCategories(response.data.categories);
-                if (!response.data.osList.includes(selectedOs)) {
-                    setSelectedOs('common');
-                }
+                const availableOsList = response.data.osList;
+                setOsList(availableOsList);
+                detectOs(availableOsList);
             } catch (err) {
-                console.error('Failed to load documentation options. Error: ' + err);
+                console.error('Failed to load OS options. Error:', err);
+                setError('Failed to load OS options.');
             }
         };
+
         document.title = 'Hiddn | Documentation';
-        detectOs();
-        fetchDocumentationOptions();
+        fetchOsOptions();
+    }, []);
+
+    const detectOs = (availableOsList: string[]) => {
+        const userAgent = navigator.userAgent || navigator.vendor;
+        let os = 'common';
+        if (/windows phone/i.test(userAgent)) {
+            os = 'windows';
+        } else if (/windows/i.test(userAgent)) {
+            os = 'windows';
+        } else if (/android/i.test(userAgent)) {
+            os = 'android';
+        } else if (/iPad|iPhone|iPod/.test(userAgent)) {
+            os = 'ios';
+        } else if (/mac os/i.test(userAgent)) {
+            os = 'macos';
+        } else if (/linux/i.test(userAgent)) {
+            os = 'linux';
+        }
+
+        if (availableOsList.includes(os)) {
+            setSelectedOs(os);
+        } else {
+            setSelectedOs('common');
+        }
+    };
+
+    // Fetch categories when selectedOs changes
+    useEffect(() => {
+        if (selectedOs) {
+            fetchCategories(selectedOs);
+        }
     }, [selectedOs]);
 
+    const fetchCategories = async (os: string) => {
+        try {
+            const response = await axios.get('/api/documentation/categories', {
+                params: { os },
+            });
+            const fetchedCategories = response.data.categories;
+            setCategories(fetchedCategories);
+            // Set default category to the first one
+            if (fetchedCategories.length > 0) {
+                setSelectedCategory(fetchedCategories[0]);
+            } else {
+                setSelectedCategory('');
+                setContent('');
+                setError('No categories available for this OS.');
+            }
+        } catch (err) {
+            console.error('Failed to load categories. Error:', err);
+            setError('Failed to load categories.');
+            setCategories([]);
+            setSelectedCategory('');
+            setContent('');
+        }
+    };
+
+    // Fetch documentation when selectedOs or selectedCategory changes
     useEffect(() => {
         const fetchDocumentation = async () => {
             setLoading(true);
@@ -42,35 +98,18 @@ const Documentation: React.FC = () => {
                 setContent(response.data);
                 setError(null);
             } catch (err) {
-                setError('Failed to load documentation. Error: ' + err);
+                console.error('Failed to load documentation. Error:', err);
+                setError('Failed to load documentation.');
                 setContent('');
             } finally {
                 setLoading(false);
             }
         };
-        if (osList.length > 0 && categories.length > 0) {
+
+        if (selectedOs && selectedCategory) {
             fetchDocumentation();
         }
-    }, [selectedOs, selectedCategory, osList, categories]);
-
-    const detectOs = () => {
-        const userAgent = navigator.userAgent || navigator.vendor;
-        if (/windows phone/i.test(userAgent)) {
-            setSelectedOs('windows');
-        } else if (/windows/i.test(userAgent)) {
-            setSelectedOs('windows');
-        } else if (/android/i.test(userAgent)) {
-            setSelectedOs('android');
-        } else if (/iPad|iPhone|iPod/.test(userAgent)) {
-            setSelectedOs('ios');
-        } else if (/mac os/i.test(userAgent)) {
-            setSelectedOs('macos');
-        } else if (/linux/i.test(userAgent)) {
-            setSelectedOs('linux');
-        } else {
-            setSelectedOs('common');
-        }
-    };
+    }, [selectedOs, selectedCategory]);
 
     const handleOsChange = (os: string) => {
         setSelectedOs(os);
@@ -93,7 +132,7 @@ const Documentation: React.FC = () => {
                             key={os}
                             onClick={() => handleOsChange(os)}
                             className={`px-4 py-2 mt-2 rounded ${
-                                selectedOs === os ? 'bg-blue-500 text-white' : 'bg-gray-200'
+                                selectedOs === os ? 'bg-hiddn-500 text-white' : 'dark:bg-gray-700 dark:text-white bg-gray-200 text-black'
                             }`}
                         >
                             {os.charAt(0).toUpperCase() + os.slice(1)}
@@ -103,25 +142,27 @@ const Documentation: React.FC = () => {
             </div>
 
             {/* Category Selector */}
-            <div className="mb-4">
-                <h2 className="mb-2 text-2xl">Select Category:</h2>
-                <div className="flex flex-wrap space-x-4">
-                    {categories.map((category) => (
-                        <button
-                            key={category}
-                            onClick={() => handleCategoryChange(category)}
-                            className={`px-4 py-2 mt-2 rounded ${
-                                selectedCategory === category ? 'bg-blue-500 text-white' : 'bg-gray-200'
-                            }`}
-                        >
-                            {category.charAt(0).toUpperCase() + category.slice(1)}
-                        </button>
-                    ))}
+            {categories.length > 0 && (
+                <div className="mb-4">
+                    <h2 className="mb-2 text-2xl">Select Category:</h2>
+                    <div className="flex flex-wrap space-x-4">
+                        {categories.map((category) => (
+                            <button
+                                key={category}
+                                onClick={() => handleCategoryChange(category)}
+                                className={`px-4 py-2 mt-2 rounded ${
+                                    selectedCategory === category ? 'bg-hiddn-500 text-white' : 'dark:bg-gray-700 dark:text-white bg-gray-200 text-black'
+                                }`}
+                            >
+                                {category.charAt(0).toUpperCase() + category.slice(1)}
+                            </button>
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Content Display */}
-            <div className="prose max-w-none">
+            <div className="prose max-w-none dark:prose-invert">
                 {loading ? (
                     <div className="flex items-center justify-center">
                         <div

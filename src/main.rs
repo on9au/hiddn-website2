@@ -35,10 +35,14 @@ async fn main() {
     let backend = Backend::default();
     let auth_layer = AuthManagerLayerBuilder::new(backend, session_layer).build();
 
+    let docs = Arc::new(RwLock::new(load_docs().await));
+
     let app = Router::new()
         // Protected routes
         .route("/documentation", get(get_documentation))
         .route("/documentation/options", get(list_documentation_options))
+        .route("/documentation/categories", get(get_documentation_categories))
+        .layer(Extension(docs))
         .route("/transactions", get(transactions))
         .route("/server_status", get(server_status))
         .route("/me", get(user_me))
@@ -74,6 +78,7 @@ async fn load_docs() -> HashMap<String, HashMap<String, String>> {
     }
 
     for entry in dir_entries {
+        println!("{:?}", entry.file_name());
         let os_name = entry.file_name().to_string_lossy().to_lowercase();
         let mut os_docs = HashMap::new();
 
@@ -86,6 +91,7 @@ async fn load_docs() -> HashMap<String, HashMap<String, String>> {
         }
 
         for file in file_entries {
+            println!("{:?}", file.file_name());
             let file_name = file.file_name().to_string_lossy().to_lowercase();
             if file_name.ends_with(".md") {
                 let category = file_name.trim_end_matches(".md").to_string();
@@ -96,6 +102,8 @@ async fn load_docs() -> HashMap<String, HashMap<String, String>> {
 
         docs.insert(os_name, os_docs);
     }
+
+    println!("{:?}", docs);
 
     docs
 }
@@ -324,29 +332,43 @@ async fn get_documentation(
     (StatusCode::NOT_FOUND, "Documentation not found").into_response()
 }
 
-/// Handler for the GET '/documentation_options' route.
+/// Handler for the GET '/documentation/options' route.
 /// This handler will return a list of OS and categories for the documentation.
 /// The documentation is stored in a shared state.
 /// The shared state is a HashMap<String, HashMap<String, String>>.
 /// The outer HashMap is keyed by OS.
 /// The inner HashMap is keyed by category.
 /// This handler requires authentication (managed by axum_login).
-async fn list_documentation_options(Extension(docs): Extension<SharedDocs>) -> impl IntoResponse {
+async fn list_documentation_options(
+    Extension(docs): Extension<SharedDocs>,
+) -> impl IntoResponse {
     let docs = docs.read().await;
 
     let os_list: Vec<String> = docs.keys().cloned().collect();
-    let categories: Vec<String> = if let Some(common_docs) = docs.get("common") {
-        common_docs.keys().cloned().collect()
-    } else {
-        vec![]
-    };
 
     let response = json!({
-        "osList": os_list,
-        "categories": categories
+        "osList": os_list
     });
 
     Json(response)
+}
+
+/// Handler for the GET '/documentation/categories' route.
+async fn get_documentation_categories(
+    Query(params): Query<HashMap<String, String>>,
+    Extension(docs): Extension<SharedDocs>,
+) -> impl IntoResponse {
+    let os = params.get("os").unwrap_or(&"common".to_string()).to_lowercase();
+
+    let docs = docs.read().await;
+
+    if let Some(os_docs) = docs.get(&os) {
+        let categories: Vec<String> = os_docs.keys().cloned().collect();
+        let response = json!({ "categories": categories });
+        return Json(response).into_response();
+    }
+
+    (StatusCode::NOT_FOUND, "OS not found").into_response()
 }
 
 /// Handler for the GET '/transactions' route.
