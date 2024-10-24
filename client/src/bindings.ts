@@ -40,6 +40,8 @@ export interface UserProfilePayload {
 	email_verified: boolean;
 	created_at: string;
 	updated_at: string;
+	email_expiration_reminder: boolean;
+	email_data_reminder: boolean;
 }
 
 export enum UserTransactionStatusEnum {

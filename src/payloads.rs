@@ -61,6 +61,8 @@ pub struct UserProfilePayload {
     pub email_verified: bool,
     pub created_at: String,
     pub updated_at: String,
+    pub email_expiration_reminder: bool,
+    pub email_data_reminder: bool,
 }
 
 #[derive(Clone, Debug, Serialize)]

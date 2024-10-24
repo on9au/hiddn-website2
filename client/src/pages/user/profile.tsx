@@ -1,75 +1,260 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { UserProfilePayload } from '../../bindings';
+import { Switch } from '@headlessui/react'; // Assuming you're using Headless UI for switches
 
 type FetchUserStatusEnum =
-    | { 'status': 'loading' }
-    | { 'status': 'success' }
-    | { 'status': 'error', 'message': string }
+    | { status: 'loading' }
+    | { status: 'success' }
+    | { status: 'error'; message: string };
 
 const Profile: React.FC = () => {
-    useEffect(() => { document.title = 'Profile - HiddN'; } );
-
+    const [userProfile, setUserProfile] = useState<UserProfilePayload | null>(null);
+    const [fetchServerStatus, setFetchServerStatus] = useState<FetchUserStatusEnum>({ status: 'loading' });
+    const [emailExpReminder, setEmailExpReminder] = useState<boolean>(false);
+    const [emailDataReminder, setEmailDataReminder] = useState<boolean>(false);
     const navigate = useNavigate();
-    const [userProfile, setUserProfile] = React.useState(null as UserProfilePayload | null);
-    const [fetchServerStatus, setFetchServerStatus] = React.useState({ 'status': 'loading' } as FetchUserStatusEnum);
 
-    const fetchUserProfile = async () => {
-        try {
-            const result = await fetch(`/api/me`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-            if (result.ok) {
-                setFetchServerStatus({ 'status': 'success' });
-                const json = await result.json();
-                setUserProfile(json as UserProfilePayload);
-            } else if (result.status === 401) {
-                setFetchServerStatus({ 'status': 'error', message: 'Unauthorized. Please log in.' });
-                navigate('/logout');
-            } else {
-                setFetchServerStatus({ 'status': 'error', message: result.statusText });
+    useEffect(() => {
+        document.title = 'Hiddn | Profile';
+
+        const fetchUserProfile = async () => {
+            try {
+                const response = await axios.get<UserProfilePayload>('/api/me', {
+                    withCredentials: true,
+                });
+                setUserProfile(response.data);
+                setEmailExpReminder(response.data.email_expiration_reminder);
+                setEmailDataReminder(response.data.email_data_reminder);
+                setFetchServerStatus({ status: 'success' });
+            } catch (error) {
+                if (axios.isAxiosError(error)) {
+                    if (error.response) {
+                        if (error.response.status === 401) {
+                            setFetchServerStatus({ status: 'error', message: 'Unauthorized. Please log in.' });
+                            navigate('/logout');
+                        } else {
+                            setFetchServerStatus({ status: 'error', message: error.response.statusText });
+                        }
+                    } else {
+                        setFetchServerStatus({
+                            status: 'error',
+                            message: 'Failed to fetch user profile. Error: ' + error.message,
+                        });
+                    }
+                } else {
+                    setFetchServerStatus({
+                        status: 'error',
+                        message: 'An unexpected error occurred: ' + error,
+                    });
+                }
             }
+        };
+
+        fetchUserProfile();
+    }, [navigate]);
+
+    // Handler functions
+    const handleChangePassword = () => {
+        navigate('/user/change-password');
+    };
+
+    const handleResetSubscriptionURL = async () => {
+        try {
+            await axios.post(
+                '/api/reset_subscription_url',
+                {},
+                { withCredentials: true }
+            );
+            alert('Subscription URL has been reset.');
         } catch (error) {
-            setFetchServerStatus({ 'status': 'error', message: 'Failed to fetch user profile. Try again later. Error: ' + error });
+            console.error('Failed to reset subscription URL:', error);
+            alert('Failed to reset subscription URL.');
         }
     };
 
-    React.useEffect(() => {
-        fetchUserProfile();
-    }, [fetchUserProfile]);
+    const handleToggleExpReminder = async () => {
+        try {
+            const newValue = !emailExpReminder;
+            await axios.post(
+                '/api/update_settings',
+                { email_expiration_reminder: newValue },
+                { withCredentials: true }
+            );
+            setEmailExpReminder(newValue);
+        } catch (error) {
+            console.error('Failed to update expiration reminder setting:', error);
+            alert('Failed to update setting.');
+        }
+    };
+
+    const handleToggleDataReminder = async () => {
+        try {
+            const newValue = !emailDataReminder;
+            await axios.post(
+                '/api/update_settings',
+                { email_data_reminder: newValue },
+                { withCredentials: true }
+            );
+            setEmailDataReminder(newValue);
+        } catch (error) {
+            console.error('Failed to update data reminder setting:', error);
+            alert('Failed to update setting.');
+        }
+    };
+
+    const handleDeleteAccount = () => {
+        navigate('/user/delete-account');
+    };
 
     return (
-        <div className="flex flex-col items-center min-h-screen pt-7">
+        <div className="flex flex-col pt-7">
             <span className="w-full mb-6 text-left">
                 <h1 className="text-4xl font-semibold">Profile</h1>
             </span>
-            <div className="w-full p-4 mb-6 bg-gray-200 dark:bg-gray-800 rounded-2xl">
-                {fetchServerStatus.status === 'loading' && (
-                    <div className="flex justify-center">
-                        <div
-                            className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
-                            role="status">
-                            <span
-                                className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"
-                            >Loading...</span>
+            <div className="container mx-auto">
+                <div className="w-full p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
+                    {fetchServerStatus.status === 'loading' ? (
+                        <div className="flex items-center justify-center h-full">
+                            <div
+                                className="inline-block w-12 h-12 border-4 border-current border-blue-500 border-solid rounded-full animate-spin border-r-transparent"
+                                role="status"
+                            >
+                                <span className="sr-only">Loading...</span>
+                            </div>
                         </div>
-                    </div>
-                )}
-                {fetchServerStatus.status === 'error' && (
-                    <p className="text-red-500">Error: {fetchServerStatus.message}</p>
-                )}
-                {fetchServerStatus.status === 'success' && (
-                    <>
-                        <h3 className="mb-3 text-xl font-semibold">Hello, {userProfile?.email}</h3>
-                        <p className="mb-px text-base">Created at: {userProfile?.created_at}</p>
-                    </>
-                )}
-            </div>
-            <div className="w-full mb-6">
-                bruh
+                    ) : fetchServerStatus.status === 'error' ? (
+                        <p className="text-red-500">{fetchServerStatus.message}</p>
+                    ) : userProfile ? (
+                        <div className="space-y-8">
+                            {/* User Details */}
+                            <div className="flex flex-col lg:flex-row lg:space-x-6">
+                                <div className="flex-1">
+                                    <h2 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-200">
+                                        {userProfile.email}
+                                    </h2>
+                                    <p className="mb-2 text-base text-gray-700 dark:text-gray-300">
+                                        <strong>Email:</strong> {userProfile.email}
+                                    </p>
+                                    <p className="mb-2 text-base text-gray-700 dark:text-gray-300">
+                                        <strong>Joined:</strong>{' '}
+                                        {new Date(userProfile.created_at).toLocaleDateString()}
+                                    </p>
+                                    <p className="mb-2 text-base text-gray-700 dark:text-gray-300">
+                                        <strong>Last Updated:</strong>{' '}
+                                        {new Date(userProfile.updated_at).toLocaleDateString()}
+                                    </p>
+                                </div>
+                            </div>
+                            {/* Settings Section */}
+                            <div className="mt-8">
+                                <h3 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-200">
+                                    Settings
+                                </h3>
+                                <div className="space-y-6">
+                                    {/* Change Password */}
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-base text-gray-700 dark:text-gray-300">
+                                                Change Password
+                                            </p>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                                Update your account password.
+                                            </p>
+                                        </div>
+                                        <button
+                                            className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none"
+                                            onClick={handleChangePassword}
+                                        >
+                                            Change
+                                        </button>
+                                    </div>
+                                    {/* Reset Subscription URL */}
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-base text-gray-700 dark:text-gray-300">
+                                                Reset Subscription URL
+                                            </p>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                                Generate a new subscription URL for your account.
+                                            </p>
+                                        </div>
+                                        <button
+                                            className="px-4 py-2 text-white bg-red-500 rounded-md hover:bg-red-600 focus:outline-none"
+                                            onClick={handleResetSubscriptionURL}
+                                        >
+                                            Reset
+                                        </button>
+                                    </div>
+                                    {/* Expiration Reminder to Email */}
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-base text-gray-700 dark:text-gray-300">
+                                                Expiration Reminder Emails
+                                            </p>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                                Receive email reminders when your plan is about to expire.
+                                            </p>
+                                        </div>
+                                        <Switch
+                                            checked={emailExpReminder}
+                                            onChange={handleToggleExpReminder}
+                                            className={`${emailExpReminder ? 'bg-hiddn-500' : 'bg-gray-200 dark:bg-gray-700'
+                                                } relative inline-flex h-6 w-11 items-center rounded-full`}
+                                        >
+                                            <span
+                                                className={`${emailExpReminder ? 'translate-x-6' : 'translate-x-1'
+                                                    } inline-block h-4 w-4 transform bg-white rounded-full transition-transform`}
+                                            />
+                                        </Switch>
+                                    </div>
+                                    {/* Data Limit Reminder to Email */}
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-base text-gray-700 dark:text-gray-300">
+                                                Data Limit Reminder Emails
+                                            </p>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                                Receive email alerts when you are close to your data limit.
+                                            </p>
+                                        </div>
+                                        <Switch
+                                            checked={emailDataReminder}
+                                            onChange={handleToggleDataReminder}
+                                            className={`${emailDataReminder ? 'bg-hiddn-500' : 'bg-gray-200 dark:bg-gray-700'
+                                                } relative inline-flex h-6 w-11 items-center rounded-full`}
+                                        >
+                                            <span
+                                                className={`${emailDataReminder ? 'translate-x-6' : 'translate-x-1'
+                                                    } inline-block h-4 w-4 transform bg-white rounded-full transition-transform`}
+                                            />
+                                        </Switch>
+                                    </div>
+                                    {/* Delete Account */}
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="text-base text-gray-700 dark:text-gray-300">
+                                                Delete Account
+                                            </p>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                                Permanently delete your account and all associated data.
+                                            </p>
+                                        </div>
+                                        <button
+                                            className="px-4 py-2 text-white bg-red-500 rounded-md hover:bg-red-600 focus:outline-none"
+                                            onClick={handleDeleteAccount}
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <p className="text-gray-700 dark:text-gray-300">No user profile data available.</p>
+                    )}
+                </div>
             </div>
         </div>
     );
