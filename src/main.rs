@@ -505,7 +505,7 @@ async fn server_status() -> impl IntoResponse {
 }
 
 /// Handler for the GET '/plan_details' route.
-/// This handler will return Json(PlanDetailsPayload)
+/// This handler will return Json(Option<PlanDetailsPayload>)
 /// This handler will return the details of the user's plan.
 /// This handler requires authentication (managed by axum_login).
 async fn plan_details() -> impl IntoResponse {

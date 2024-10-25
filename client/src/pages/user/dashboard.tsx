@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaArrowUp, FaArrowRight } from 'react-icons/fa';
+import { FaArrowUp, FaArrowRight, FaBook } from 'react-icons/fa';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import { AnnouncementPayload, PlanDetailsPayload } from '../../bindings';
@@ -70,7 +70,7 @@ const Dashboard: React.FC = () => {
 
     return (
         <div className="flex flex-col pt-7">
-            <span className="w-full px-4 mb-6 text-left">
+            <span className="w-full mb-6 text-left">
                 <h1 className="text-4xl font-semibold">{greeting}.</h1>
             </span>
             <div className="container mx-auto">
@@ -85,44 +85,83 @@ const Dashboard: React.FC = () => {
                     </div>
                 ) : error ? (
                     <p className="text-red-500">{error}</p>
-                ) : planDetails ? (
+                ) : (
                     <div className="flex flex-col lg:flex-row lg:space-x-6">
-                        {/* Plan Details Card */}
+                        {/* Plan Details or Call to Action */}
                         <div className="w-full mb-6 lg:w-1/2 lg:mb-0">
-                            <div className="p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
-                                <h3 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                                    Your Plan
-                                </h3>
-                                <p className="mb-2 text-base text-gray-700 dark:text-gray-300">
-                                    <strong>Expiration:</strong> {planDetails.expiration}
-                                </p>
-                                <p className="mb-4 text-base text-gray-700 dark:text-gray-300">
-                                    <strong>Status:</strong> {planDetails.status}
-                                </p>
-                                {/* Data Usage Progress Bar */}
-                                <div className="mb-4">
-                                    <p className="mb-1 text-base text-gray-700 dark:text-gray-300">
-                                        Data Usage: {planDetails.dataUsed}GB / {planDetails.dataLimit}GB
+                            {planDetails ? (
+                                <div className="p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
+                                    <h3 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-200">
+                                        Your Plan
+                                    </h3>
+                                    <p className="mb-2 text-base text-gray-700 dark:text-gray-300">
+                                        <strong>Expiration:</strong> {planDetails.expiration}
                                     </p>
-                                    <div className="w-full h-4 bg-gray-300 rounded-full dark:bg-gray-700">
-                                        <div
-                                            className="h-4 rounded-full bg-hiddn-500"
-                                            style={{ width: `${dataUsagePercentage}%` }}
-                                        ></div>
+                                    <p className="mb-4 text-base text-gray-700 dark:text-gray-300">
+                                        <strong>Status:</strong> {planDetails.status}
+                                    </p>
+                                    {/* Data Usage Progress Bar */}
+                                    <div className="mb-4">
+                                        <p className="mb-1 text-base text-gray-700 dark:text-gray-300">
+                                            Data Usage: {planDetails.dataUsed}GB / {planDetails.dataLimit}GB
+                                        </p>
+                                        <div className="w-full h-4 bg-gray-300 rounded-full dark:bg-gray-700">
+                                            <div
+                                                className="h-4 rounded-full bg-hiddn-500"
+                                                style={{ width: `${dataUsagePercentage}%` }}
+                                            ></div>
+                                        </div>
+                                        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                                            {dataUsagePercentage.toFixed(2)}% used
+                                        </p>
                                     </div>
-                                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                                        {dataUsagePercentage.toFixed(2)}% used
+                                    {/* Quick Actions */}
+                                    <div className="flex space-x-4">
+                                        <button
+                                            className="flex items-center px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none"
+                                            onClick={() => navigate('/user/plan')}
+                                        >
+                                            <span>Upgrade Plan</span> <FaArrowUp className="inline-block ml-2" />
+                                        </button>
+                                        <button
+                                            className="flex items-center px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none"
+                                            onClick={() => navigate('/user/transaction')}
+                                        >
+                                            <span>View Transactions</span> <FaArrowRight className="inline-block ml-2" />
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
+                                    <h3 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-200">
+                                        No Active Plan
+                                    </h3>
+                                    <p className="mb-4 text-base text-gray-700 dark:text-gray-300">
+                                        You don't have an active plan at the moment. To enjoy our VPN services, please
+                                        consider purchasing a plan that suits your needs.
                                     </p>
-                                </div>
-                                {/* Quick Actions */}
-                                <div className="flex space-x-4">
-                                    <button className="flex items-center px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none" onClick={() => navigate("/user/plan")}>
-                                        <span>Upgrade Plan</span> <FaArrowUp className="inline-block ml-2" />
-                                    </button>
-                                    <button className="flex items-center px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none" onClick={() => navigate("/user/transaction")}>
-                                        <span>View Transactions</span> <FaArrowRight className="inline-block ml-2" />
+                                    <button
+                                        className="flex items-center px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none"
+                                        onClick={() => navigate('/user/plan')}
+                                    >
+                                        <span>View Plans</span> <FaArrowUp className="inline-block ml-2" />
                                     </button>
                                 </div>
+                            )}
+                            {/* Documentation Section */}
+                            <div className="p-6 mt-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
+                                <h3 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-200">
+                                    Get Started with Our VPN
+                                </h3>
+                                <p className="mb-4 text-base text-gray-700 dark:text-gray-300">
+                                    Need help setting up the VPN client? Check out our documentation to get started.
+                                </p>
+                                <button
+                                    className="flex items-center px-4 py-2 text-white rounded-md bg-hiddn-500 hover:bg-hiddn-600 focus:outline-none"
+                                    onClick={() => navigate('/documentation')}
+                                >
+                                    <span>View Documentation</span> <FaBook className="inline-block ml-2" />
+                                </button>
                             </div>
                         </div>
                         {/* Announcements Section */}
@@ -148,13 +187,13 @@ const Dashboard: React.FC = () => {
                                         ))}
                                     </div>
                                 ) : (
-                                    <p className="text-gray-700 dark:text-gray-300">No announcements at this time.</p>
+                                    <p className="text-gray-700 dark:text-gray-300">
+                                        No announcements at this time.
+                                    </p>
                                 )}
                             </div>
                         </div>
                     </div>
-                ) : (
-                    <p className="text-gray-700 dark:text-gray-300">No plan details available.</p>
                 )}
             </div>
         </div>
