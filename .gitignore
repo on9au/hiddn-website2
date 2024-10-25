@@ -13,4 +13,3 @@ dist-ssr
 *.local
 
 /target
-client/src/bindings.ts
