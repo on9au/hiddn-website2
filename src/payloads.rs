@@ -73,6 +73,11 @@ pub struct UserTransactionPayload {
     pub transaction_date: String,
     pub payment_method: Option<String>,
     pub status: UserTransactionStatusEnum,
+    pub stripe_payment_intent_id: Option<String>,
+    pub created_at: String,
+    pub updated_at: String,
+    pub plan_id: Option<U53>,
+    pub description: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -122,4 +127,11 @@ pub struct PlanPayload {
     pub data_limit: Option<f64>,
     pub duration_days: U53,
     pub description: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[typeshare::typeshare]
+pub struct CreateOrderResponsePayload {
+    pub order_id: U53,
+    pub payment_intent_client_secret: String,
 }

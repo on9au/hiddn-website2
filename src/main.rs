@@ -1,7 +1,7 @@
 use std::{collections::HashMap, sync::Arc};
 
 use axum::{
-    extract::Query,
+    extract::{Path, Query},
     http::StatusCode,
     response::IntoResponse,
     routing::{delete, get, post},
@@ -53,9 +53,13 @@ async fn main() {
         .route("/announcements", get(get_announcements))
         .layer(Extension(announcements))
         .route("/transactions", get(transactions))
+        .route("/transaction/:id", get(transactions_id))
+        .route("/transaction/:id/complete", post(transaction_complete))
         .route("/server_status", get(server_status))
         .route("/plan_details", get(plan_details))
         .route("/plans", get(plans))
+        .route("/plans/:id", get(plans_id))
+        .route("/orders", post(create_transaction))
         .route("/reset_subscription_url", post(reset_subscription_url))
         .route("/update_settings", post(update_settings))
         .route("/delete_account", delete(delete_account))
@@ -447,9 +451,14 @@ async fn transactions() -> impl IntoResponse {
         UserTransactionPayload {
             transaction_id: 1_u32.into(),
             amount: 100.0,
-            transaction_date: "2021-01-01T00:00:00Z".to_string(), // Placeholder
+            transaction_date: "2021-01-01T00:00:00Z".to_string(),
             payment_method: Some("Credit Card".to_string()),
             status: UserTransactionStatusEnum::Completed,
+            stripe_payment_intent_id: Some("pi_123456".to_string()),
+            created_at: "2021-01-01T00:00:00Z".to_string(),
+            updated_at: "2021-01-01T00:00:00Z".to_string(),
+            plan_id: Some(2_u32.into()),
+            description: Some("Payment for Premium Plan".to_string()),
         },
         UserTransactionPayload {
             transaction_id: 2_u32.into(),
@@ -457,6 +466,11 @@ async fn transactions() -> impl IntoResponse {
             transaction_date: "2021-01-01T00:00:00Z".to_string(), // Placeholder
             payment_method: Some("Cash".to_string()),
             status: UserTransactionStatusEnum::Pending,
+            stripe_payment_intent_id: Some("pi_123456".to_string()),
+            created_at: "2021-01-01T00:00:00Z".to_string(),
+            updated_at: "2021-01-01T00:00:00Z".to_string(),
+            plan_id: Some(2_u32.into()),
+            description: Some("Payment for Premium Plan".to_string()),
         },
         UserTransactionPayload {
             transaction_id: 3_u32.into(),
@@ -464,6 +478,11 @@ async fn transactions() -> impl IntoResponse {
             transaction_date: "2021-01-01T00:00:00Z".to_string(), // Placeholder
             payment_method: None,
             status: UserTransactionStatusEnum::Unpaid,
+            stripe_payment_intent_id: Some("pi_123456".to_string()),
+            created_at: "2021-01-01T00:00:00Z".to_string(),
+            updated_at: "2021-01-01T00:00:00Z".to_string(),
+            plan_id: Some(2_u32.into()),
+            description: None,
         },
         UserTransactionPayload {
             transaction_id: 4_u32.into(),
@@ -471,6 +490,11 @@ async fn transactions() -> impl IntoResponse {
             transaction_date: "2021-01-01T00:00:00Z".to_string(), // Placeholder
             payment_method: Some("Paypal".to_string()),
             status: UserTransactionStatusEnum::Cancelled,
+            stripe_payment_intent_id: None,
+            created_at: "2021-01-01T00:00:00Z".to_string(),
+            updated_at: "2021-01-01T00:00:00Z".to_string(),
+            plan_id: None,
+            description: Some("Payment for Premium Plan".to_string()),
         },
         UserTransactionPayload {
             transaction_id: 5_u32.into(),
@@ -478,10 +502,45 @@ async fn transactions() -> impl IntoResponse {
             transaction_date: "2021-01-01T00:00:00Z".to_string(), // Placeholder
             payment_method: Some("Credit Card".to_string()),
             status: UserTransactionStatusEnum::Failed,
+            stripe_payment_intent_id: Some("pi_123456".to_string()),
+            created_at: "2021-01-01T00:00:00Z".to_string(),
+            updated_at: "2021-01-01T00:00:00Z".to_string(),
+            plan_id: Some(2_u32.into()),
+            description: Some("Payment for Premium Plan".to_string()),
         },
     ];
 
     Json(transactions).into_response()
+}
+
+/// Handler for the GET '/transaction/:id' route.
+/// This handler will return Json(UserTransactionPayload)
+/// This handler will return the transaction with the given id.
+/// This handler requires authentication (managed by axum_login).
+async fn transactions_id(Path(id): Path<u32>) -> impl IntoResponse {
+    let transaction = UserTransactionPayload {
+        transaction_id: id.into(),
+        amount: 100.0,
+        transaction_date: "2021-01-01T00:00:00Z".to_string(),
+        payment_method: Some("Credit Card".to_string()),
+        status: UserTransactionStatusEnum::Pending,
+        stripe_payment_intent_id: Some("pi_123456".to_string()),
+        created_at: "2021-01-01T00:00:00Z".to_string(),
+        updated_at: "2021-01-01T00:00:00Z".to_string(),
+        plan_id: Some(2_u32.into()),
+        description: Some("Payment for Premium Plan".to_string()),
+    };
+
+    Json(transaction).into_response()
+}
+
+/// Handler for the POST '/transaction/:id/complete' route.
+/// This handler will complete the transaction with the given id.
+/// This handler requires authentication (managed by axum_login).
+async fn transaction_complete(Path(id): Path<u32>) -> impl IntoResponse {
+    // Would complete the transaction in the db.
+    // Would also complete the stripe payment intent.
+    StatusCode::OK.into_response()
 }
 
 /// Handler for the GET '/server_status' route.
@@ -547,6 +606,37 @@ async fn plans() -> impl IntoResponse {
     ];
 
     Json(plans).into_response()
+}
+
+/// Handler for the GET '/plans/:id' route.
+/// This handler will return Json(PlanPayload)
+/// This handler will return the details of the plan with the given id.
+/// This handler requires authentication (managed by axum_login).
+async fn plans_id(Path(id): Path<u32>) -> impl IntoResponse {
+    let plan_details = PlanPayload {
+        id: id.into(),
+        name: "Premium".to_string(),
+        price: 10.0,
+        data_limit: Some(40.0),
+        duration_days: 30_u32.into(),
+        description: Some("Premium plan".to_string()),
+    };
+
+    Json(plan_details).into_response()
+}
+
+/// Handler for the POST '/orders' route.
+/// This handler will create an order for the user.
+/// This handler will return Json(CreateOrderResponsePayload)
+/// This handler requires authentication (managed by axum_login).
+async fn create_transaction() -> impl IntoResponse {
+    // Would create a new order in the db.
+    // Would also create stripe payment intent.
+    Json(payloads::CreateOrderResponsePayload {
+        order_id: 1_u32.into(),
+        payment_intent_client_secret: "pi_123456".to_string(),
+    })
+    .into_response()
 }
 
 /// Handler for the POST '/reset_subscription_url' route.

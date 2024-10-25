@@ -37,9 +37,9 @@ const Plan: React.FC = () => {
 
     return (
         <div className="flex flex-col pt-7">
-            <div className="w-full mb-6 text-left">
+            <span className="w-full mb-6 text-left">
                 <h1 className="text-4xl font-semibold">Available Plans</h1>
-            </div>
+            </span>
             <div className="container mx-auto">
                 {loading ? (
                     <div className="flex items-center justify-center h-full">

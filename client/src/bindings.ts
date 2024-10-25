@@ -58,6 +58,11 @@ export interface UserTransactionPayload {
 	transaction_date: string;
 	payment_method?: string;
 	status: UserTransactionStatusEnum;
+	stripe_payment_intent_id?: string;
+	created_at: string;
+	updated_at: string;
+	plan_id?: number;
+	description?: string;
 }
 
 export enum PlanStatusEnum {
@@ -87,6 +92,11 @@ export interface PlanPayload {
 	data_limit?: number;
 	duration_days: number;
 	description?: string;
+}
+
+export interface CreateOrderResponsePayload {
+	order_id: number;
+	payment_intent_client_secret: string;
 }
 
 export enum ServerStatusEnum {
