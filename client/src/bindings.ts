@@ -45,11 +45,11 @@ export interface UserProfilePayload {
 }
 
 export enum UserTransactionStatusEnum {
-	Unpaid = "unpaid",
-	Pending = "pending",
-	Completed = "completed",
-	Failed = "failed",
-	Cancelled = "cancelled",
+	Unpaid = "Unpaid",
+	Pending = "Pending",
+	Completed = "Completed",
+	Failed = "Failed",
+	Cancelled = "Cancelled",
 }
 
 export interface UserTransactionPayload {
@@ -78,6 +78,15 @@ export interface AnnouncementPayload {
 	title: string;
 	date: string;
 	content: string;
+}
+
+export interface PlanPayload {
+	id: number;
+	name: string;
+	price: number;
+	data_limit?: number;
+	duration_days: number;
+	description?: string;
 }
 
 export enum ServerStatusEnum {

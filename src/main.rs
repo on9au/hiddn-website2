@@ -15,7 +15,7 @@ use axum_login::{
 use chrono::{DateTime, Utc};
 use payloads::{
     AnnouncementPayload, ForgotPasswordPayload, LoginPayload, LoginResponsePayload,
-    PlanDetailsPayload, PlanStatusEnum, RegisterPayload, ServerStatusPayload,
+    PlanDetailsPayload, PlanPayload, PlanStatusEnum, RegisterPayload, ServerStatusPayload,
     UserTransactionPayload, UserTransactionStatusEnum, VerifyEmailPayload,
 };
 use serde_json::json;
@@ -55,6 +55,7 @@ async fn main() {
         .route("/transactions", get(transactions))
         .route("/server_status", get(server_status))
         .route("/plan_details", get(plan_details))
+        .route("/plans", get(plans))
         .route("/reset_subscription_url", post(reset_subscription_url))
         .route("/update_settings", post(update_settings))
         .route("/delete_account", delete(delete_account))
@@ -519,6 +520,33 @@ async fn plan_details() -> impl IntoResponse {
     };
 
     Json(plan_details).into_response()
+}
+
+/// Handler for the GET '/plans' route.
+/// This handler will return Json(Vec<PlanDetailsPayload>)
+/// This handler will return all the plans available.
+/// This handler requires authentication (managed by axum_login).
+async fn plans() -> impl IntoResponse {
+    let plans = vec![
+        PlanPayload {
+            id: 0_u32.into(),
+            name: "Basic".to_string(),
+            price: 5.0,
+            data_limit: Some(20.0),
+            duration_days: 30_u32.into(),
+            description: Some("Basic plan".to_string()),
+        },
+        PlanPayload {
+            id: 1_u32.into(),
+            name: "Premium".to_string(),
+            price: 10.0,
+            data_limit: Some(40.0),
+            duration_days: 30_u32.into(),
+            description: Some("Premium plan".to_string()),
+        },
+    ];
+
+    Json(plans).into_response()
 }
 
 /// Handler for the POST '/reset_subscription_url' route.

@@ -78,15 +78,10 @@ pub struct UserTransactionPayload {
 #[derive(Clone, Debug, Serialize)]
 #[typeshare::typeshare]
 pub enum UserTransactionStatusEnum {
-    #[serde(rename = "unpaid")]
     Unpaid,
-    #[serde(rename = "pending")]
     Pending,
-    #[serde(rename = "completed")]
     Completed,
-    #[serde(rename = "failed")]
     Failed,
-    #[serde(rename = "cancelled")]
     Cancelled,
 }
 
@@ -116,4 +111,15 @@ pub struct AnnouncementPayload {
     pub title: String,
     pub date: String,
     pub content: String,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[typeshare::typeshare]
+pub struct PlanPayload {
+    pub id: U53,
+    pub name: String,
+    pub price: f64,
+    pub data_limit: Option<f64>,
+    pub duration_days: U53,
+    pub description: Option<String>,
 }
