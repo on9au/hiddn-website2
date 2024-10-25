@@ -151,14 +151,14 @@ const Dashboard: React.FC = () => {
                             {/* Documentation Section */}
                             <div className="p-6 mt-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
                                 <h3 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                                    Get Started with Our VPN
+                                    Get Started with HiddN VPN
                                 </h3>
                                 <p className="mb-4 text-base text-gray-700 dark:text-gray-300">
                                     Need help setting up the VPN client? Check out our documentation to get started.
                                 </p>
                                 <button
                                     className="flex items-center px-4 py-2 text-white rounded-md bg-hiddn-500 hover:bg-hiddn-600 focus:outline-none"
-                                    onClick={() => navigate('/documentation')}
+                                    onClick={() => navigate('/user/documentation')}
                                 >
                                     <span>View Documentation</span> <FaBook className="inline-block ml-2" />
                                 </button>

@@ -1,4 +1,4 @@
-import {Navigate, Route, Routes} from 'react-router-dom';
+import {Route, Routes} from 'react-router-dom';
 import Login from './pages/login';
 import Register from './pages/register';
 import Forgot from './pages/forgot';
@@ -18,6 +18,8 @@ import Status from './pages/user/status';
 import DeleteProfile from './pages/user/deleteAccount';
 import Goodbye from './pages/goodbye';
 import ChangePassword from './pages/user/changePassword';
+import LoginPageRedirect from './pages/loginPageRedirect';
+import UserPageRedirect from './pages/user/userPageRedirect';
 
 const Router = () => {
     return (
@@ -28,7 +30,8 @@ const Router = () => {
                 <Route path="register" element={<Register/>}/>
                 <Route path="forgot" element={<Forgot/>}/>
                 <Route path="goodbye" element={<Goodbye/>}/>
-                <Route path="" element={<Navigate to="/login"/>}/>
+                <Route path="*" element={<LoginPageRedirect/>}/>
+                <Route path="" element={<LoginPageRedirect/>}/>
             </Route>
             <Route path="/user" element={<PrivateRoute element={UserLayout}/>}>
                 <Route path="dashboard" element={<Dashboard/>}/>
@@ -42,8 +45,9 @@ const Router = () => {
                 <Route path="profile" element={<Profile/>}/>
                 <Route path="delete-account" element={<DeleteProfile/>}/>
                 <Route path="change-password" element={<ChangePassword/>}/>
+                <Route path="*" element={<UserPageRedirect/>}/>
+                <Route path="" element={<UserPageRedirect/>}/>
             </Route>
-            <Route path="*" element={<Navigate to="/login"/>}/>
         </Routes>
     )
 };

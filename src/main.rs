@@ -4,7 +4,7 @@ use axum::{
     extract::Query,
     http::StatusCode,
     response::IntoResponse,
-    routing::{get, post},
+    routing::{delete, get, post},
     Extension, Json, Router,
 };
 use axum_login::{
@@ -57,6 +57,8 @@ async fn main() {
         .route("/plan_details", get(plan_details))
         .route("/reset_subscription_url", post(reset_subscription_url))
         .route("/update_settings", post(update_settings))
+        .route("/delete_account", delete(delete_account))
+        .route("/change_password", post(change_password))
         .route("/me", get(user_me))
         .route_layer(login_required!(Backend))
         // Routes involving authentication
@@ -532,6 +534,25 @@ async fn reset_subscription_url() -> impl IntoResponse {
 /// This handler requires authentication (managed by axum_login).
 async fn update_settings() -> impl IntoResponse {
     // Typically, would update the user's settings in the db.
+    StatusCode::OK.into_response()
+}
+
+/// Handler for the DELETE '/delete_account' route.
+/// This handler will delete the user's account.
+/// This handler requires authentication (managed by axum_login).
+async fn delete_account() -> impl IntoResponse {
+    // Typically, would delete the user's account in the db.
+    StatusCode::OK.into_response()
+}
+
+/// Handler for the POST '/change_password' route.
+/// This handler will change the user's password.
+/// This handler requires authentication (managed by axum_login).
+async fn change_password() -> impl IntoResponse {
+    // Typically, would change the user's password in the db, as well as:
+    // - Verify if the password is valid
+    // - Invalidate all sessions
+    // - Send an email to the user notifying them of the password change
     StatusCode::OK.into_response()
 }
 

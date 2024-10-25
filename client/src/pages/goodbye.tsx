@@ -6,30 +6,32 @@ import Loginbutton from "../components/loginbutton";
 const Goodbye: React.FC = () => {
     const navigate = useNavigate();
 
-    useEffect(() => { document.title = 'Logout - HiddN'; });
+    useEffect(() => { document.title = 'Goodbye - HiddN'; });
 
     const [logoutStatus, setLogoutStatus] = React.useState<LogoutStatus>({ type: 'Idle' });
 
     useEffect(() => {
         // Log out user, with API endpoint.
-        setLogoutStatus({ type: 'LoggingOut' });
-        try {
-            fetch(`api/logout_user`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }).then((response) => {
-                if (response.status === 200) {
-                    setLogoutStatus({ type: 'Success' });
-                    localStorage.removeItem('isAuthenticated');
-                } else {
-                    setLogoutStatus({ type: 'Error', message: response.statusText });
-                }
-            });
-        } catch (error) {
-            setLogoutStatus({ type: 'Error', message: 'Failed to log out. Try again later. Error: ' + error });
-        }
+        setTimeout(() => {
+            setLogoutStatus({ type: 'LoggingOut' });
+            try {
+                fetch(`api/logout_user`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }).then((response) => {
+                    if (response.status === 200) {
+                        setLogoutStatus({ type: 'Success' });
+                        localStorage.removeItem('isAuthenticated');
+                    } else {
+                        setLogoutStatus({ type: 'Error', message: response.statusText });
+                    }
+                });
+            } catch (error) {
+                setLogoutStatus({ type: 'Error', message: 'Failed to log out. Try again later. Error: ' + error });
+            }
+        }, 5000);
     }, []);
 
     const returnToLogin = () => {
@@ -51,7 +53,7 @@ const Goodbye: React.FC = () => {
                 <>
                     <h1 className="mb-4 text-4xl">Logging you out...</h1>
                     <div
-                        className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                        className="inline-block h-8 w-8 mb-4 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
                         role="status">
                         <span
                             className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]"

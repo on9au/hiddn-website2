@@ -55,7 +55,7 @@ const LoginPageLayout: React.FC = () => {
     // If user is authenticated, show the dashboard page
     if (isAuthenticated) {
         if (typeof window !== 'undefined') {
-            if (window.location.pathname !== '/logout') {
+            if (window.location.pathname !== '/logout' && window.location.pathname !== '/goodbye') {
                 navigate('/user/dashboard');
             }
         }
