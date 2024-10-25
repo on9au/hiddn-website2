@@ -116,10 +116,10 @@ const Dashboard: React.FC = () => {
                                 </div>
                                 {/* Quick Actions */}
                                 <div className="flex space-x-4">
-                                    <button className="flex items-center px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none">
+                                    <button className="flex items-center px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none" onClick={() => navigate("/user/plan")}>
                                         <span>Upgrade Plan</span> <FaArrowUp className="inline-block ml-2" />
                                     </button>
-                                    <button className="flex items-center px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none">
+                                    <button className="flex items-center px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none" onClick={() => navigate("/user/transaction")}>
                                         <span>View Transactions</span> <FaArrowRight className="inline-block ml-2" />
                                     </button>
                                 </div>
