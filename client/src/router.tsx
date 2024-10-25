@@ -17,6 +17,7 @@ import PrivateRoute from './components/privateroute';
 import Status from './pages/user/status';
 import DeleteProfile from './pages/user/deleteAccount';
 import Goodbye from './pages/goodbye';
+import ChangePassword from './pages/user/changePassword';
 
 const Router = () => {
     return (
@@ -40,6 +41,7 @@ const Router = () => {
                 <Route path="support" element={<Support/>}/>
                 <Route path="profile" element={<Profile/>}/>
                 <Route path="delete-account" element={<DeleteProfile/>}/>
+                <Route path="change-password" element={<ChangePassword/>}/>
             </Route>
             <Route path="*" element={<Navigate to="/login"/>}/>
         </Routes>

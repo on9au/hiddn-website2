@@ -55,6 +55,8 @@ async fn main() {
         .route("/transactions", get(transactions))
         .route("/server_status", get(server_status))
         .route("/plan_details", get(plan_details))
+        .route("/reset_subscription_url", post(reset_subscription_url))
+        .route("/update_settings", post(update_settings))
         .route("/me", get(user_me))
         .route_layer(login_required!(Backend))
         // Routes involving authentication
@@ -515,6 +517,22 @@ async fn plan_details() -> impl IntoResponse {
     };
 
     Json(plan_details).into_response()
+}
+
+/// Handler for the POST '/reset_subscription_url' route.
+/// This handler will reset the subscription URL.
+/// This handler requires authentication (managed by axum_login).
+async fn reset_subscription_url() -> impl IntoResponse {
+    // Typically, would call marzban api to reset the subscription URL.
+    StatusCode::OK.into_response()
+}
+
+/// Handler for the POST '/update_settings' route.
+/// This handler will update the user's settings.
+/// This handler requires authentication (managed by axum_login).
+async fn update_settings() -> impl IntoResponse {
+    // Typically, would update the user's settings in the db.
+    StatusCode::OK.into_response()
 }
 
 /// Handler for the GET '/announcements' route.
