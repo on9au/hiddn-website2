@@ -1,5 +1,9 @@
+// payloads.rs
+
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use typeshare::U53;
+use uuid::Uuid;
 
 #[derive(Clone, Debug, Deserialize)]
 #[typeshare::typeshare]
@@ -129,9 +133,63 @@ pub struct PlanPayload {
     pub description: Option<String>,
 }
 
+#[derive(Clone, Debug, Deserialize)]
+#[typeshare::typeshare]
+pub struct CreateOrderPayload {
+    pub plan_id: U53,
+}
+
 #[derive(Clone, Debug, Serialize)]
 #[typeshare::typeshare]
 pub struct CreateOrderResponsePayload {
-    pub order_id: U53,
+    pub order_id: u32,
     pub payment_intent_client_secret: String,
+}
+
+#[derive(Debug, sqlx::FromRow)]
+pub struct SubscriptionPlan {
+    pub id: u32,
+    pub name: String,
+    pub price: f64,
+    pub data_limit: Option<i64>, // in GB
+    pub duration_days: i32,
+    pub description: Option<String>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Debug, sqlx::FromRow)]
+pub struct OnlineUser {
+    pub id: u32,
+    pub email: String,
+    pub password_hash: String,
+    pub password_salt: String,
+    pub credit: f64,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Debug, sqlx::FromRow)]
+pub struct UserSubscription {
+    pub id: u32,
+    pub online_user_id: i32,
+    pub subscription_plan_id: i32,
+    pub start_date: DateTime<Utc>,
+    pub end_date: DateTime<Utc>,
+    pub status: String, // 'active', 'expired', 'cancelled'
+}
+
+#[derive(Debug, sqlx::FromRow)]
+pub struct PaymentTransaction {
+    pub id: u32,
+    pub online_user_id: u32,
+    pub amount: f64,
+    pub transaction_date: DateTime<Utc>,
+    pub payment_method: Option<String>,
+    pub status: String, // 'unpaid', 'pending', 'completed', 'failed', 'cancelled'
+    pub stripe_payment_intent_id: Option<String>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    pub plan_id: Option<u32>,
+    pub description: Option<String>,
 }

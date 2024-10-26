@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{collections::HashMap, process, sync::Arc};
 
 use axum::{
     extract::{Path, Query},
@@ -9,18 +9,22 @@ use axum::{
 };
 use axum_login::{
     login_required,
-    tower_sessions::{MemoryStore, SessionManagerLayer},
+    tower_sessions::{cookie::time::Duration, Expiry, MemoryStore, SessionManagerLayer},
     AuthManagerLayerBuilder,
 };
 use chrono::{DateTime, Utc};
 use payloads::{
-    AnnouncementPayload, ForgotPasswordPayload, LoginPayload, LoginResponsePayload,
-    PlanDetailsPayload, PlanPayload, PlanStatusEnum, RegisterPayload, ServerStatusPayload,
-    UserTransactionPayload, UserTransactionStatusEnum, VerifyEmailPayload,
+    AnnouncementPayload, CreateOrderPayload, ForgotPasswordPayload, LoginPayload,
+    LoginResponsePayload, PaymentTransaction, PlanDetailsPayload, PlanPayload, PlanStatusEnum,
+    RegisterPayload, ServerStatusPayload, SubscriptionPlan, UserTransactionPayload,
+    UserTransactionStatusEnum, VerifyEmailPayload,
 };
 use serde_json::json;
 use sessions::{AuthSession, Backend};
+use sqlx::MySqlPool;
+use stripe::PaymentMethodId;
 use tokio::{fs, net::TcpListener, sync::RwLock};
+use tracing::error;
 
 mod payloads;
 mod sessions;
@@ -29,16 +33,36 @@ type SharedDocs = Arc<RwLock<HashMap<String, HashMap<String, String>>>>;
 
 #[tokio::main]
 async fn main() {
+    // Load dotenv file
+    match dotenvy::dotenv() {
+        Ok(_) => {}
+        Err(e) => {
+            println!("Error loading .env file: {}", e);
+            process::exit(1);
+        }
+    };
+
+    // Logging/Tracing setup
+    tracing_subscriber::fmt::init();
+
+    // Initalize DB pool
+    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let pool = sqlx::MySqlPool::connect(&database_url)
+        .await
+        .expect("Failed to connect to db");
+
     // Session layer.
     let session_store = MemoryStore::default();
-    let session_layer = SessionManagerLayer::new(session_store);
+    let session_layer = SessionManagerLayer::new(session_store)
+        .with_http_only(true)
+        .with_expiry(Expiry::OnInactivity(Duration::days(7)));
 
     // Auth service.
-    let backend = Backend::default();
+    let backend = Backend::new(pool.clone());
     let auth_layer = AuthManagerLayerBuilder::new(backend, session_layer).build();
 
+    // Load documentation and announcements
     let docs = Arc::new(RwLock::new(load_docs().await));
-
     let announcements = Arc::new(RwLock::new(load_announcements().await));
 
     let app = Router::new()
@@ -629,14 +653,137 @@ async fn plans_id(Path(id): Path<u32>) -> impl IntoResponse {
 /// This handler will create an order for the user.
 /// This handler will return Json(CreateOrderResponsePayload)
 /// This handler requires authentication (managed by axum_login).
-async fn create_transaction() -> impl IntoResponse {
-    // Would create a new order in the db.
-    // Would also create stripe payment intent.
-    Json(payloads::CreateOrderResponsePayload {
-        order_id: 1_u32.into(),
-        payment_intent_client_secret: "pi_123456".to_string(),
-    })
-    .into_response()
+async fn create_transaction(
+    mut auth_session: AuthSession,
+    Extension(pool): Extension<MySqlPool>,
+    Json(payload): Json<CreateOrderPayload>,
+) -> impl IntoResponse {
+    // Fetch the subscription plan
+    let plan = match sqlx::query_as::<_, SubscriptionPlan>(
+        "SELECT * FROM hiddn_subscription_plans WHERE id = ?",
+    )
+    .bind(payload.plan_id.into())
+    .fetch_one(&pool)
+    .await
+    {
+        Ok(plan) => plan,
+        Err(sqlx::Error::RowNotFound) => {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(json!({ "error": "Invalid plan_id" })),
+            )
+                .into_response()
+        }
+        Err(e) => {
+            error!("Database error: {:?}", e);
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({ "error": "Internal server error" })),
+            )
+                .into_response();
+        }
+    };
+
+    // Create a Stripe Payment Intent (Assuming you have Stripe setup)
+    let payment_intent_secret = match create_stripe_payment_intent(plan.price).await {
+        Ok(secret) => secret,
+        Err(e) => {
+            error!("Stripe error: {:?}", e);
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({ "error": "Failed to create payment intent" })),
+            )
+                .into_response();
+        }
+    };
+
+    let user_id = match auth_session.user {
+        Some(user) => user.id,
+        None => {
+            return (
+                StatusCode::UNAUTHORIZED,
+                Json(json!({ "error": "User not authenticated" })),
+            )
+                .into_response();
+        }
+    };
+
+    // Insert the transaction into the database
+    let transaction = match sqlx::query_as::<_, PaymentTransaction>(
+        "INSERT INTO payment_transactions (online_user_id, amount, status, stripe_payment_intent_id, plan_id, description)
+        VALUES (?, ?, 'unpaid', ?, ?, ?)
+        RETURNING *",
+    )
+    .bind(user_id)
+    .bind(plan.price)
+    .bind(&payment_intent_secret)
+    .bind(Some(plan.id))
+    .bind(Some(format!("Payment for plan {}", plan.name)))
+    .fetch_one(&pool)
+    .await
+    {
+        Ok(tx) => tx,
+        Err(e) => {
+            error!("Database insert error: {:?}", e);
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({ "error": "Failed to create transaction" })),
+            )
+                .into_response();
+        }
+    };
+
+    // Respond with transaction ID and payment intent client secret
+    let response = payloads::CreateOrderResponsePayload {
+        order_id: transaction.id,
+        payment_intent_client_secret: payment_intent_secret,
+    };
+
+    (StatusCode::OK, Json(response)).into_response()
+}
+
+async fn create_stripe_payment_intent(amount: f64) -> Result<String, stripe::StripeError> {
+    let stripe_secret_key =
+        std::env::var("STRIPE_SECRET_KEY").expect("STRIPE_SECRET_KEY must be set in .env");
+    let client = stripe::Client::new(&stripe_secret_key);
+
+    let params = stripe::CreatePaymentIntent {
+        amount: (amount * 100.0) as i64, // Convert to cents
+        currency: stripe::Currency::AUD, // Change currency as needed
+        payment_method_types: Some(vec!["card".to_string()]),
+        application_fee_amount: None,
+        automatic_payment_methods: None,
+        capture_method: None,
+        confirm: Some(true),
+        confirmation_method: Some(stripe::PaymentIntentConfirmationMethod::Manual),
+        customer: None,
+        description: Some("Payment for HiddN subscription"),
+        error_on_requires_action: Some(true),
+        expand: &[],
+        mandate: None,
+        mandate_data: None,
+        metadata: None,
+        off_session: None,
+        on_behalf_of: None,
+        payment_method: Some(PaymentMethodId::default()),
+        payment_method_configuration: None,
+        payment_method_data: None,
+        payment_method_options: todo!(),
+        radar_options: todo!(),
+        receipt_email: todo!(),
+        return_url: todo!(),
+        setup_future_usage: todo!(),
+        shipping: todo!(),
+        statement_descriptor: todo!(),
+        statement_descriptor_suffix: todo!(),
+        transfer_data: todo!(),
+        transfer_group: todo!(),
+        use_stripe_sdk: todo!(),
+    };
+
+    let intent: stripe::PaymentIntent = stripe::PaymentIntent::create(&client, params).await?;
+
+    Ok(intent.client_secret.unwrap())
 }
 
 /// Handler for the POST '/reset_subscription_url' route.

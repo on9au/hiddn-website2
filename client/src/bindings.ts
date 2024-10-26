@@ -94,6 +94,10 @@ export interface PlanPayload {
 	description?: string;
 }
 
+export interface CreateOrderPayload {
+	plan_id: number;
+}
+
 export interface CreateOrderResponsePayload {
 	order_id: number;
 	payment_intent_client_secret: string;
