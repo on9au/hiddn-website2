@@ -22,7 +22,7 @@ use payloads::{
 use serde_json::json;
 use sessions::{AuthSession, Backend};
 use sqlx::MySqlPool;
-use stripe::PaymentMethodId;
+use stripe::{Client, CreatePaymentIntent, Currency, PaymentIntent, PaymentMethodId};
 use tokio::{fs, net::TcpListener, sync::RwLock};
 use tracing::error;
 
@@ -654,7 +654,7 @@ async fn plans_id(Path(id): Path<u32>) -> impl IntoResponse {
 /// This handler will return Json(CreateOrderResponsePayload)
 /// This handler requires authentication (managed by axum_login).
 async fn create_transaction(
-    mut auth_session: AuthSession,
+    auth_session: AuthSession,
     Extension(pool): Extension<MySqlPool>,
     Json(payload): Json<CreateOrderPayload>,
 ) -> impl IntoResponse {
@@ -662,7 +662,7 @@ async fn create_transaction(
     let plan = match sqlx::query_as::<_, SubscriptionPlan>(
         "SELECT * FROM hiddn_subscription_plans WHERE id = ?",
     )
-    .bind(payload.plan_id.into())
+    .bind::<u64>(payload.plan_id.into())
     .fetch_one(&pool)
     .await
     {
@@ -745,44 +745,16 @@ async fn create_transaction(
 async fn create_stripe_payment_intent(amount: f64) -> Result<String, stripe::StripeError> {
     let stripe_secret_key =
         std::env::var("STRIPE_SECRET_KEY").expect("STRIPE_SECRET_KEY must be set in .env");
-    let client = stripe::Client::new(&stripe_secret_key);
+    let client = Client::new(stripe_secret_key);
 
-    let params = stripe::CreatePaymentIntent {
-        amount: (amount * 100.0) as i64, // Convert to cents
-        currency: stripe::Currency::AUD, // Change currency as needed
+    let params = CreatePaymentIntent {
+        amount: (amount * 100.0) as i64, // Convert amount to cents
+        currency: Currency::AUD,         // Change currency as needed
         payment_method_types: Some(vec!["card".to_string()]),
-        application_fee_amount: None,
-        automatic_payment_methods: None,
-        capture_method: None,
-        confirm: Some(true),
-        confirmation_method: Some(stripe::PaymentIntentConfirmationMethod::Manual),
-        customer: None,
-        description: Some("Payment for HiddN subscription"),
-        error_on_requires_action: Some(true),
-        expand: &[],
-        mandate: None,
-        mandate_data: None,
-        metadata: None,
-        off_session: None,
-        on_behalf_of: None,
-        payment_method: Some(PaymentMethodId::default()),
-        payment_method_configuration: None,
-        payment_method_data: None,
-        payment_method_options: todo!(),
-        radar_options: todo!(),
-        receipt_email: todo!(),
-        return_url: todo!(),
-        setup_future_usage: todo!(),
-        shipping: todo!(),
-        statement_descriptor: todo!(),
-        statement_descriptor_suffix: todo!(),
-        transfer_data: todo!(),
-        transfer_group: todo!(),
-        use_stripe_sdk: todo!(),
+        ..Default::default()
     };
 
-    let intent: stripe::PaymentIntent = stripe::PaymentIntent::create(&client, params).await?;
-
+    let intent = PaymentIntent::create(&client, params).await?;
     Ok(intent.client_secret.unwrap())
 }
 
