@@ -46,6 +46,7 @@ impl AuthUser for User {
 // }
 #[derive(Clone, Default)]
 pub struct Backend {
+    #[allow(dead_code)] // We're not using this yet.
     users: HashMap<Uuid, User>,
 }
 
