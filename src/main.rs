@@ -1,4 +1,4 @@
-use std::{collections::HashMap, process, sync::Arc};
+use std::{collections::HashMap, sync::Arc};
 
 use axum_login::{
     tower_sessions::{cookie::time::Duration, Expiry, MemoryStore, SessionManagerLayer},
@@ -14,6 +14,7 @@ mod handlers;
 mod payloads;
 mod routes;
 mod sessions;
+mod ssr;
 mod utils;
 
 type SharedDocs = Arc<RwLock<HashMap<String, HashMap<String, String>>>>;
@@ -21,13 +22,7 @@ type SharedDocs = Arc<RwLock<HashMap<String, HashMap<String, String>>>>;
 #[tokio::main]
 async fn main() {
     // Load dotenv file
-    match dotenvy::dotenv() {
-        Ok(_) => {}
-        Err(e) => {
-            println!("Error loading .env file: {}", e);
-            process::exit(1);
-        }
-    };
+    dotenvy::dotenv().ok();
 
     // Logging/Tracing setup
     tracing_subscriber::fmt::init();
@@ -52,7 +47,10 @@ async fn main() {
     let announcements: Arc<RwLock<Vec<AnnouncementPayload>>> =
         Arc::new(RwLock::new(load_announcements().await));
 
-    let app = create_router(docs, announcements, auth_layer);
+    // Shared app state for SSR
+    let shared_app_state = ssr::setup_app_state_ssr().await;
+
+    let app = create_router(docs, announcements, auth_layer, shared_app_state);
 
     let listener = TcpListener::bind("127.0.0.1:3000").await.unwrap();
     println!("listening on {}", listener.local_addr().unwrap());
