@@ -23,14 +23,6 @@ pub fn create_router(
     shared_app_state: Arc<AppState>,
 ) -> Router {
     Router::new()
-        // SSR Frontend
-        .nest_service(
-            "/",
-            ServeDir::new("./frontend/dist/client")
-                .append_index_html_on_directories(false)
-                .fallback(get(handle_ssr).into_service()),
-        )
-        .layer(Extension(shared_app_state))
         // API Routes
         .nest(
             "/api",
@@ -70,4 +62,12 @@ pub fn create_router(
                 .route("/generate_204", get(generate_204))
                 .route("/verify_email", post(verify_email)),
         )
+        // SSR Frontend
+        .nest_service(
+            "/",
+            ServeDir::new("./client/dist/client")
+                .append_index_html_on_directories(false)
+                .fallback(get(handle_ssr).into_service()),
+        )
+        .layer(Extension(shared_app_state))
 }

@@ -16,7 +16,6 @@ pub async fn load_docs() -> HashMap<String, HashMap<String, String>> {
     }
 
     for entry in dir_entries {
-        println!("{:?}", entry.file_name());
         let os_name = entry.file_name().to_string_lossy().to_lowercase();
         let mut os_docs = HashMap::new();
 
@@ -29,7 +28,6 @@ pub async fn load_docs() -> HashMap<String, HashMap<String, String>> {
         }
 
         for file in file_entries {
-            println!("{:?}", file.file_name());
             let file_name = file.file_name().to_string_lossy().to_lowercase();
             if file_name.ends_with(".md") {
                 let category = file_name.trim_end_matches(".md").to_string();
@@ -40,8 +38,6 @@ pub async fn load_docs() -> HashMap<String, HashMap<String, String>> {
 
         docs.insert(os_name, os_docs);
     }
-
-    println!("{:?}", docs);
 
     docs
 }
@@ -74,7 +70,6 @@ pub async fn load_announcements() -> Vec<AnnouncementPayload> {
         .collect();
 
     for entry in dir_entries {
-        println!("{:?}", entry.file_name());
         let file_name = entry.file_name().to_string_lossy().to_lowercase();
         if file_name.ends_with(".md") {
             let content = fs::read_to_string(entry.path()).await.unwrap_or_default();
@@ -89,8 +84,6 @@ pub async fn load_announcements() -> Vec<AnnouncementPayload> {
             announcements.push(announcement);
         }
     }
-
-    println!("{:?}", announcements);
 
     announcements
 }

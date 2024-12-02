@@ -50,6 +50,7 @@ async fn main() {
     // Shared app state for SSR
     let shared_app_state = ssr::setup_app_state_ssr().await;
 
+    // Create router
     let app = create_router(docs, announcements, auth_layer, shared_app_state);
 
     let listener = TcpListener::bind("127.0.0.1:3000").await.unwrap();

@@ -1,32 +1,41 @@
-use std::{env::current_exe, path::PathBuf, sync::Arc};
+use std::sync::Arc;
 
 use axum::{
     http::Uri,
     response::{Html, IntoResponse},
     Extension,
 };
-use serde_json::Value;
-use tokio::{fs, process::Command};
-
-const ENTRY_SERVER_JS_RENDER: &str = r#"(async () => {
-  const { render } = await import(process.argv[2]);
-  const url = process.argv[3];
-  const result = render(url);
-  console.log(JSON.stringify(result));
-})();
-"#;
+use reqwest::Client;
+use serde::{Deserialize, Serialize};
+use tokio::{fs, process::Child};
 
 pub struct Rendered {
     head: String,
     html: String,
 }
 
+#[derive(Serialize)]
+struct RenderRequest {
+    url: String,
+}
+
+#[derive(Deserialize)]
+struct RenderResponse {
+    head: Option<String>,
+    html: Option<String>,
+}
+
 pub struct AppState {
-    // is_production: bool,
     pub template_html: Option<String>,
-    // ssr_manifest: Option<Value>,
-    pub entry_server_render_cjs_path: PathBuf,
-    pub entry_server_path: PathBuf,
+    pub node_runtime: Child,
+}
+
+impl Drop for AppState {
+    fn drop(&mut self) {
+        self.node_runtime
+            .start_kill()
+            .expect("Failed to kill SSR server");
+    }
 }
 
 pub async fn setup_app_state_ssr() -> Arc<AppState> {
@@ -36,31 +45,14 @@ pub async fn setup_app_state_ssr() -> Arc<AppState> {
             .expect("Template file missing"),
     );
 
-    fs::write(
-        current_exe()
-            .expect("Failed to get current exe path: {e}")
-            .parent()
-            .unwrap()
-            .join("entry-server-render.cjs"),
-        ENTRY_SERVER_JS_RENDER,
-    )
-    .await
-    .expect("Failed to write entry-server-render.cjs");
-
-    let entry_server_render_cjs_path = current_exe()
-        .expect("Failed to get current exe path: {e}")
-        .parent()
-        .unwrap()
-        .join("entry-server-render.cjs");
-
-    let entry_server_path = std::env::current_dir()
-        .expect("Failed to get current directory")
-        .join("client/dist/server/entry-server.js");
+    let node_runtime = tokio::process::Command::new("node")
+        .arg("./client/server-ssr.js")
+        .spawn()
+        .expect("Failed to start SSR server");
 
     Arc::new(AppState {
         template_html,
-        entry_server_render_cjs_path,
-        entry_server_path,
+        node_runtime,
     })
 }
 
@@ -71,27 +63,35 @@ pub async fn handle_ssr(
     let url = uri.path().to_string();
 
     let template = app_state.template_html.clone().unwrap();
-    let rendered = execute_ssr(&url, app_state.as_ref()).await;
+    let rendered = execute_ssr(&url).await;
     let html = template
         .replace("<!--app-html-->", &rendered.html)
         .replace("<!--app-head-->", &rendered.head);
     Html(html)
 }
 
-async fn execute_ssr(url: &str, app_state: &AppState) -> Rendered {
-    let output = Command::new("node")
-        .arg(app_state.entry_server_render_cjs_path.clone())
-        .arg(app_state.entry_server_path.clone())
-        .arg(url)
-        .output()
+async fn execute_ssr(url: &str) -> Rendered {
+    let client = Client::new();
+    let response = client
+        .post("http://localhost:3001/render")
+        .json(&RenderRequest {
+            url: url.to_string(),
+        })
+        .send()
         .await
-        .expect("failed to execute SSR script");
+        .expect("Failed to send request to SSR server");
 
-    let rendered = String::from_utf8_lossy(output.stdout.as_slice()).to_string();
-    let json: Value = serde_json::from_str(&rendered).expect("Failed to parse JSON");
+    if !response.status().is_success() {
+        panic!("SSR server returned an error");
+    }
 
-    let head = json["head"].as_str().unwrap().to_string();
-    let html = json["html"].as_str().unwrap().to_string();
+    let rendered: RenderResponse = response
+        .json()
+        .await
+        .expect("Failed to parse SSR server response");
 
-    Rendered { head, html }
+    Rendered {
+        head: rendered.head.unwrap_or("".to_owned()),
+        html: rendered.html.unwrap_or("".to_owned()),
+    }
 }
