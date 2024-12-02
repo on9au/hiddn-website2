@@ -9,3 +9,6 @@ preview:
 build:
 	cd client && npm i && npm run build
 	cargo build
+
+npm i:
+	cd client && npm i
