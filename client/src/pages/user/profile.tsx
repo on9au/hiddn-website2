@@ -9,6 +9,24 @@ type FetchUserStatusEnum =
     | { status: 'success' }
     | { status: 'error'; message: string };
 
+const SkeletonProfile: React.FC = () => {
+    return (
+        <div className="space-y-8 animate-pulse">
+            <div className="w-1/3 h-8 bg-gray-300 rounded"></div>
+            <div className="space-y-4">
+                <div className="w-1/4 h-6 bg-gray-300 rounded"></div>
+                <div className="w-1/2 h-6 bg-gray-300 rounded"></div>
+                <div className="w-1/3 h-6 bg-gray-300 rounded"></div>
+            </div>
+            <div className="space-y-4">
+                <div className="w-1/4 h-6 bg-gray-300 rounded"></div>
+                <div className="w-1/2 h-6 bg-gray-300 rounded"></div>
+                <div className="w-1/3 h-6 bg-gray-300 rounded"></div>
+            </div>
+        </div>
+    );
+};
+
 const Profile: React.FC = () => {
     const [userProfile, setUserProfile] = useState<UserProfilePayload | null>(null);
     const [fetchServerStatus, setFetchServerStatus] = useState<FetchUserStatusEnum>({ status: 'loading' });
@@ -116,14 +134,7 @@ const Profile: React.FC = () => {
             <div className="container mx-auto">
                 <div className="w-full p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
                     {fetchServerStatus.status === 'loading' ? (
-                        <div className="flex items-center justify-center h-full">
-                            <div
-                                className="inline-block w-12 h-12 border-4 border-current border-blue-500 border-solid rounded-full animate-spin border-r-transparent"
-                                role="status"
-                            >
-                                <span className="sr-only">Loading...</span>
-                            </div>
-                        </div>
+                        <SkeletonProfile />
                     ) : fetchServerStatus.status === 'error' ? (
                         <p className="text-red-500">{fetchServerStatus.message}</p>
                     ) : userProfile ? (

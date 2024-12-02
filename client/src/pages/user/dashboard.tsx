@@ -5,6 +5,41 @@ import ReactMarkdown from 'react-markdown';
 import { AnnouncementPayload, PlanDetailsPayload } from '../../bindings';
 import { useNavigate } from 'react-router-dom';
 
+const SkeletonDashboard: React.FC = () => {
+    return (
+        <div className="space-y-8 animate-pulse">
+            <div className="w-1/3 h-8 bg-gray-300 rounded"></div>
+            <div className="flex flex-col lg:flex-row lg:space-x-6">
+                <div className="w-full mb-6 lg:w-1/2 lg:mb-0">
+                    <div className="p-6 space-y-4 bg-white rounded-lg shadow-md dark:bg-gray-800">
+                        <div className="w-1/2 h-6 bg-gray-300 rounded"></div>
+                        <div className="w-1/4 h-4 bg-gray-300 rounded"></div>
+                        <div className="w-1/4 h-4 bg-gray-300 rounded"></div>
+                        <div className="w-full h-4 bg-gray-300 rounded"></div>
+                        <div className="w-full h-4 bg-gray-300 rounded"></div>
+                        <div className="w-1/3 h-4 bg-gray-300 rounded"></div>
+                    </div>
+                    <div className="p-6 mt-6 space-y-4 bg-white rounded-lg shadow-md dark:bg-gray-800">
+                        <div className="w-1/2 h-6 bg-gray-300 rounded"></div>
+                        <div className="w-full h-4 bg-gray-300 rounded"></div>
+                        <div className="w-1/3 h-4 bg-gray-300 rounded"></div>
+                    </div>
+                </div>
+                <div className="w-full lg:w-1/2">
+                    <div className="p-6 space-y-4 bg-white rounded-lg shadow-md dark:bg-gray-800">
+                        <div className="w-1/2 h-6 bg-gray-300 rounded"></div>
+                        <div className="space-y-4">
+                            <div className="w-full h-4 bg-gray-300 rounded"></div>
+                            <div className="w-full h-4 bg-gray-300 rounded"></div>
+                            <div className="w-full h-4 bg-gray-300 rounded"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const Dashboard: React.FC = () => {
     const [planDetails, setPlanDetails] = useState<PlanDetailsPayload | null>(null);
     const [announcements, setAnnouncements] = useState<AnnouncementPayload[]>([]);
@@ -75,14 +110,7 @@ const Dashboard: React.FC = () => {
             </span>
             <div className="container mx-auto">
                 {loading ? (
-                    <div className="flex items-center justify-center h-full">
-                        <div
-                            className="inline-block w-12 h-12 border-4 border-current border-blue-500 border-solid rounded-full animate-spin border-r-transparent"
-                            role="status"
-                        >
-                            <span className="sr-only">Loading...</span>
-                        </div>
-                    </div>
+                    <SkeletonDashboard />
                 ) : error ? (
                     <p className="text-red-500">{error}</p>
                 ) : (
