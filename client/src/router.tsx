@@ -31,7 +31,6 @@ const Router = () => {
                 <Route path="forgot" element={<Forgot/>}/>
                 <Route path="goodbye" element={<Goodbye/>}/>
                 <Route path="*" element={<LoginPageRedirect/>}/>
-                <Route path="" element={<LoginPageRedirect/>}/>
             </Route>
             <Route path="/user" element={<PrivateRoute element={UserLayout}/>}>
                 <Route path="dashboard" element={<Dashboard/>}/>
@@ -46,7 +45,6 @@ const Router = () => {
                 <Route path="delete-account" element={<DeleteProfile/>}/>
                 <Route path="change-password" element={<ChangePassword/>}/>
                 <Route path="*" element={<UserPageRedirect/>}/>
-                <Route path="" element={<UserPageRedirect/>}/>
             </Route>
         </Routes>
     )
