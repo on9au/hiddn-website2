@@ -146,7 +146,7 @@ pub struct CreateOrderResponsePayload {
     pub payment_intent_client_secret: String,
 }
 
-#[derive(Debug, sqlx::FromRow)]
+#[derive(Debug)]
 pub struct SubscriptionPlan {
     pub id: u32,
     pub name: String,
@@ -158,7 +158,7 @@ pub struct SubscriptionPlan {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, sqlx::FromRow)]
+#[derive(Debug)]
 pub struct OnlineUser {
     pub id: u32,
     pub email: String,
@@ -169,7 +169,7 @@ pub struct OnlineUser {
     pub updated_at: DateTime<Utc>,
 }
 
-#[derive(Debug, sqlx::FromRow)]
+#[derive(Debug)]
 pub struct UserSubscription {
     pub id: u32,
     pub online_user_id: i32,
@@ -179,7 +179,7 @@ pub struct UserSubscription {
     pub status: String, // 'active', 'expired', 'cancelled'
 }
 
-#[derive(Debug, sqlx::FromRow)]
+#[derive(Debug)]
 pub struct PaymentTransaction {
     pub id: u32,
     pub online_user_id: u32,

@@ -14,17 +14,13 @@ use axum_login::{
 };
 use chrono::{DateTime, Utc};
 use payloads::{
-    AnnouncementPayload, CreateOrderPayload, ForgotPasswordPayload, LoginPayload,
-    LoginResponsePayload, PaymentTransaction, PlanDetailsPayload, PlanPayload, PlanStatusEnum,
-    RegisterPayload, ServerStatusPayload, SubscriptionPlan, UserTransactionPayload,
-    UserTransactionStatusEnum, VerifyEmailPayload,
+    AnnouncementPayload, ForgotPasswordPayload, LoginPayload, LoginResponsePayload,
+    PlanDetailsPayload, PlanPayload, PlanStatusEnum, RegisterPayload, ServerStatusPayload,
+    UserTransactionPayload, UserTransactionStatusEnum, VerifyEmailPayload,
 };
 use serde_json::json;
 use sessions::{AuthSession, Backend};
-use sqlx::MySqlPool;
-use stripe::{Client, CreatePaymentIntent, Currency, PaymentIntent, PaymentMethodId};
 use tokio::{fs, net::TcpListener, sync::RwLock};
-use tracing::error;
 
 mod payloads;
 mod sessions;
@@ -46,10 +42,7 @@ async fn main() {
     tracing_subscriber::fmt::init();
 
     // Initalize DB pool
-    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let pool = sqlx::MySqlPool::connect(&database_url)
-        .await
-        .expect("Failed to connect to db");
+    let _database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
     // Session layer.
     let session_store = MemoryStore::default();
@@ -58,7 +51,7 @@ async fn main() {
         .with_expiry(Expiry::OnInactivity(Duration::days(7)));
 
     // Auth service.
-    let backend = Backend::new(pool.clone());
+    let backend = Backend::default();
     let auth_layer = AuthManagerLayerBuilder::new(backend, session_layer).build();
 
     // Load documentation and announcements
@@ -561,7 +554,7 @@ async fn transactions_id(Path(id): Path<u32>) -> impl IntoResponse {
 /// Handler for the POST '/transaction/:id/complete' route.
 /// This handler will complete the transaction with the given id.
 /// This handler requires authentication (managed by axum_login).
-async fn transaction_complete(Path(id): Path<u32>) -> impl IntoResponse {
+async fn transaction_complete(Path(_id): Path<u32>) -> impl IntoResponse {
     // Would complete the transaction in the db.
     // Would also complete the stripe payment intent.
     StatusCode::OK.into_response()
@@ -653,109 +646,14 @@ async fn plans_id(Path(id): Path<u32>) -> impl IntoResponse {
 /// This handler will create an order for the user.
 /// This handler will return Json(CreateOrderResponsePayload)
 /// This handler requires authentication (managed by axum_login).
-async fn create_transaction(
-    auth_session: AuthSession,
-    Extension(pool): Extension<MySqlPool>,
-    Json(payload): Json<CreateOrderPayload>,
-) -> impl IntoResponse {
-    // Fetch the subscription plan
-    let plan = match sqlx::query_as::<_, SubscriptionPlan>(
-        "SELECT * FROM hiddn_subscription_plans WHERE id = ?",
-    )
-    .bind::<u64>(payload.plan_id.into())
-    .fetch_one(&pool)
-    .await
-    {
-        Ok(plan) => plan,
-        Err(sqlx::Error::RowNotFound) => {
-            return (
-                StatusCode::BAD_REQUEST,
-                Json(json!({ "error": "Invalid plan_id" })),
-            )
-                .into_response()
-        }
-        Err(e) => {
-            error!("Database error: {:?}", e);
-            return (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                Json(json!({ "error": "Internal server error" })),
-            )
-                .into_response();
-        }
-    };
-
-    // Create a Stripe Payment Intent (Assuming you have Stripe setup)
-    let payment_intent_secret = match create_stripe_payment_intent(plan.price).await {
-        Ok(secret) => secret,
-        Err(e) => {
-            error!("Stripe error: {:?}", e);
-            return (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                Json(json!({ "error": "Failed to create payment intent" })),
-            )
-                .into_response();
-        }
-    };
-
-    let user_id = match auth_session.user {
-        Some(user) => user.id,
-        None => {
-            return (
-                StatusCode::UNAUTHORIZED,
-                Json(json!({ "error": "User not authenticated" })),
-            )
-                .into_response();
-        }
-    };
-
-    // Insert the transaction into the database
-    let transaction = match sqlx::query_as::<_, PaymentTransaction>(
-        "INSERT INTO payment_transactions (online_user_id, amount, status, stripe_payment_intent_id, plan_id, description)
-        VALUES (?, ?, 'unpaid', ?, ?, ?)
-        RETURNING *",
-    )
-    .bind(user_id)
-    .bind(plan.price)
-    .bind(&payment_intent_secret)
-    .bind(Some(plan.id))
-    .bind(Some(format!("Payment for plan {}", plan.name)))
-    .fetch_one(&pool)
-    .await
-    {
-        Ok(tx) => tx,
-        Err(e) => {
-            error!("Database insert error: {:?}", e);
-            return (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                Json(json!({ "error": "Failed to create transaction" })),
-            )
-                .into_response();
-        }
-    };
-
-    // Respond with transaction ID and payment intent client secret
-    let response = payloads::CreateOrderResponsePayload {
-        order_id: transaction.id,
-        payment_intent_client_secret: payment_intent_secret,
-    };
-
-    (StatusCode::OK, Json(response)).into_response()
-}
-
-async fn create_stripe_payment_intent(amount: f64) -> Result<String, stripe::StripeError> {
-    let stripe_secret_key =
-        std::env::var("STRIPE_SECRET_KEY").expect("STRIPE_SECRET_KEY must be set in .env");
-    let client = Client::new(stripe_secret_key);
-
-    let params = CreatePaymentIntent {
-        amount: (amount * 100.0) as i64, // Convert amount to cents
-        currency: Currency::AUD,         // Change currency as needed
-        payment_method_types: Some(vec!["card".to_string()]),
-        ..Default::default()
-    };
-
-    let intent = PaymentIntent::create(&client, params).await?;
-    Ok(intent.client_secret.unwrap())
+async fn create_transaction() -> impl IntoResponse {
+    // Would create a new order in the db.
+    // Would also create stripe payment intent.
+    Json(payloads::CreateOrderResponsePayload {
+        order_id: 1_u32,
+        payment_intent_client_secret: "pi_123456".to_string(),
+    })
+    .into_response()
 }
 
 /// Handler for the POST '/reset_subscription_url' route.
