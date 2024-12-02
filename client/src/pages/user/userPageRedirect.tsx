@@ -9,7 +9,7 @@ const UserPageRedirect = () => {
     useEffect(() => {
         setTimeout(() => {
             navigate('/user/dashboard');
-        } , 1000);
+        } , 1500);
     }
     , [navigate]);
 

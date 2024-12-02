@@ -4,6 +4,19 @@ import axios from 'axios';
 import { CreateOrderResponsePayload, PlanPayload } from '../../bindings';
 import { FaShoppingCart } from 'react-icons/fa';
 
+const SkeletonPlanID: React.FC = () => {
+    return (
+        <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-md dark:bg-gray-800 animate-pulse">
+            <div className="w-1/2 h-8 mb-4 bg-gray-300 rounded"></div>
+            <div className="w-1/4 h-6 mb-2 bg-gray-300 rounded"></div>
+            <div className="w-1/3 h-6 mb-2 bg-gray-300 rounded"></div>
+            <div className="w-1/4 h-6 mb-2 bg-gray-300 rounded"></div>
+            <div className="w-full h-6 mb-4 bg-gray-300 rounded"></div>
+            <div className="w-full h-10 bg-gray-300 rounded"></div>
+        </div>
+    );
+};
+
 const PlanID: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -76,14 +89,7 @@ const PlanID: React.FC = () => {
             </span>
             <div className="container mx-auto">
                 {loading ? (
-                    <div className="flex items-center justify-center h-full">
-                        <div
-                            className="inline-block w-12 h-12 border-4 border-current border-blue-500 border-solid rounded-full animate-spin border-r-transparent"
-                            role="status"
-                        >
-                            <span className="sr-only">Loading...</span>
-                        </div>
-                    </div>
+                    <SkeletonPlanID />
                 ) : error ? (
                     <p className="text-red-500">{error}</p>
                 ) : plan ? (

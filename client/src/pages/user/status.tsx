@@ -8,6 +8,37 @@ type FetchServerStatusEnum =
     | { status: 'success' }
     | { status: 'error'; message: string };
 
+const SkeletonStatus: React.FC = () => {
+    return (
+        <div className="overflow-x-auto">
+            <table className="w-full text-left">
+                <thead className="bg-gray-200 dark:bg-gray-700">
+                    <tr>
+                        <th className="px-4 py-2 font-semibold text-gray-700 border-b dark:text-gray-300">
+                            Server
+                        </th>
+                        <th className="px-4 py-2 font-semibold text-gray-700 border-b dark:text-gray-300">
+                            Status
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {[1, 2, 3].map((_, index) => (
+                        <tr key={index} className="hover:bg-gray-100 dark:hover:bg-gray-900">
+                            <td className="px-4 py-2 text-gray-700 border-b dark:text-gray-300">
+                                <div className="w-24 h-6 bg-gray-300 rounded animate-pulse"></div>
+                            </td>
+                            <td className="px-4 py-2 text-gray-700 border-b dark:text-gray-300">
+                                <div className="w-16 h-6 bg-gray-300 rounded animate-pulse"></div>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
+};
+
 const Status: React.FC = () => {
     const [serverStatus, setServerStatus] = useState<ServerStatusPayload[]>([]);
     const [fetchStatus, setFetchStatus] = useState<FetchServerStatusEnum>({ status: 'loading' });
@@ -80,14 +111,7 @@ const Status: React.FC = () => {
             <div className="container mx-auto">
                 <div className="w-full p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
                     {fetchStatus.status === 'loading' ? (
-                        <div className="flex items-center justify-center h-full">
-                            <div
-                                className="inline-block w-12 h-12 border-4 border-current border-blue-500 border-solid rounded-full animate-spin border-r-transparent"
-                                role="status"
-                            >
-                                <span className="sr-only">Loading...</span>
-                            </div>
-                        </div>
+                        <SkeletonStatus />
                     ) : fetchStatus.status === 'error' ? (
                         <p className="text-red-500">{fetchStatus.message}</p>
                     ) : (

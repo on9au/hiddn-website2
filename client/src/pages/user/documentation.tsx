@@ -12,6 +12,19 @@ import {
 import ReactMarkdown from 'react-markdown';
 import { useNavigate } from 'react-router-dom';
 
+const SkeletonDocumentation: React.FC = () => {
+    return (
+        <div className="prose max-w-none dark:prose-invert animate-pulse">
+            <div className="w-1/2 h-8 mb-4 bg-gray-300 rounded"></div>
+            <div className="w-full h-6 mb-2 bg-gray-300 rounded"></div>
+            <div className="w-3/4 h-6 mb-2 bg-gray-300 rounded"></div>
+            <div className="w-1/2 h-6 mb-2 bg-gray-300 rounded"></div>
+            <div className="w-full h-6 mb-2 bg-gray-300 rounded"></div>
+            <div className="w-3/4 h-6 mb-2 bg-gray-300 rounded"></div>
+        </div>
+    );
+};
+
 const Documentation: React.FC = () => {
     const [content, setContent] = useState<string>('');
     const [osList, setOsList] = useState<string[]>([]);
@@ -82,7 +95,7 @@ const Documentation: React.FC = () => {
                     setError('No documentation available for this OS.');
                 }
             } catch (err) {
-                
+
                 if (axios.isAxiosError(err)) {
                     if (err.response) {
                         if (err.response.status === 401) {
@@ -178,8 +191,8 @@ const Documentation: React.FC = () => {
                                     key={os}
                                     onClick={() => handleOsChange(os)}
                                     className={`flex items-center w-full px-3 py-2 text-left rounded-md focus:outline-none transition-colors ${selectedOs === os
-                                            ? 'bg-hiddn-500 text-white'
-                                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                                        ? 'bg-hiddn-500 text-white'
+                                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                                         }`}
                                 >
                                     {getOsIcon(os)}
@@ -201,8 +214,8 @@ const Documentation: React.FC = () => {
                                         key={category}
                                         onClick={() => handleCategoryChange(category)}
                                         className={`w-full px-3 py-2 text-left rounded-md focus:outline-none transition-colors ${selectedCategory === category
-                                                ? 'bg-hiddn-500 text-white'
-                                                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                                            ? 'bg-hiddn-500 text-white'
+                                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                                             }`}
                                     >
                                         {category.charAt(0).toUpperCase() + category.slice(1)}
@@ -219,14 +232,7 @@ const Documentation: React.FC = () => {
                         } lg:overflow-y-auto lg:max-h-[80vh]`}
                 >
                     {loading ? (
-                        <div className="flex items-center justify-center h-full">
-                            <div
-                                className="inline-block w-12 h-12 border-4 border-current border-blue-500 border-solid rounded-full animate-spin border-r-transparent"
-                                role="status"
-                            >
-                                <span className="sr-only">Loading...</span>
-                            </div>
-                        </div>
+                        <SkeletonDocumentation />
                     ) : error ? (
                         <p className="text-red-500">{error}</p>
                     ) : (
