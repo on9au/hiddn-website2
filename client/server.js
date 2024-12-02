@@ -40,13 +40,14 @@ if (!isProduction) {
     app.use(base, sirv('./dist/client', { extensions: [] }))
 }
 
-// Proxy /api to http://localhost:3000
+// Proxy /api/* to http://localhost:3000/api/*
 app.use('/api', createProxyMiddleware({
     target: 'http://localhost:3000',
     changeOrigin: true,
-    pathRewrite: { '^/api': '' },
+    pathRewrite: {
+        '^/api': '/api',
+    },
 }));
-
 // Handle client-side routing by serving index.html for unmatched routes
 app.use('*', async (req, res, next) => {
     try {
