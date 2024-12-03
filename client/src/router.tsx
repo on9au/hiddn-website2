@@ -1,4 +1,4 @@
-import {Route, Routes} from 'react-router-dom';
+import {Route, Routes, Navigate} from 'react-router-dom';
 import Login from './pages/login';
 import Register from './pages/register';
 import Forgot from './pages/forgot';
@@ -34,6 +34,7 @@ const Router = () => {
                 <Route path="forgot" element={<Forgot/>}/>
                 <Route path="goodbye" element={<Goodbye/>}/>
                 <Route path="*" element={<LoginPageRedirect/>}/>
+                <Route path="/" element={<Navigate to="/login"/>} />
             </Route>
             <Route path="/user" element={<PrivateRoute element={UserLayout}/>}>
                 <Route path="dashboard" element={<Dashboard/>}/>
