@@ -14,7 +14,6 @@ pub struct Config {
     pub redirect_to_https: bool,
     // HTTPS Config
     pub https_port: u16,
-    pub https_socket_addr: String,
     pub https_cert_path: String,
     pub https_key_path: String,
 
