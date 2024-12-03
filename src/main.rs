@@ -13,6 +13,7 @@ use payloads::AnnouncementPayload;
 use reqwest::StatusCode;
 use routes::create_router;
 use sessions::Backend;
+use sqlx::MySqlPool;
 use tokio::sync::RwLock;
 use tracing::info;
 use utils::{load_announcements, load_docs};
@@ -36,6 +37,11 @@ async fn main() {
     // Logging/Tracing setup
     tracing_subscriber::fmt::init();
 
+    // Database setup
+    let pool = MySqlPool::connect(&GLOBAL_CONFIG.database_url)
+        .await
+        .expect("Failed to connect to database");
+
     // Session layer.
     let session_store = MemoryStore::default();
     let session_layer = SessionManagerLayer::new(session_store)
@@ -57,7 +63,7 @@ async fn main() {
     let shared_app_state = ssr::setup_app_state_ssr().await;
 
     // Create router
-    let app = create_router(docs, announcements, auth_layer, shared_app_state);
+    let app = create_router(docs, announcements, auth_layer, shared_app_state, pool);
 
     // let listener = TcpListener::bind(GLOBAL_CONFIG.http_socket_addr.clone())
     //     .await

@@ -8,6 +8,7 @@ use axum::{
 use axum_login::{login_required, tower_sessions::MemoryStore, AuthManagerLayer};
 use tokio::sync::RwLock;
 use tower_http::services::ServeDir;
+use tracing_subscriber::layer;
 
 use crate::{
     handlers::*,
@@ -24,6 +25,7 @@ pub fn create_router(
     announcements: Arc<RwLock<Vec<AnnouncementPayload>>>,
     auth_layer: AuthManagerLayer<Backend, MemoryStore>,
     shared_app_state: Arc<AppState>,
+    pool: sqlx::MySqlPool,
 ) -> Router {
     Router::new()
         // API Routes
@@ -71,7 +73,8 @@ pub fn create_router(
                 .route("/register_user", post(register_user))
                 .route("/forgot_password", post(forgot_password))
                 .route("/generate_204", get(generate_204))
-                .route("/verify_email", post(verify_email)),
+                .route("/verify_email", post(verify_email))
+                .layer(Extension(pool)),
         )
         // SSR Frontend
         .nest_service(
