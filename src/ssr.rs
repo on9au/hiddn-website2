@@ -79,7 +79,10 @@ pub async fn handle_ssr(
 async fn execute_ssr(url: &str) -> Rendered {
     let client = Client::new();
     let response = client
-        .post("http://localhost:3001/render")
+        .post(format!(
+            "http://localhost:{}/render",
+            GLOBAL_CONFIG.express_port
+        ))
         .json(&RenderRequest {
             url: url.to_string(),
         })
