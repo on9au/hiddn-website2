@@ -138,13 +138,13 @@ const SidebarAdmin: React.FC = React.memo(() => {
                     <div className="flex flex-col">
                         {/* Sidebar links */}
                         <SidebarLink to="/admin/dashboard" label="Dashboard" icon={<HomeIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
+                        <SidebarLink to="/admin/user-management" label="User Management" icon={<PersonIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
                         <SidebarLink to="/admin/documentation" label="Documentation" icon={<BookIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
                         <SidebarLink to="/admin/announcement" label="Announcements" icon={<MegaphoneIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
                         <SidebarLink to="/admin/plan" label="Plans" icon={<GearIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
                         <SidebarLink to="/admin/transaction" label="Transactions" icon={<CreditCardIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
                         <SidebarLink to="/admin/status" label="Server Status" icon={<ServerIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
                         <SidebarLink to="/admin/support" label="Support" icon={<InboxIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
-                        <SidebarLink to="/admin/profile" label="Profile" icon={<PersonIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
                     </div>
                     <div className="flex flex-col">
                         <DarkmodeSidebarLink toggleDarkmode={changeTheme} darkModeState={theme} />

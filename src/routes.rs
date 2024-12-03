@@ -11,7 +11,7 @@ use tower_http::services::ServeDir;
 
 use crate::{
     handlers::*,
-    handlers_admin::admin_me,
+    handlers_admin::{admin_me, admin_users},
     payloads::AnnouncementPayload,
     sessions::Backend,
     ssr::{handle_ssr, AppState},
@@ -52,6 +52,7 @@ pub fn create_router(
                 .route("/me", get(user_me))
                 // Admin routes
                 .route("/admin/me", get(admin_me))
+                .route("/admin/users", get(admin_users))
                 .route_layer(login_required!(Backend))
                 // Routes involving authentication
                 .route("/", get(root))

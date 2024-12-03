@@ -103,6 +103,14 @@ export interface CreateOrderResponsePayload {
 	payment_intent_client_secret: string;
 }
 
+export interface AdminUser {
+	id: number;
+	email: string;
+	admin: boolean;
+	created_at: DateTime<Utc>;
+	updated_at: DateTime<Utc>;
+}
+
 export enum ServerStatusEnum {
 	Online = "Online",
 	Degraded = "Degraded",

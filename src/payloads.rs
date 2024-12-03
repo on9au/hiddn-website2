@@ -193,3 +193,13 @@ pub struct PaymentTransaction {
     pub plan_id: Option<u32>,
     pub description: Option<String>,
 }
+
+#[derive(Debug, Serialize)]
+#[typeshare::typeshare]
+pub struct AdminUser {
+    pub id: u32,
+    pub email: String,
+    pub admin: bool,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
