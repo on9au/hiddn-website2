@@ -66,7 +66,7 @@ pub async fn load_announcements() -> Vec<AnnouncementPayload> {
         }))
         .await;
 
-    entries_with_metadata.sort_by_key(|&(_, modified)| std::cmp::Reverse(modified));
+    entries_with_metadata.sort_by_key(|&(_, modified)| modified);
 
     let dir_entries: Vec<_> = entries_with_metadata
         .into_iter()

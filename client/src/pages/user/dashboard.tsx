@@ -76,7 +76,8 @@ const Dashboard: React.FC = () => {
                 const response = await axios.get('/api/announcements', {
                     withCredentials: true,
                 });
-                setAnnouncements(response.data);
+                const reversedAnnouncements = response.data.reverse();
+                setAnnouncements(reversedAnnouncements);
             } catch (err) {
                 console.error('Failed to load announcements. Error:', err);
             }
