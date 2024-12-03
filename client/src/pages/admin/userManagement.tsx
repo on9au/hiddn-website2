@@ -62,8 +62,8 @@ const AdminUserManagement: React.FC = () => {
                                             <td className="px-4 py-2 text-gray-700 border-b dark:text-gray-300">
                                                 <input type="checkbox" checked={user.admin} readOnly />
                                             </td>
-                                            <td className="py-2">
-                                                <button className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-500">Edit</button>
+                                            <td className="px-4 py-2 text-gray-700 border-b dark:text-gray-300">
+                                                <button className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700">Edit</button>
                                                 <button className="px-4 py-2 ml-2 text-white bg-red-500 rounded-md hover:bg-red-600">Delete</button>
                                             </td>
                                         </tr>
