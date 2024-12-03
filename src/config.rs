@@ -8,10 +8,12 @@ pub static GLOBAL_CONFIG: Lazy<Config> = Lazy::new(Config::from_env);
 pub struct Config {
     // HTTP/HTTPS Config
     pub http_or_https: HttpOrHttps,
+    pub ip_addr: String,
     // HTTP Config
+    pub http_port: u16,
     pub redirect_to_https: bool,
-    pub http_socket_addr: String,
     // HTTPS Config
+    pub https_port: u16,
     pub https_socket_addr: String,
     pub https_cert_path: String,
     pub https_key_path: String,

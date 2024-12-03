@@ -1,6 +1,8 @@
 use std::{collections::HashMap, net::SocketAddr, path::PathBuf, sync::Arc};
 
-use axum::{extract::Host, http::Uri, BoxError};
+use axum::{
+    extract::Host, handler::HandlerWithoutStateExt, http::Uri, response::Redirect, BoxError,
+};
 use axum_login::{
     tower_sessions::{cookie::time::Duration, Expiry, MemoryStore, SessionManagerLayer},
     AuthManagerLayer, AuthManagerLayerBuilder,
@@ -8,9 +10,10 @@ use axum_login::{
 use axum_server::tls_rustls::RustlsConfig;
 use config::{HttpOrHttps, GLOBAL_CONFIG};
 use payloads::AnnouncementPayload;
+use reqwest::StatusCode;
 use routes::create_router;
 use sessions::Backend;
-use tokio::{net::TcpListener, sync::RwLock};
+use tokio::sync::RwLock;
 use tracing::info;
 use utils::{load_announcements, load_docs};
 
@@ -69,10 +72,10 @@ async fn main() {
 
     match GLOBAL_CONFIG.http_or_https {
         HttpOrHttps::Http => {
-            let addr = GLOBAL_CONFIG
-                .http_socket_addr
-                .parse::<SocketAddr>()
-                .unwrap();
+            let addr = (GLOBAL_CONFIG.ip_addr.clone()
+                + GLOBAL_CONFIG.http_port.to_string().as_str())
+            .parse::<SocketAddr>()
+            .unwrap();
             info!("listening on http://{}", addr);
 
             axum_server::bind(addr)
@@ -88,14 +91,14 @@ async fn main() {
             .await
             .unwrap();
 
-            let addr = GLOBAL_CONFIG
-                .https_socket_addr
-                .parse::<SocketAddr>()
-                .unwrap();
+            let addr = (GLOBAL_CONFIG.ip_addr.clone()
+                + GLOBAL_CONFIG.https_port.to_string().as_str())
+            .parse::<SocketAddr>()
+            .unwrap();
             info!("listening on https://{}", addr);
 
             if GLOBAL_CONFIG.redirect_to_https {
-                tokio::spawn(redirect_http_to_https())
+                tokio::spawn(redirect_http_to_https());
             }
 
             axum_server::bind_rustls(addr, config)
@@ -116,14 +119,17 @@ async fn redirect_http_to_https() {
             parts.path_and_query = Some("/".parse().unwrap());
         }
 
-        let https_host = host.replace(&ports.http.to_string(), &ports.https.to_string());
+        let https_host = host.replace(
+            &GLOBAL_CONFIG.http_port.to_string(),
+            &GLOBAL_CONFIG.https_port.to_string(),
+        );
         parts.authority = Some(https_host.parse()?);
 
         Ok(Uri::from_parts(parts)?)
     }
 
     let redirect = move |Host(host): Host, uri: Uri| async move {
-        match make_https(host, uri, ports) {
+        match make_https(host, uri) {
             Ok(uri) => Ok(Redirect::permanent(&uri.to_string())),
             Err(error) => {
                 tracing::warn!(%error, "failed to convert URI to HTTPS");
@@ -132,8 +138,7 @@ async fn redirect_http_to_https() {
         }
     };
 
-    let addr = GLOBAL_CONFIG
-        .http_socket_addr
+    let addr = (GLOBAL_CONFIG.ip_addr.clone() + GLOBAL_CONFIG.http_port.to_string().as_str())
         .parse::<SocketAddr>()
         .unwrap();
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
