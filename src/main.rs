@@ -4,6 +4,7 @@ use axum_login::{
     tower_sessions::{cookie::time::Duration, Expiry, MemoryStore, SessionManagerLayer},
     AuthManagerLayer, AuthManagerLayerBuilder,
 };
+use config::GLOBAL_CONFIG;
 use payloads::AnnouncementPayload;
 use routes::create_router;
 use sessions::Backend;
@@ -52,7 +53,9 @@ async fn main() {
     // Create router
     let app = create_router(docs, announcements, auth_layer, shared_app_state);
 
-    let listener = TcpListener::bind("127.0.0.1:3000").await.unwrap();
+    let listener = TcpListener::bind(GLOBAL_CONFIG.socket_addr.clone())
+        .await
+        .unwrap();
     println!("listening on {}", listener.local_addr().unwrap());
 
     axum::serve(listener, app.into_make_service())

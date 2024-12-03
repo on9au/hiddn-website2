@@ -3,12 +3,14 @@ use std::collections::HashMap;
 use chrono::{DateTime, Utc};
 use tokio::fs;
 
-use crate::payloads::AnnouncementPayload;
+use crate::{config::GLOBAL_CONFIG, payloads::AnnouncementPayload};
 
 pub async fn load_docs() -> HashMap<String, HashMap<String, String>> {
     let mut docs = HashMap::new();
 
-    let mut paths = fs::read_dir("./docs").await.unwrap();
+    let mut paths = fs::read_dir(GLOBAL_CONFIG.documentation_dir.clone())
+        .await
+        .unwrap();
 
     let mut dir_entries = Vec::new();
     while let Some(entry) = paths.next_entry().await.unwrap() {
@@ -46,7 +48,9 @@ pub async fn load_announcements() -> Vec<AnnouncementPayload> {
     let mut announcements = Vec::new();
 
     // Read announcements dir
-    let mut paths = fs::read_dir("./announcements").await.unwrap();
+    let mut paths = fs::read_dir(GLOBAL_CONFIG.announcements_dir.clone())
+        .await
+        .unwrap();
 
     let mut dir_entries = Vec::new();
 
