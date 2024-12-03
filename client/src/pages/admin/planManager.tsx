@@ -10,7 +10,7 @@ const AdminPlanManager: React.FC = () => {
     const [newPlan, setNewPlan] = useState<NewPlanPayload>({
         name: '',
         price: 0,
-        data_limit: undefined,
+        data_limit: 0,
         duration_days: 0,
         description: '',
     });
@@ -38,6 +38,30 @@ const AdminPlanManager: React.FC = () => {
     }, []);
 
     const handleCreatePlan = async () => {
+        // If any fields are empty excl data_limit, alert user and return
+        if (!newPlan.name) {
+            alert('Name is required.');
+            return;
+        }
+        if (newPlan.price < 0) {
+            alert('Price must be greater or equal to 0.');
+            return;
+        }
+        if (newPlan.duration_days < 0) {
+            alert('Duration must be greater or equal to 0.');
+            return;
+        }
+        if (newPlan.data_limit && newPlan.data_limit < 0) {
+            alert('Data limit must be greater or equal to 0.');
+            return;
+        }
+        if (newPlan.duration_days < 0) {
+            const confirmInfinitePlan = window.confirm('Are you sure you want to create an infinite plan?');
+            if (!confirmInfinitePlan) {
+                return;
+            }
+        }
+        
         try {
             const response = await axios.post('/api/admin/plans', newPlan, {
                 withCredentials: true,
@@ -57,6 +81,11 @@ const AdminPlanManager: React.FC = () => {
     };
 
     const handleDeletePlan = async (planId: number) => {
+        // Verify user wants to delete plan
+        const confirmDelete = window.confirm('Are you sure you want to delete this plan?');
+        if (!confirmDelete) {
+            return;
+        }
         try {
             await axios.delete(`/api/admin/plans/${planId}`, {
                 withCredentials: true,
@@ -76,39 +105,44 @@ const AdminPlanManager: React.FC = () => {
             <div className="container mx-auto">
                 <div className="w-full p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
                     <h2 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-200">Create New Plan</h2>
+                    <p>Name</p>
                     <input
                         type="text"
                         placeholder="Name"
                         value={newPlan.name}
                         onChange={(e) => setNewPlan({ ...newPlan, name: e.target.value })}
-                        className="w-full p-2 mb-4 border rounded"
+                        className="w-full p-2 mb-4 border rounded dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
                     />
+                    <p>Price</p>
                     <input
                         type="number"
                         placeholder="Price"
                         value={newPlan.price}
                         onChange={(e) => setNewPlan({ ...newPlan, price: parseFloat(e.target.value) })}
-                        className="w-full p-2 mb-4 border rounded"
+                        className="w-full p-2 mb-4 border rounded dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
                     />
+                    <p>Data Limit (GB)</p>
                     <input
                         type="number"
                         placeholder="Data Limit (GB)"
                         value={newPlan.data_limit}
                         onChange={(e) => setNewPlan({ ...newPlan, data_limit: parseFloat(e.target.value) })}
-                        className="w-full p-2 mb-4 border rounded"
+                        className="w-full p-2 mb-4 border rounded dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
                     />
+                    <p>Duration (days)</p>
                     <input
                         type="number"
                         placeholder="Duration (days)"
                         value={newPlan.duration_days}
                         onChange={(e) => setNewPlan({ ...newPlan, duration_days: parseInt(e.target.value) })}
-                        className="w-full p-2 mb-4 border rounded"
+                        className="w-full p-2 mb-4 border rounded dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
                     />
+                    <p>Description</p>
                     <textarea
                         placeholder="Description"
                         value={newPlan.description}
                         onChange={(e) => setNewPlan({ ...newPlan, description: e.target.value })}
-                        className="w-full p-2 mb-4 border rounded"
+                        className="w-full p-2 mb-4 border rounded dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
                     />
                     <button
                         onClick={handleCreatePlan}
