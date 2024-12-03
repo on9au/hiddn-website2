@@ -20,6 +20,8 @@ import Goodbye from './pages/goodbye';
 import ChangePassword from './pages/user/changePassword';
 import LoginPageRedirect from './pages/loginPageRedirect';
 import UserPageRedirect from './pages/user/userPageRedirect';
+import UserLayoutAdmin from './components/userlayout_admin';
+import AdminDashboard from './pages/admin/dashboard';
 
 const Router = () => {
     return (
@@ -44,6 +46,19 @@ const Router = () => {
                 <Route path="profile" element={<Profile/>}/>
                 <Route path="delete-account" element={<DeleteProfile/>}/>
                 <Route path="change-password" element={<ChangePassword/>}/>
+                <Route path="*" element={<UserPageRedirect/>}/>
+            </Route>
+            <Route path="/admin" element={<PrivateRoute element={UserLayoutAdmin}/>}>
+                <Route path="dashboard" element={<AdminDashboard/>}/>
+                {/* <Route path="documentation" element={<Documentation/>}/>
+                <Route path="plan" element={<Plan/>}/>
+                <Route path="plan/:id" element={<PlanID/>}/>
+                <Route path="transaction" element={<Transaction/>}/>
+                <Route path="transaction/:id" element={<TransactionID/>}/>
+                <Route path="status" element={<Status/>}/>
+                <Route path="support" element={<Support/>}/>
+                <Route path="profile" element={<Profile/>}/>
+                <Route path="change-password" element={<ChangePassword/>}/> */}
                 <Route path="*" element={<UserPageRedirect/>}/>
             </Route>
         </Routes>

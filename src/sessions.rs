@@ -12,8 +12,15 @@ pub type AuthSession = axum_login::AuthSession<Backend>;
 #[derive(Clone)]
 pub struct User {
     id: i64,
+    admin: bool,
     pub email: String,
     password_hash: String, // On the DB, it would be salted.
+}
+
+impl User {
+    pub fn is_admin(&self) -> bool {
+        self.admin
+    }
 }
 
 // To avoid leaking the password in logs, we implement a custom Debug implementation
@@ -85,6 +92,7 @@ impl AuthnBackend for Backend {
         if creds.email == "test@test.com" && creds.password == "password" {
             Ok(Some(User {
                 id: 1,
+                admin: true,
                 email: "test@test.com".to_string(),
                 password_hash: "password".to_string(),
             }))
@@ -104,6 +112,7 @@ impl AuthnBackend for Backend {
         if *user_id == 1 {
             Ok(Some(User {
                 id: 1,
+                admin: true,
                 email: "test@test.com".to_string(),
                 password_hash: "password".to_string(),
             }))

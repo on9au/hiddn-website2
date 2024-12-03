@@ -10,7 +10,9 @@ use sessions::Backend;
 use tokio::{net::TcpListener, sync::RwLock};
 use utils::{load_announcements, load_docs};
 
+mod config;
 mod handlers;
+mod handlers_admin;
 mod payloads;
 mod routes;
 mod sessions;
@@ -26,9 +28,6 @@ async fn main() {
 
     // Logging/Tracing setup
     tracing_subscriber::fmt::init();
-
-    // Initalize DB pool
-    let _database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
     // Session layer.
     let session_store = MemoryStore::default();
