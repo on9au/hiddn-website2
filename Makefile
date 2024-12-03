@@ -15,7 +15,7 @@ preview: $(env)
 
 build: $(env)
 	cd client && npm i && npm run build
-	cargo build
+	cargo build --release
 
 npm i:
 	cd client && npm i

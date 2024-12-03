@@ -1,0 +1,21 @@
+services:
+  hiddn_website:
+    build: .
+    restart: always
+    env_file: .env
+    network_mode: host
+    depends_on:
+      - mysql
+    volumes:
+      - /var/lib/hiddn_website:/var/lib/hiddn_website
+
+  mysql:
+    image: mysql:latest
+    restart: always
+    env_file: .env
+    network_mode: host
+    command: --bind-address=127.0.0.1 --mysqlx-bind-address=127.0.0.1 --disable-log-bin
+    environment:
+      MYSQL_DATABASE: hiddn_website
+    volumes:
+      - /var/lib/hiddn_website/mysql:/var/lib/mysql
