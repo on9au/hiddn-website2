@@ -120,7 +120,7 @@ const AdminAnnouncementsEditor: React.FC = () => {
                             </div>
                             <div>
                                 <h2 className="mb-2 text-2xl font-semibold">Existing Announcements</h2>
-                                {announcements ? announcements.map((announcement) => (
+                                {announcements.length > 0 ? announcements.map((announcement) => (
                                     <div key={announcement.id} className="p-4 mb-4 bg-gray-100 rounded shadow-md dark:bg-gray-700">
                                         <h3 className="text-xl font-semibold">{announcement.title}</h3>
                                         <p className="text-sm text-gray-600 dark:text-gray-400">
