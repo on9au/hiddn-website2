@@ -111,6 +111,11 @@ export interface AdminUser {
 	updated_at: DateTime<Utc>;
 }
 
+export interface AdminCreateAnnouncement {
+	title: string;
+	content: string;
+}
+
 export enum ServerStatusEnum {
 	Online = "Online",
 	Degraded = "Degraded",

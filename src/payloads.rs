@@ -3,7 +3,6 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use typeshare::U53;
-use uuid::Uuid;
 
 #[derive(Clone, Debug, Deserialize)]
 #[typeshare::typeshare]
@@ -202,4 +201,11 @@ pub struct AdminUser {
     pub admin: bool,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Deserialize)]
+#[typeshare::typeshare]
+pub struct AdminCreateAnnouncement {
+    pub title: String,
+    pub content: String,
 }

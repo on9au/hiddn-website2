@@ -11,7 +11,7 @@ use tower_http::services::ServeDir;
 
 use crate::{
     handlers::*,
-    handlers_admin::{admin_me, admin_users},
+    handlers_admin::{admin_me, admin_users, delete_announcement, post_announcement},
     payloads::AnnouncementPayload,
     sessions::Backend,
     ssr::{handle_ssr, AppState},
@@ -36,6 +36,8 @@ pub fn create_router(
                 )
                 .layer(Extension(docs))
                 .route("/announcements", get(get_announcements))
+                .route("/admin/announcements", post(post_announcement))
+                .route("/admin/announcements/:id", delete(delete_announcement))
                 .layer(Extension(announcements))
                 .route("/transactions", get(transactions))
                 .route("/transaction/:id", get(transactions_id))

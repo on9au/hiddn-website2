@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { AnnouncementPayload } from '../../bindings';
+import { AdminCreateAnnouncement, AnnouncementPayload } from '../../bindings';
 import { useNavigate } from 'react-router-dom';
 
 const AdminAnnouncementsEditor: React.FC = () => {
     const [announcements, setAnnouncements] = useState<AnnouncementPayload[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [newAnnouncement, setNewAnnouncement] = useState({ title: '', content: '' });
+    const [newAnnouncement, setNewAnnouncement] = useState<AdminCreateAnnouncement>({ title: '', content: '' });
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -34,8 +34,13 @@ const AdminAnnouncementsEditor: React.FC = () => {
     }, [navigate]);
 
     const handleCreateAnnouncement = async () => {
+        // If title or content is empty, alert user and return
+        if (!newAnnouncement.title || !newAnnouncement.content) {
+            alert('Title and content are required.');
+            return;
+        }
         try {
-            const response = await axios.post('/api/announcements', newAnnouncement, { withCredentials: true });
+            const response = await axios.post('/api/admin/announcements', newAnnouncement, { withCredentials: true });
             setAnnouncements([...announcements, response.data]);
             setNewAnnouncement({ title: '', content: '' });
         } catch (err) {
@@ -52,8 +57,13 @@ const AdminAnnouncementsEditor: React.FC = () => {
     };
 
     const handleDeleteAnnouncement = async (id: number) => {
+        // Alert user to confirm deletion
+        const confirmDelete = window.confirm('Are you sure you want to delete this announcement?');
+        if (!confirmDelete) {
+            return;
+        }
         try {
-            await axios.delete(`/api/announcements/${id}`, { withCredentials: true });
+            await axios.delete(`/api/admin/announcements/${id}`, { withCredentials: true });
             setAnnouncements(announcements.filter(announcement => announcement.id !== id));
         } catch (err) {
             if (axios.isAxiosError(err)) {

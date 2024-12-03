@@ -25,7 +25,6 @@ import AdminDashboard from './pages/admin/dashboard';
 import AdminPageRedirect from './pages/admin/adminPageRedirect';
 import AdminUserManagement from './pages/admin/userManagement';
 import AdminAnnouncementsEditor from './pages/admin/announcementsEditor';
-import AdminDocumentationEditor from './pages/admin/documentationEditor';
 
 const Router = () => {
     return (
@@ -57,7 +56,6 @@ const Router = () => {
                 <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="user-management" element={<AdminUserManagement />} />
                 <Route path="announcement" element={<AdminAnnouncementsEditor />} />
-                <Route path="documentation" element={<AdminDocumentationEditor/>}/>
                 {/*
                 <Route path="plan" element={<AdminPlan/>}/>
                 <Route path="plan/:id" element={<AdminPlanID/>}/>

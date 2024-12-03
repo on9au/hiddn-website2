@@ -97,7 +97,7 @@ pub async fn logout_user(mut auth_session: AuthSession) -> impl IntoResponse {
 /// It will send code to email to verify the email.
 /// Should have a rate limit to prevent spamming.
 /// This acts as a way to verify the email's ownership and existence.
-pub async fn verify_email(Json(payload): Json<VerifyEmailPayload>) -> impl IntoResponse {
+pub async fn verify_email(Json(_payload): Json<VerifyEmailPayload>) -> impl IntoResponse {
     // TODO: Implement actual email verification logic
     // We would create a temporary verificaton code linked to the email in the db which expires after a certain time.
     // We would send the verification code to the email.
