@@ -48,25 +48,9 @@ pub async fn setup_app_state_ssr() -> Arc<AppState> {
             .expect("Template file missing"),
     );
 
-    #[cfg(debug_assertions)]
-    let profile = "debug";
-    #[cfg(not(debug_assertions))]
-    let profile = "release";
-
-    #[cfg(debug_assertions)]
-    let node_runtime = tokio::process::Command::new("node")
-        .arg("./server-ssr.js")
-        .arg(GLOBAL_CONFIG.express_port.to_string())
-        .arg(profile)
-        .current_dir("./client")
-        .spawn()
-        .expect("Failed to start SSR server");
-
-    #[cfg(not(debug_assertions))]
     let node_runtime = tokio::process::Command::new("node")
         .arg("./client/server-ssr.js")
         .arg(GLOBAL_CONFIG.express_port.to_string())
-        .arg(profile)
         .spawn()
         .expect("Failed to start SSR server");
 
