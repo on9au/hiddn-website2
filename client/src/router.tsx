@@ -22,6 +22,7 @@ import LoginPageRedirect from './pages/loginPageRedirect';
 import UserPageRedirect from './pages/user/userPageRedirect';
 import UserLayoutAdmin from './components/userlayout_admin';
 import AdminDashboard from './pages/admin/dashboard';
+import AdminPageRedirect from './pages/admin/adminPageRedirect';
 
 const Router = () => {
     return (
@@ -50,16 +51,17 @@ const Router = () => {
             </Route>
             <Route path="/admin" element={<PrivateRoute element={UserLayoutAdmin}/>}>
                 <Route path="dashboard" element={<AdminDashboard/>}/>
-                {/* <Route path="documentation" element={<Documentation/>}/>
-                <Route path="plan" element={<Plan/>}/>
-                <Route path="plan/:id" element={<PlanID/>}/>
-                <Route path="transaction" element={<Transaction/>}/>
-                <Route path="transaction/:id" element={<TransactionID/>}/>
-                <Route path="status" element={<Status/>}/>
-                <Route path="support" element={<Support/>}/>
-                <Route path="profile" element={<Profile/>}/>
-                <Route path="change-password" element={<ChangePassword/>}/> */}
-                <Route path="*" element={<UserPageRedirect/>}/>
+                {/* <Route path="documentation" element={<AdminDocumentation/>}/>
+                <Route path="announcement" element={<AdminAnnouncement/>}/>
+                <Route path="plan" element={<AdminPlan/>}/>
+                <Route path="plan/:id" element={<AdminPlanID/>}/>
+                <Route path="transaction" element={<AdminTransaction/>}/>
+                <Route path="transaction/:id" element={<AdminTransactionID/>}/>
+                <Route path="status" element={<AdminStatus/>}/>
+                <Route path="support" element={<AdminSupport/>}/>
+                <Route path="profile" element={<AdminProfile/>}/>
+                <Route path="change-password" element={<AdminChangePassword/>}/> */}
+                <Route path="*" element={<AdminPageRedirect/>}/>
             </Route>
         </Routes>
     )
