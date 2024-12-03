@@ -8,6 +8,7 @@ use axum::{
 };
 use serde_json::json;
 use tokio::sync::RwLock;
+use tracing::{debug, error};
 
 use crate::{
     payloads::{
@@ -36,7 +37,6 @@ pub async fn generate_204() -> impl IntoResponse {
 /// This handler will return OK if the user is authenticated, and UNAUTHORIZED if the user is not.
 /// The server will use axum_login to keep the user authenticated.
 pub async fn is_logged_in(auth_session: AuthSession) -> impl IntoResponse {
-    println!("{:?}", auth_session.user);
     match auth_session.user {
         Some(_) => StatusCode::OK.into_response(),
         None => StatusCode::UNAUTHORIZED.into_response(),
@@ -55,14 +55,11 @@ pub async fn login_user(
 ) -> impl IntoResponse {
     // TODO: Implement actual authentication logic interfacing with db
 
-    // Debug print the payload
-    println!("{:?}", payload);
-
     let user = match auth_session.authenticate(payload).await {
         Ok(Some(user)) => user,
         Ok(None) => return StatusCode::UNAUTHORIZED.into_response(),
         Err(e) => {
-            println!("Error: {}", e);
+            error!("Error: {}", e);
             return StatusCode::INTERNAL_SERVER_ERROR.into_response();
         }
     };
@@ -70,7 +67,7 @@ pub async fn login_user(
     match auth_session.login(&user).await {
         Ok(_) => {}
         Err(e) => {
-            println!("Error: {}", e);
+            error!("Error: {}", e);
             return StatusCode::INTERNAL_SERVER_ERROR.into_response();
         }
     }
@@ -89,7 +86,7 @@ pub async fn logout_user(mut auth_session: AuthSession) -> impl IntoResponse {
     match auth_session.logout().await {
         Ok(_) => StatusCode::OK.into_response(),
         Err(e) => {
-            println!("Error: {}", e);
+            error!("Error: {}", e);
             StatusCode::INTERNAL_SERVER_ERROR.into_response()
         }
     }
@@ -104,9 +101,6 @@ pub async fn verify_email(Json(payload): Json<VerifyEmailPayload>) -> impl IntoR
     // TODO: Implement actual email verification logic
     // We would create a temporary verificaton code linked to the email in the db which expires after a certain time.
     // We would send the verification code to the email.
-
-    // Debug print the payload
-    println!("{:?}", payload);
 
     StatusCode::OK.into_response()
 }
@@ -123,11 +117,8 @@ pub async fn verify_email(Json(payload): Json<VerifyEmailPayload>) -> impl IntoR
 pub async fn register_user(Json(payload): Json<RegisterPayload>) -> impl IntoResponse {
     // TODO: Implement actual registration logic interfacing with db
 
-    // Debug print the payload
-    println!("{:?}", payload);
-
     // Check if the email is already taken
-    println!("Checking if email is already taken...");
+    debug!("Checking if email is already taken...");
 
     // Check if code is valid
     if payload.email_verification_code != "123456" {
@@ -170,9 +161,6 @@ pub async fn register_user(Json(payload): Json<RegisterPayload>) -> impl IntoRes
 /// The server will use axum_login to keep the user authenticated.
 pub async fn forgot_password(Json(payload): Json<ForgotPasswordPayload>) -> impl IntoResponse {
     // TODO: Implement actual registration logic interfacing with db
-
-    // Debug print the payload
-    println!("{:?}", payload);
 
     // Check if the user exists
     if payload.email != "test@test.com" {

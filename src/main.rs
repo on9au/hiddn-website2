@@ -1,4 +1,4 @@
-use std::{collections::HashMap, net::SocketAddr, path::PathBuf, sync::Arc};
+use std::{collections::HashMap, net::SocketAddr, sync::Arc};
 
 use axum::{
     extract::Host, handler::HandlerWithoutStateExt, http::Uri, response::Redirect, BoxError,
@@ -72,8 +72,11 @@ async fn main() {
 
     match GLOBAL_CONFIG.http_or_https {
         HttpOrHttps::Http => {
-            let addr = (GLOBAL_CONFIG.ip_addr.clone()
-                + GLOBAL_CONFIG.http_port.to_string().as_str())
+            let addr = format!(
+                "{}:{}",
+                GLOBAL_CONFIG.ip_addr.clone(),
+                GLOBAL_CONFIG.http_port
+            )
             .parse::<SocketAddr>()
             .unwrap();
             info!("listening on http://{}", addr);
@@ -91,8 +94,11 @@ async fn main() {
             .await
             .unwrap();
 
-            let addr = (GLOBAL_CONFIG.ip_addr.clone()
-                + GLOBAL_CONFIG.https_port.to_string().as_str())
+            let addr = format!(
+                "{}:{}",
+                GLOBAL_CONFIG.ip_addr.clone(),
+                GLOBAL_CONFIG.https_port
+            )
             .parse::<SocketAddr>()
             .unwrap();
             info!("listening on https://{}", addr);

@@ -8,6 +8,9 @@ use axum::{
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use tokio::{fs, process::Child};
+use tracing::info;
+
+use crate::config::GLOBAL_CONFIG;
 
 pub struct Rendered {
     head: String,
@@ -47,8 +50,11 @@ pub async fn setup_app_state_ssr() -> Arc<AppState> {
 
     let node_runtime = tokio::process::Command::new("node")
         .arg("./client/server-ssr.js")
+        .arg(GLOBAL_CONFIG.express_port.to_string())
         .spawn()
         .expect("Failed to start SSR server");
+
+    info!("SSR server listening at {}", GLOBAL_CONFIG.express_port);
 
     Arc::new(AppState {
         template_html,

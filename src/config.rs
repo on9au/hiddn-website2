@@ -9,13 +9,18 @@ pub struct Config {
     // HTTP/HTTPS Config
     pub http_or_https: HttpOrHttps,
     pub ip_addr: String,
+
     // HTTP Config
     pub http_port: u16,
     pub redirect_to_https: bool,
+
     // HTTPS Config
     pub https_port: u16,
     pub https_cert_path: String,
     pub https_key_path: String,
+
+    // Express Config
+    pub express_port: u16,
 
     // Database Config
     pub database_url: String,
