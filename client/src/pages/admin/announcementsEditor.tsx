@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { AdminCreateAnnouncement, AnnouncementPayload } from '../../bindings';
 import { useNavigate } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
 
 const AdminAnnouncementsEditor: React.FC = () => {
     const [announcements, setAnnouncements] = useState<AnnouncementPayload[]>([]);
@@ -14,7 +15,8 @@ const AdminAnnouncementsEditor: React.FC = () => {
         const fetchAnnouncements = async () => {
             try {
                 const response = await axios.get('/api/announcements', { withCredentials: true });
-                setAnnouncements(response.data);
+                const reversedAnnouncements = response.data.reverse();
+                setAnnouncements(reversedAnnouncements);
                 setLoading(false);
             } catch (err) {
                 if (axios.isAxiosError(err)) {
@@ -41,7 +43,7 @@ const AdminAnnouncementsEditor: React.FC = () => {
         }
         try {
             const response = await axios.post('/api/admin/announcements', newAnnouncement, { withCredentials: true });
-            setAnnouncements([...announcements, response.data]);
+            setAnnouncements([response.data, ...announcements]);
             setNewAnnouncement({ title: '', content: '' });
         } catch (err) {
             if (axios.isAxiosError(err)) {
@@ -92,41 +94,51 @@ const AdminAnnouncementsEditor: React.FC = () => {
                     ) : (
                         <div>
                             <div className="mb-6">
-                                <h2 className="text-2xl font-semibold">Create New Announcement</h2>
+                                <h2 className="mb-2 text-2xl font-semibold">Create New Announcement</h2>
                                 <input
                                     type="text"
                                     placeholder="Title"
                                     value={newAnnouncement.title}
                                     onChange={(e) => setNewAnnouncement({ ...newAnnouncement, title: e.target.value })}
-                                    className="w-full p-2 mb-4 border rounded"
+                                    className="w-full p-2 mb-4 border rounded dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
                                 />
                                 <textarea
                                     placeholder="Content"
                                     value={newAnnouncement.content}
                                     onChange={(e) => setNewAnnouncement({ ...newAnnouncement, content: e.target.value })}
-                                    className="w-full p-2 mb-4 border rounded"
+                                    className="w-full p-2 mb-4 border rounded dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
                                 />
+                                <div className="mt-2 prose max-w-none dark:prose-invert">
+                                            <ReactMarkdown>{newAnnouncement.content}</ReactMarkdown>
+                                        </div>
                                 <button
                                     onClick={handleCreateAnnouncement}
-                                    className="px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600"
+                                    className="px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700"
                                 >
                                     Create
                                 </button>
                             </div>
                             <div>
-                                <h2 className="text-2xl font-semibold">Existing Announcements</h2>
-                                {announcements.reverse().map((announcement) => (
+                                <h2 className="mb-2 text-2xl font-semibold">Existing Announcements</h2>
+                                {announcements ? announcements.map((announcement) => (
                                     <div key={announcement.id} className="p-4 mb-4 bg-gray-100 rounded shadow-md dark:bg-gray-700">
                                         <h3 className="text-xl font-semibold">{announcement.title}</h3>
-                                        <p>{announcement.content}</p>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                                            {new Date(announcement.date).toLocaleDateString()}
+                                        </p>
+                                        <div className="mt-2 prose max-w-none dark:prose-invert">
+                                            <ReactMarkdown>{announcement.content}</ReactMarkdown>
+                                        </div>
                                         <button
                                             onClick={() => handleDeleteAnnouncement(announcement.id)}
-                                            className="px-4 py-2 mt-2 text-white bg-red-500 rounded-md hover:bg-red-600"
+                                            className="px-4 py-2 mt-2 text-white bg-red-500 rounded-md hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700"
                                         >
                                             Delete
                                         </button>
                                     </div>
-                                ))}
+                                )) : (
+                                    <p className="text-gray-700 dark:text-gray-300">No announcements at this time.</p>
+                                )}
                             </div>
                         </div>
                     )}
