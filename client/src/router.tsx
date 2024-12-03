@@ -25,6 +25,7 @@ import AdminDashboard from './pages/admin/dashboard';
 import AdminPageRedirect from './pages/admin/adminPageRedirect';
 import AdminUserManagement from './pages/admin/userManagement';
 import AdminAnnouncementsEditor from './pages/admin/announcementsEditor';
+import AdminPlanManager from './pages/admin/planManager';
 
 const Router = () => {
     return (
@@ -56,8 +57,8 @@ const Router = () => {
                 <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="user-management" element={<AdminUserManagement />} />
                 <Route path="announcement" element={<AdminAnnouncementsEditor />} />
+                <Route path="plan" element={<AdminPlanManager/>}/>
                 {/*
-                <Route path="plan" element={<AdminPlan/>}/>
                 <Route path="plan/:id" element={<AdminPlanID/>}/>
                 <Route path="transaction" element={<AdminTransaction/>}/>
                 <Route path="transaction/:id" element={<AdminTransactionID/>}/>

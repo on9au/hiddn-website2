@@ -94,6 +94,14 @@ export interface PlanPayload {
 	description?: string;
 }
 
+export interface NewPlanPayload {
+	name: string;
+	price: number;
+	data_limit?: number;
+	duration_days: number;
+	description?: string;
+}
+
 export interface CreateOrderPayload {
 	plan_id: number;
 }

@@ -9,7 +9,9 @@ use tokio::sync::RwLock;
 
 use crate::{
     config::GLOBAL_CONFIG,
-    payloads::{AdminCreateAnnouncement, AdminUser, AnnouncementPayload},
+    payloads::{
+        AdminCreateAnnouncement, AdminUser, AnnouncementPayload, NewPlanPayload, PlanPayload,
+    },
     sessions::AuthSession,
 };
 
@@ -89,6 +91,41 @@ pub async fn delete_announcement(
     } else {
         StatusCode::NOT_FOUND.into_response()
     }
+}
+
+/// POST '/api/admin/plans'
+pub async fn post_plan(
+    auth_session: AuthSession,
+    Json(new_announcement): Json<NewPlanPayload>,
+) -> impl IntoResponse {
+    // Validate that the user is an admin
+    if !is_admin(&auth_session).await {
+        return StatusCode::FORBIDDEN.into_response();
+    }
+
+    // impl db call here
+
+    axum::Json(PlanPayload {
+        id: 2_u32.into(),
+        name: new_announcement.name,
+        price: new_announcement.price,
+        data_limit: new_announcement.data_limit,
+        duration_days: new_announcement.duration_days,
+        description: new_announcement.description,
+    })
+    .into_response()
+}
+
+/// DELETE '/api/admin/plans/:id'
+pub async fn delete_plan(auth_session: AuthSession, Path(id): Path<u32>) -> impl IntoResponse {
+    // Validate that the user is an admin
+    if !is_admin(&auth_session).await {
+        return StatusCode::FORBIDDEN.into_response();
+    }
+
+    // impl db call here
+
+    StatusCode::NO_CONTENT.into_response()
 }
 
 /// /api/admin/users

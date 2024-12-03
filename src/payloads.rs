@@ -134,6 +134,16 @@ pub struct PlanPayload {
 
 #[derive(Clone, Debug, Deserialize)]
 #[typeshare::typeshare]
+pub struct NewPlanPayload {
+    pub name: String,
+    pub price: f64,
+    pub data_limit: Option<f64>,
+    pub duration_days: U53,
+    pub description: Option<String>,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[typeshare::typeshare]
 pub struct CreateOrderPayload {
     pub plan_id: U53,
 }
