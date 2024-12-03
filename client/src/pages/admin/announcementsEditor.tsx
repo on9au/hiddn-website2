@@ -1,0 +1,129 @@
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { AnnouncementPayload } from '../../bindings';
+import { useNavigate } from 'react-router-dom';
+
+const AdminAnnouncementsEditor: React.FC = () => {
+    const [announcements, setAnnouncements] = useState<AnnouncementPayload[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [newAnnouncement, setNewAnnouncement] = useState({ title: '', content: '' });
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchAnnouncements = async () => {
+            try {
+                const response = await axios.get('/api/announcements', { withCredentials: true });
+                setAnnouncements(response.data);
+                setLoading(false);
+            } catch (err) {
+                if (axios.isAxiosError(err)) {
+                    if (err.response) {
+                        if (err.response.status === 401) {
+                            setError('Unauthorized. Please log in.');
+                            navigate('/logout');
+                        }
+                    }
+                }
+                setError('Failed to load announcements.');
+                setLoading(false);
+            }
+        };
+
+        fetchAnnouncements();
+    }, [navigate]);
+
+    const handleCreateAnnouncement = async () => {
+        try {
+            const response = await axios.post('/api/announcements', newAnnouncement, { withCredentials: true });
+            setAnnouncements([...announcements, response.data]);
+            setNewAnnouncement({ title: '', content: '' });
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                if (err.response) {
+                    if (err.response.status === 401) {
+                        setError('Unauthorized. Please log in.');
+                        navigate('/logout');
+                    }
+                }
+            }
+            setError('Failed to create announcement.');
+        }
+    };
+
+    const handleDeleteAnnouncement = async (id: number) => {
+        try {
+            await axios.delete(`/api/announcements/${id}`, { withCredentials: true });
+            setAnnouncements(announcements.filter(announcement => announcement.id !== id));
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                if (err.response) {
+                    if (err.response.status === 401) {
+                        setError('Unauthorized. Please log in.');
+                        navigate('/logout');
+                    }
+                }
+            }
+            setError('Failed to delete announcement.');
+        }
+    };
+
+    return (
+        <div className="flex flex-col pt-7">
+            <span className="w-full mb-6 text-left">
+                <h1 className="text-4xl font-semibold">Announcements Editor</h1>
+            </span>
+            <div className="container mx-auto">
+                <div className="w-full p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
+                    {loading ? (
+                        <p>Loading...</p>
+                    ) : error ? (
+                        <p className="text-red-500">{error}</p>
+                    ) : (
+                        <div>
+                            <div className="mb-6">
+                                <h2 className="text-2xl font-semibold">Create New Announcement</h2>
+                                <input
+                                    type="text"
+                                    placeholder="Title"
+                                    value={newAnnouncement.title}
+                                    onChange={(e) => setNewAnnouncement({ ...newAnnouncement, title: e.target.value })}
+                                    className="w-full p-2 mb-4 border rounded"
+                                />
+                                <textarea
+                                    placeholder="Content"
+                                    value={newAnnouncement.content}
+                                    onChange={(e) => setNewAnnouncement({ ...newAnnouncement, content: e.target.value })}
+                                    className="w-full p-2 mb-4 border rounded"
+                                />
+                                <button
+                                    onClick={handleCreateAnnouncement}
+                                    className="px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600"
+                                >
+                                    Create
+                                </button>
+                            </div>
+                            <div>
+                                <h2 className="text-2xl font-semibold">Existing Announcements</h2>
+                                {announcements.map((announcement) => (
+                                    <div key={announcement.id} className="p-4 mb-4 bg-gray-100 rounded shadow-md dark:bg-gray-700">
+                                        <h3 className="text-xl font-semibold">{announcement.title}</h3>
+                                        <p>{announcement.content}</p>
+                                        <button
+                                            onClick={() => handleDeleteAnnouncement(announcement.id)}
+                                            className="px-4 py-2 mt-2 text-white bg-red-500 rounded-md hover:bg-red-600"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default AdminAnnouncementsEditor;
