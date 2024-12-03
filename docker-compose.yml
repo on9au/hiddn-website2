@@ -5,7 +5,8 @@ services:
     env_file: .env
     network_mode: host
     depends_on:
-      - mysql
+      - mysql:
+          condition: service_healthy
     volumes:
       - /var/lib/hiddn_website:/var/lib/hiddn_website
 
