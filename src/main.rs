@@ -1,14 +1,17 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{collections::HashMap, net::SocketAddr, path::PathBuf, sync::Arc};
 
+use axum::{extract::Host, http::Uri, BoxError};
 use axum_login::{
     tower_sessions::{cookie::time::Duration, Expiry, MemoryStore, SessionManagerLayer},
     AuthManagerLayer, AuthManagerLayerBuilder,
 };
-use config::GLOBAL_CONFIG;
+use axum_server::tls_rustls::RustlsConfig;
+use config::{HttpOrHttps, GLOBAL_CONFIG};
 use payloads::AnnouncementPayload;
 use routes::create_router;
 use sessions::Backend;
 use tokio::{net::TcpListener, sync::RwLock};
+use tracing::info;
 use utils::{load_announcements, load_docs};
 
 mod config;
@@ -53,12 +56,92 @@ async fn main() {
     // Create router
     let app = create_router(docs, announcements, auth_layer, shared_app_state);
 
-    let listener = TcpListener::bind(GLOBAL_CONFIG.socket_addr.clone())
-        .await
-        .unwrap();
-    println!("listening on {}", listener.local_addr().unwrap());
+    // let listener = TcpListener::bind(GLOBAL_CONFIG.http_socket_addr.clone())
+    //     .await
+    //     .unwrap();
+    // info!("listening on {}", listener.local_addr().unwrap());
 
-    axum::serve(listener, app.into_make_service())
+    // axum::serve(listener, app.into_make_service())
+    //     .await
+    //     .unwrap();
+
+    // Begin listening on specified sockets
+
+    match GLOBAL_CONFIG.http_or_https {
+        HttpOrHttps::Http => {
+            let addr = GLOBAL_CONFIG
+                .http_socket_addr
+                .parse::<SocketAddr>()
+                .unwrap();
+            info!("listening on http://{}", addr);
+
+            axum_server::bind(addr)
+                .serve(app.into_make_service())
+                .await
+                .unwrap();
+        }
+        HttpOrHttps::Https => {
+            let config = RustlsConfig::from_pem_file(
+                GLOBAL_CONFIG.https_cert_path.clone(),
+                GLOBAL_CONFIG.https_key_path.clone(),
+            )
+            .await
+            .unwrap();
+
+            let addr = GLOBAL_CONFIG
+                .https_socket_addr
+                .parse::<SocketAddr>()
+                .unwrap();
+            info!("listening on https://{}", addr);
+
+            if GLOBAL_CONFIG.redirect_to_https {
+                tokio::spawn(redirect_http_to_https())
+            }
+
+            axum_server::bind_rustls(addr, config)
+                .serve(app.into_make_service())
+                .await
+                .unwrap();
+        }
+    };
+}
+
+async fn redirect_http_to_https() {
+    fn make_https(host: String, uri: Uri) -> Result<Uri, BoxError> {
+        let mut parts = uri.into_parts();
+
+        parts.scheme = Some(axum::http::uri::Scheme::HTTPS);
+
+        if parts.path_and_query.is_none() {
+            parts.path_and_query = Some("/".parse().unwrap());
+        }
+
+        let https_host = host.replace(&ports.http.to_string(), &ports.https.to_string());
+        parts.authority = Some(https_host.parse()?);
+
+        Ok(Uri::from_parts(parts)?)
+    }
+
+    let redirect = move |Host(host): Host, uri: Uri| async move {
+        match make_https(host, uri, ports) {
+            Ok(uri) => Ok(Redirect::permanent(&uri.to_string())),
+            Err(error) => {
+                tracing::warn!(%error, "failed to convert URI to HTTPS");
+                Err(StatusCode::BAD_REQUEST)
+            }
+        }
+    };
+
+    let addr = GLOBAL_CONFIG
+        .http_socket_addr
+        .parse::<SocketAddr>()
+        .unwrap();
+    let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
+    info!(
+        "Redirecting http://{} to https counterpart",
+        listener.local_addr().unwrap()
+    );
+    axum::serve(listener, redirect.into_make_service())
         .await
         .unwrap();
 }
