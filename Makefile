@@ -5,15 +5,18 @@ $(env):
 	echo "Please fill in the required values in the .env file"
 	cp .env.example $(env)
 
-dev: $(env)
+typeshare:
+	cargo install typeshare-cli
+
+dev: $(env) typeshare
 	cd client && npm i && npm run build
 	RUST_LOG=debug cargo run
 
-preview: $(env)
+preview: $(env) typeshare
 	cd client && npm i && npm run build
 	cargo run --release
 
-build: $(env)
+build: $(env) typeshare
 	cd client && npm i && npm run build
 	cargo build --release
 
