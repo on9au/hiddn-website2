@@ -7,8 +7,7 @@ use axum::{
 };
 use axum_login::{login_required, tower_sessions::MemoryStore, AuthManagerLayer};
 use tokio::sync::RwLock;
-use tower_http::services::ServeDir;
-use tracing_subscriber::layer;
+use tower_http::{services::ServeDir, trace::TraceLayer};
 
 use crate::{
     handlers::*,
@@ -74,7 +73,8 @@ pub fn create_router(
                 .route("/forgot_password", post(forgot_password))
                 .route("/generate_204", get(generate_204))
                 .route("/verify_email", post(verify_email))
-                .layer(Extension(pool)),
+                .layer(Extension(pool))
+                .layer(TraceLayer::new_for_http()),
         )
         // SSR Frontend
         .nest_service(

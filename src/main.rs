@@ -13,7 +13,7 @@ use payloads::AnnouncementPayload;
 use reqwest::StatusCode;
 use routes::create_router;
 use sessions::Backend;
-use sqlx::MySqlPool;
+use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
 use tokio::sync::RwLock;
 use tracing::info;
 use utils::{load_announcements, load_docs};
@@ -38,9 +38,17 @@ async fn main() {
     tracing_subscriber::fmt::init();
 
     // Database setup
-    let pool = MySqlPool::connect(&GLOBAL_CONFIG.database_url)
+    let pool = MySqlPoolOptions::new()
+        .max_connections(150)
+        .connect(&GLOBAL_CONFIG.database_url)
         .await
         .expect("Failed to connect to database");
+
+    // Migrate database
+    sqlx::migrate!("./migrations")
+        .run(&pool)
+        .await
+        .expect("Failed to migrate database");
 
     // Session layer.
     let session_store = MemoryStore::default();
