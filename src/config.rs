@@ -25,6 +25,11 @@ pub struct Config {
     // Database Config
     pub database_url: String,
 
+    // Marzban Panel Config
+    pub marzban_panel_url: String,
+    pub marzban_panel_username: String,
+    pub marzban_panel_password: String,
+
     // Stripe Config
     pub stripe_api_key: String,
 
