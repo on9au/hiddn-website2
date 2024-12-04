@@ -10,6 +10,7 @@ const AdminUserManagement: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        document.title = 'Admin User Management - HiddN';
         const fetchUsers = async () => {
             try {
                 const response = await axios.get('/api/admin/users', { withCredentials: true });

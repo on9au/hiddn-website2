@@ -12,6 +12,7 @@ const AdminAnnouncementsEditor: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+        document.title = 'Admin Announcements Editor - HiddN';
         const fetchAnnouncements = async () => {
             try {
                 const response = await axios.get('/api/announcements', { withCredentials: true });

@@ -100,7 +100,7 @@ const AdminPlanManager: React.FC = () => {
     return (
         <div className="flex flex-col pt-7">
             <span className="w-full mb-6 text-left">
-                <h1 className="text-4xl font-semibold">Admin Plan Manager</h1>
+                <h1 className="text-4xl font-semibold">Plan Manager</h1>
             </span>
             <div className="container mx-auto">
                 <div className="w-full p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
