@@ -13,7 +13,7 @@ use payloads::AnnouncementPayload;
 use reqwest::StatusCode;
 use routes::create_router;
 use sessions::Backend;
-use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
+use sqlx::mysql::MySqlPoolOptions;
 use tokio::sync::RwLock;
 use tracing::info;
 use utils::{load_announcements, load_docs};
