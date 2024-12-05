@@ -17,13 +17,19 @@ pub struct User {
     pub email: String,
     password_hash: String,
     is_admin: bool,
-    created_at: DateTime<Utc>,
-    updated_at: DateTime<Utc>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    pub email_data_reminder: bool,
+    pub email_expiration_reminder: bool,
 }
 
 impl User {
     pub fn is_admin(&self) -> bool {
         self.is_admin
+    }
+
+    pub fn id(&self) -> i64 {
+        self.id
     }
 }
 
@@ -98,7 +104,9 @@ impl AuthnBackend for Backend {
                 password_hash,
                 is_admin as `is_admin: bool`,
                 created_at as `created_at: DateTime<Utc>`,
-                updated_at as `updated_at: DateTime<Utc>`
+                updated_at as `updated_at: DateTime<Utc>`,
+                email_data_reminder as `email_data_reminder: bool`,
+                email_expiration_reminder as `email_expiration_reminder: bool`
             FROM users
             WHERE email = ?
             "#,
@@ -139,7 +147,9 @@ impl AuthnBackend for Backend {
                 password_hash,
                 is_admin as `is_admin: bool`,
                 created_at as `created_at: DateTime<Utc>`,
-                updated_at as `updated_at: DateTime<Utc>`
+                updated_at as `updated_at: DateTime<Utc>`,
+                email_data_reminder as `email_data_reminder: bool`,
+                email_expiration_reminder as `email_expiration_reminder: bool`
             FROM users
             WHERE id = ?
             "#,

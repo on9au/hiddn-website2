@@ -16,7 +16,7 @@ use sqlx::{query, MySqlPool};
 use tokio::sync::RwLock;
 use tracing::{debug, error};
 
-use crate::payloads::PlanDetailsRust;
+use crate::payloads::{PlanDetailsRust, UserProfileSettingsChangePayload};
 use crate::{
     payloads::{
         AnnouncementPayload, CreateOrderResponsePayload, ForgotPasswordPayload, LoginPayload,
@@ -471,15 +471,6 @@ pub async fn plan_details(
     Extension(marzban_client): Extension<MarzbanAPIClient>,
     auth_session: AuthSession,
 ) -> impl IntoResponse {
-    // Sample
-    return Json(PlanDetailsRust {
-        expiration: Some(1609459200),
-        status: PlanStatusEnum::Active,
-        data_used: 16428249907,
-        data_limit: Some(21474836480),
-    })
-    .into_response();
-
     // Get the user's details from the db
     let user = auth_session.user.unwrap();
 
@@ -582,8 +573,43 @@ pub async fn reset_subscription_url() -> impl IntoResponse {
 /// Handler for the POST '/update_settings' route.
 /// This handler will update the user's settings.
 /// This handler requires authentication (managed by axum_login).
-pub async fn update_settings() -> impl IntoResponse {
-    // Typically, would update the user's settings in the db.
+pub async fn update_settings(
+    auth_session: AuthSession,
+    Extension(pool): Extension<MySqlPool>,
+    Json(payload): Json<UserProfileSettingsChangePayload>,
+) -> impl IntoResponse {
+    let user_id = auth_session.user.unwrap().id();
+
+    if payload.email_data_reminder.is_some() {
+        query!(
+            r#"
+            UPDATE users
+            SET email_data_reminder = ?
+            WHERE id = ?
+            "#,
+            payload.email_data_reminder.unwrap(),
+            user_id
+        )
+        .execute(&pool)
+        .await
+        .expect("Failed to update email_data_reminder");
+    }
+
+    if payload.email_expiration_reminder.is_some() {
+        query!(
+            r#"
+            UPDATE users
+            SET email_expiration_reminder = ?
+            WHERE id = ?
+            "#,
+            payload.email_expiration_reminder.unwrap(),
+            user_id
+        )
+        .execute(&pool)
+        .await
+        .expect("Failed to update email_data_reminder");
+    }
+
     StatusCode::OK.into_response()
 }
 
@@ -627,11 +653,10 @@ pub async fn user_me(auth_session: AuthSession) -> impl IntoResponse {
 
     let user_profile = UserProfilePayload {
         email: user.email,
-        email_verified: true,
-        created_at: "2021-01-01T00:00:00Z".to_string(), // Placeholder
-        updated_at: "2021-01-01T00:00:00Z".to_string(),
-        email_expiration_reminder: false,
-        email_data_reminder: true, // Placeholder
+        created_at: user.created_at.to_string(),
+        updated_at: user.updated_at.to_string(),
+        email_expiration_reminder: user.email_expiration_reminder,
+        email_data_reminder: user.email_data_reminder,
     };
 
     Json(user_profile).into_response()

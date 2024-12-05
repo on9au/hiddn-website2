@@ -75,11 +75,17 @@ pub struct ServerStatusPayload {
 #[typeshare::typeshare]
 pub struct UserProfilePayload {
     pub email: String,
-    pub email_verified: bool,
     pub created_at: String,
     pub updated_at: String,
     pub email_expiration_reminder: bool,
     pub email_data_reminder: bool,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[typeshare::typeshare]
+pub struct UserProfileSettingsChangePayload {
+    pub email_expiration_reminder: Option<bool>,
+    pub email_data_reminder: Option<bool>,
 }
 
 #[derive(Clone, Debug, Serialize)]
