@@ -33,7 +33,7 @@ const Register: React.FC = () => {
 
         const payload: RequestCodePayload = { email };
 
-        const result = await fetch(`api/verify_email`, {
+        const result = await fetch(`api/request_code`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -67,28 +67,28 @@ const Register: React.FC = () => {
             return;
         }
 
-        // Verify password strength
-        // Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number.
-        // Check length first
-        if (password.length < 8) {
-            setAuthStatus({ type: 'Error', message: 'Password must be at least 8 characters long.' });
-            return;
-        }
-        // Check for uppercase letter
-        if (!/[A-Z]/.test(password)) {
-            setAuthStatus({ type: 'Error', message: 'Password must contain at least one uppercase letter.' });
-            return;
-        }
-        // Check for lowercase letter
-        if (!/[a-z]/.test(password)) {
-            setAuthStatus({ type: 'Error', message: 'Password must contain at least one lowercase letter.' });
-            return;
-        }
-        // Check for number
-        if (!/[0-9]/.test(password)) {
-            setAuthStatus({ type: 'Error', message: 'Password must contain at least one number.' });
-            return;
-        }
+        // // Verify password strength
+        // // Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number.
+        // // Check length first
+        // if (password.length < 8) {
+        //     setAuthStatus({ type: 'Error', message: 'Password must be at least 8 characters long.' });
+        //     return;
+        // }
+        // // Check for uppercase letter
+        // if (!/[A-Z]/.test(password)) {
+        //     setAuthStatus({ type: 'Error', message: 'Password must contain at least one uppercase letter.' });
+        //     return;
+        // }
+        // // Check for lowercase letter
+        // if (!/[a-z]/.test(password)) {
+        //     setAuthStatus({ type: 'Error', message: 'Password must contain at least one lowercase letter.' });
+        //     return;
+        // }
+        // // Check for number
+        // if (!/[0-9]/.test(password)) {
+        //     setAuthStatus({ type: 'Error', message: 'Password must contain at least one number.' });
+        //     return;
+        // }
 
         setAuthStatus({ type: 'Loading' });
 

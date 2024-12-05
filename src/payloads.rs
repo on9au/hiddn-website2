@@ -27,6 +27,13 @@ pub struct RegisterPayload {
     pub invite_code: String,
 }
 
+#[derive(Clone, Debug, Serialize)]
+#[typeshare::typeshare]
+pub struct PasswordFeedbackPayload {
+    pub warning: Option<String>,
+    pub suggestions: Vec<String>,
+}
+
 #[derive(Clone, Debug, Deserialize)]
 #[typeshare::typeshare]
 pub struct ForgotPasswordPayload {

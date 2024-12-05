@@ -55,6 +55,11 @@ export interface NewPlanPayload {
 	description?: string;
 }
 
+export interface PasswordFeedbackPayload {
+	warning?: string;
+	suggestions: string[];
+}
+
 export enum PlanStatusEnum {
 	Active = "Active",
 	Expired = "Expired",

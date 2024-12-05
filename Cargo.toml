@@ -13,7 +13,7 @@ serde_json = "1.0.133"
 tokio = { version = "1.42.0", features = ["full"] }
 typeshare = "1.0.4"
 uuid = { version = "1.11.0", features = ["serde", "v4"] }
-argon2 = { version = "0.5.3", features = ["simple"] }
+argon2 = { version = "0.5.3", features = ["simple", "password-hash"] }
 dotenvy = "0.15.7"
 rand = "0.8.5"
 tracing-subscriber = "0.3.19"
@@ -25,6 +25,7 @@ once_cell = "1.20.2"
 axum-server = { version = "0.7.1", features = ["tls-rustls"] }
 sqlx = { version = "0.8.2", features = ["chrono", "macros", "mysql", "runtime-tokio", "uuid"] }
 marzban_api = "0.2.2"
+zxcvbn = "3.1.0"
 # async-stripe = { version = "0.39.1", features = ["runtime-tokio-hyper"] }
 
 [profile.release]
