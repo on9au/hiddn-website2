@@ -1,8 +1,9 @@
-use std::collections::HashMap;
-
+use argon2::PasswordHash;
+use argon2::{Argon2, PasswordVerifier};
 use axum::async_trait;
 use axum_login::{AuthUser, AuthnBackend, UserId};
-use uuid::Uuid;
+use chrono::{DateTime, Utc};
+use sqlx::{query_as, MySqlPool};
 
 use crate::payloads::LoginPayload;
 
@@ -12,14 +13,17 @@ pub type AuthSession = axum_login::AuthSession<Backend>;
 #[derive(Clone)]
 pub struct User {
     id: i64,
-    admin: bool,
+    pub marzban_username: String,
     pub email: String,
-    password_hash: String, // On the DB, it would be salted.
+    password_hash: String,
+    is_admin: bool,
+    created_at: DateTime<Utc>,
+    updated_at: DateTime<Utc>,
 }
 
 impl User {
     pub fn is_admin(&self) -> bool {
-        self.admin
+        self.is_admin
     }
 }
 
@@ -28,8 +32,13 @@ impl std::fmt::Debug for User {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("User")
             .field("id", &self.id)
+            .field("marzban_username", &self.marzban_username)
             .field("email", &self.email)
             .field("password_hash", &"[redacted]")
+            .field("password_salt", &"[redacted]")
+            .field("is_admin", &self.is_admin)
+            .field("created_at", &self.created_at)
+            .field("updated_at", &self.updated_at)
             .finish()
     }
 }
@@ -51,10 +60,15 @@ impl AuthUser for User {
 // pub struct Backend {
 //     pool: sqlx::PgPool,
 // }
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct Backend {
-    #[allow(dead_code)] // We're not using this yet.
-    users: HashMap<Uuid, User>,
+    users: MySqlPool,
+}
+
+impl Backend {
+    pub fn new(pool: MySqlPool) -> Self {
+        Self { users: pool }
+    }
 }
 
 // impl Backend {
@@ -68,56 +82,72 @@ pub struct Backend {
 impl AuthnBackend for Backend {
     type User = User;
     type Credentials = LoginPayload;
-    type Error = std::convert::Infallible;
+    type Error = sqlx::Error;
 
     async fn authenticate(
         &self,
         creds: Self::Credentials,
     ) -> Result<Option<Self::User>, Self::Error> {
-        // let user: Option<Self::User> = sqlx::query_as("select * from users where username = ? ")
-        //     .bind(creds.email)
-        //     .fetch_optional(&self.db)
-        //     .await?;
+        let user = query_as!(
+            User,
+            r#"
+            SELECT 
+                id,
+                marzban_username,
+                email,
+                password_hash,
+                is_admin as `is_admin: bool`,
+                created_at as `created_at: DateTime<Utc>`,
+                updated_at as `updated_at: DateTime<Utc>`
+            FROM users
+            WHERE email = ?
+            "#,
+            creds.email
+        )
+        .fetch_optional(&self.users)
+        .await?;
 
-        // Verifying the password is blocking and potentially slow, so we'll do so via
-        // `spawn_blocking`.
-        // task::spawn_blocking(|| {
-        //     // We're using password-based authentication--this works by comparing our form
-        //     // input with an argon2 password hash.
-        //     Ok(user.filter(|user| verify_password(creds.password, &user.password).is_ok()))
-        // })
-        // .await
+        let user = match user {
+            Some(user) => user,
+            None => return Ok(None),
+        };
 
-        // For now, we'll just return a dummy user.
-        if creds.email == "test@test.com" && creds.password == "password" {
-            Ok(Some(User {
-                id: 1,
-                admin: true,
-                email: "test@test.com".to_string(),
-                password_hash: "password".to_string(),
-            }))
-        } else {
-            Ok(None)
+        // Verify password
+        let argon2 = Argon2::default();
+
+        // We need to convert the password hash from the database to a PasswordHash
+        let password_hash = PasswordHash::new(&user.password_hash)
+            .expect("Failed to decode password hash from user db");
+
+        // Verify the password
+        let validation = argon2.verify_password(creds.password.as_bytes(), &password_hash);
+
+        match validation {
+            Ok(_) => Ok(Some(user)),
+            Err(_) => Ok(None),
         }
     }
 
     async fn get_user(&self, user_id: &UserId<Self>) -> Result<Option<Self::User>, Self::Error> {
-        // let user = sqlx::query_as("select * from users where id = ?")
-        //     .bind(user_id)
-        //     .fetch_optional(&self.db)
-        //     .await?;
+        let user = query_as!(
+            User,
+            r#"
+            SELECT 
+                id,
+                marzban_username,
+                email,
+                password_hash,
+                is_admin as `is_admin: bool`,
+                created_at as `created_at: DateTime<Utc>`,
+                updated_at as `updated_at: DateTime<Utc>`
+            FROM users
+            WHERE id = ?
+            "#,
+            user_id
+        )
+        .fetch_optional(&self.users)
+        .await?;
 
-        // Ok(user)
-
-        if *user_id == 1 {
-            Ok(Some(User {
-                id: 1,
-                admin: true,
-                email: "test@test.com".to_string(),
-                password_hash: "password".to_string(),
-            }))
-        } else {
-            Ok(None)
-        }
+        Ok(user)
     }
 }

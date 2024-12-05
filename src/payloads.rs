@@ -38,8 +38,15 @@ pub struct ForgotPasswordPayload {
 
 #[derive(Clone, Debug, Deserialize)]
 #[typeshare::typeshare]
+pub struct RequestCodePayload {
+    pub email: String,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+#[typeshare::typeshare]
 pub struct VerifyEmailPayload {
     pub email: String,
+    pub email_verification_code: String,
 }
 
 #[derive(Clone, Debug, Deserialize)]

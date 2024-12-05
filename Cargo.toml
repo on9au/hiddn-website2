@@ -13,7 +13,7 @@ serde_json = "1.0.133"
 tokio = { version = "1.42.0", features = ["full"] }
 typeshare = "1.0.4"
 uuid = { version = "1.11.0", features = ["serde", "v4"] }
-argon2 = "0.5.3"
+argon2 = { version = "0.5.3", features = ["simple"] }
 dotenvy = "0.15.7"
 rand = "0.8.5"
 tracing-subscriber = "0.3.19"

@@ -7,6 +7,7 @@ use axum::{
     Extension, Json,
 };
 use serde_json::json;
+use sqlx::MySqlPool;
 use tokio::sync::RwLock;
 use tracing::{debug, error};
 
@@ -14,8 +15,8 @@ use crate::{
     payloads::{
         AnnouncementPayload, CreateOrderResponsePayload, ForgotPasswordPayload, LoginPayload,
         LoginResponsePayload, PlanDetailsPayload, PlanPayload, PlanStatusEnum, RegisterPayload,
-        ServerStatusPayload, UserProfilePayload, UserTransactionPayload, UserTransactionStatusEnum,
-        VerifyEmailPayload,
+        RequestCodePayload, ServerStatusPayload, UserProfilePayload, UserTransactionPayload,
+        UserTransactionStatusEnum, VerifyEmailPayload,
     },
     sessions::AuthSession,
     SharedDocs,
@@ -53,8 +54,7 @@ pub async fn login_user(
     mut auth_session: AuthSession,
     Json(payload): Json<LoginPayload>,
 ) -> impl IntoResponse {
-    // TODO: Implement actual authentication logic interfacing with db
-
+    // Authenticate the user with the db
     let user = match auth_session.authenticate(payload).await {
         Ok(Some(user)) => user,
         Ok(None) => return StatusCode::UNAUTHORIZED.into_response(),
@@ -64,6 +64,7 @@ pub async fn login_user(
         }
     };
 
+    // Log the user in
     match auth_session.login(&user).await {
         Ok(_) => {}
         Err(e) => {
@@ -102,6 +103,15 @@ pub async fn verify_email(Json(_payload): Json<VerifyEmailPayload>) -> impl Into
     // We would create a temporary verificaton code linked to the email in the db which expires after a certain time.
     // We would send the verification code to the email.
 
+    StatusCode::OK.into_response()
+}
+
+/// Handler for the POST `/request_code` route.
+/// This handler will receive a JSON(RequestCodePayload) payload from the client.
+/// It will send code to email to verify the email.
+/// Should have a rate limit to prevent spamming.
+/// This acts as a way to verify the email's ownership and existence.
+pub async fn request_code(Json(_payload): Json<RequestCodePayload>) -> impl IntoResponse {
     StatusCode::OK.into_response()
 }
 

@@ -92,7 +92,7 @@ async fn main() {
     debug!("Setting up auth layer");
 
     // Auth service.
-    let backend = Backend::default();
+    let backend = Backend::new(pool.clone());
     let auth_layer: AuthManagerLayer<Backend, MemoryStore> =
         AuthManagerLayerBuilder::new(backend, session_layer).build();
 
@@ -118,7 +118,14 @@ async fn main() {
     debug!("Setting up router");
 
     // Create router
-    let app = create_router(docs, announcements, auth_layer, shared_app_state, pool);
+    let app = create_router(
+        docs,
+        announcements,
+        auth_layer,
+        shared_app_state,
+        pool,
+        marzban_client,
+    );
 
     info!("Router setup");
 

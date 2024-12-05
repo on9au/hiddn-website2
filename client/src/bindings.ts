@@ -85,6 +85,10 @@ export interface RegisterPayload {
 	invite_code: string;
 }
 
+export interface RequestCodePayload {
+	email: string;
+}
+
 export interface ServerStatusPayload {
 	server: string;
 	status: string;
@@ -122,6 +126,7 @@ export interface UserTransactionPayload {
 
 export interface VerifyEmailPayload {
 	email: string;
+	email_verification_code: string;
 }
 
 export enum ServerStatusEnum {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthStatus, EmailVerifyStatus } from '../auth';
 import CommonLink from '../components/commonlink';
-import { RegisterPayload, VerifyEmailPayload } from '../bindings';
+import { RegisterPayload, RequestCodePayload } from '../bindings';
 import Loginbutton from '../components/loginbutton';
 import TextInput from '../components/logintextinput';
 import VerificationInput from '../components/loginpageverificationinput';
@@ -31,7 +31,7 @@ const Register: React.FC = () => {
 
         setVerifyStatus({ type: 'Loading' });
 
-        const payload: VerifyEmailPayload = { email };
+        const payload: RequestCodePayload = { email };
 
         const result = await fetch(`api/verify_email`, {
             method: 'POST',

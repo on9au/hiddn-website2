@@ -6,6 +6,7 @@ use axum::{
     Extension, Router,
 };
 use axum_login::{login_required, tower_sessions::MemoryStore, AuthManagerLayer};
+use marzban_api::client::MarzbanAPIClient;
 use tokio::sync::RwLock;
 use tower_http::{services::ServeDir, trace::TraceLayer};
 
@@ -25,6 +26,7 @@ pub fn create_router(
     auth_layer: AuthManagerLayer<Backend, MemoryStore>,
     shared_app_state: Arc<AppState>,
     pool: sqlx::MySqlPool,
+    marzban_client: MarzbanAPIClient,
 ) -> Router {
     Router::new()
         // API Routes
@@ -72,8 +74,10 @@ pub fn create_router(
                 .route("/register_user", post(register_user))
                 .route("/forgot_password", post(forgot_password))
                 .route("/generate_204", get(generate_204))
+                .route("/request_code", post(request_code))
                 .route("/verify_email", post(verify_email))
                 .layer(Extension(pool))
+                .layer(Extension(marzban_client))
                 .layer(TraceLayer::new_for_http()),
         )
         // SSR Frontend
