@@ -49,6 +49,10 @@ const formatBytes = (bytes: number, decimals = 2): string => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
+const formatUnixTimestamp = (timestamp: number): string => {
+    return new Date(timestamp * 1000).toLocaleString(undefined, { timeZoneName: 'short' });
+}
+
 const Dashboard: React.FC = () => {
     const [planDetails, setPlanDetails] = useState<PlanDetailsPayload | null>(null);
     const [announcements, setAnnouncements] = useState<AnnouncementPayload[]>([]);
@@ -133,7 +137,7 @@ const Dashboard: React.FC = () => {
                                         Your Plan
                                     </h3>
                                     <p className="mb-2 text-base text-gray-700 dark:text-gray-300">
-                                        <strong>Expiration:</strong> {planDetails.expiration}
+                                        <strong>Expiration:</strong> {planDetails.expiration ? formatUnixTimestamp(planDetails.expiration) : "Never"}
                                     </p>
                                     <p className="mb-4 text-base text-gray-700 dark:text-gray-300">
                                         <strong>Status:</strong> {planDetails.status}
@@ -141,7 +145,7 @@ const Dashboard: React.FC = () => {
                                     {/* Data Usage Progress Bar */}
                                     <div className="mb-4">
                                         <p className="mb-1 text-base text-gray-700 dark:text-gray-300">
-                                            Data Usage: {formatBytes(planDetails.dataUsed)} {planDetails.dataLimit && `/ ${formatBytes(planDetails.dataLimit)}`}
+                                            Data Usage: {formatBytes(planDetails.dataUsed)}{planDetails.dataLimit && `/ ${formatBytes(planDetails.dataLimit)}`}
                                         </p>
                                         <div className="w-full h-4 bg-gray-300 rounded-full dark:bg-gray-700">
                                             <div

@@ -10,20 +10,19 @@ use axum::{
     Extension, Json,
 };
 use marzban_api::client::MarzbanAPIClient;
-use marzban_api::models::user::{
-    UserCreate, UserDataLimitResetStrategy, UserStatus, UserStatusCreate,
-};
+use marzban_api::models::user::UserStatus;
 use serde_json::json;
 use sqlx::{query, MySqlPool};
 use tokio::sync::RwLock;
 use tracing::{debug, error};
 
+use crate::payloads::PlanDetailsRust;
 use crate::{
     payloads::{
         AnnouncementPayload, CreateOrderResponsePayload, ForgotPasswordPayload, LoginPayload,
-        LoginResponsePayload, PasswordFeedbackPayload, PlanDetailsPayload, PlanPayload,
-        PlanStatusEnum, RegisterPayload, RequestCodePayload, ServerStatusPayload,
-        UserProfilePayload, UserTransactionPayload, UserTransactionStatusEnum, VerifyEmailPayload,
+        LoginResponsePayload, PasswordFeedbackPayload, PlanPayload, PlanStatusEnum,
+        RegisterPayload, RequestCodePayload, ServerStatusPayload, UserProfilePayload,
+        UserTransactionPayload, UserTransactionStatusEnum, VerifyEmailPayload,
     },
     sessions::AuthSession,
     SharedDocs,
@@ -134,7 +133,6 @@ pub async fn request_code(Json(_payload): Json<RequestCodePayload>) -> impl Into
 /// The server will use axum_login to keep the user authenticated.
 pub async fn register_user(
     Extension(pool): Extension<MySqlPool>,
-    Extension(marzban_client): Extension<MarzbanAPIClient>,
     Json(payload): Json<RegisterPayload>,
 ) -> impl IntoResponse {
     // TODO: Implement actual registration logic interfacing with db
@@ -473,6 +471,15 @@ pub async fn plan_details(
     Extension(marzban_client): Extension<MarzbanAPIClient>,
     auth_session: AuthSession,
 ) -> impl IntoResponse {
+    // Sample
+    return Json(PlanDetailsRust {
+        expiration: Some(1609459200),
+        status: PlanStatusEnum::Active,
+        data_used: 16428249907,
+        data_limit: Some(21474836480),
+    })
+    .into_response();
+
     // Get the user's details from the db
     let user = auth_session.user.unwrap();
 
@@ -496,11 +503,11 @@ pub async fn plan_details(
         UserStatus::OnHold => PlanStatusEnum::OnHold,
     };
 
-    let plan_details = PlanDetailsPayload {
-        expiration: user.expire.map(|t| t.into()),
+    let plan_details = PlanDetailsRust {
+        expiration: user.expire,
         status,
-        data_used: user.used_traffic.into(),
-        data_limit: user.data_limit.map(|t| t.into()),
+        data_used: user.used_traffic,
+        data_limit: user.data_limit,
     };
 
     Json(plan_details).into_response()

@@ -118,6 +118,18 @@ pub struct PlanDetailsPayload {
     pub data_limit: Option<U53>,
 }
 
+/// PlanDetaulsPayload but with u64 instead of U53/u32 (since data used and data limit are in bytes
+/// and will go over the limit of u32, and converting to U53 goes like: u64 -> u32 -> U53)
+#[derive(Clone, Debug, Serialize)]
+pub struct PlanDetailsRust {
+    pub expiration: Option<u64>,
+    pub status: PlanStatusEnum,
+    #[serde(rename = "dataUsed")]
+    pub data_used: u64,
+    #[serde(rename = "dataLimit")]
+    pub data_limit: Option<u64>,
+}
+
 #[derive(Clone, Debug, Serialize)]
 #[typeshare::typeshare]
 pub enum PlanStatusEnum {
