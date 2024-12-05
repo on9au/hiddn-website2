@@ -27,8 +27,8 @@ const Login: React.FC = () => {
             password,
         };
 
-        if (payload.email === '' || !payload.email.includes('@')) {
-            setAuthStatus({ type: 'Error', message: 'Please enter a valid email address.' });
+        if (payload.email === '') {
+            setAuthStatus({ type: 'Error', message: 'Email cannot be blank.' });
             return;
         }
 

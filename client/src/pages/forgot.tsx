@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import zxcvbn from 'zxcvbn';
 import { AuthStatus, EmailVerifyStatus } from '../auth';
 import CommonLink from '../components/commonlink';
-import { ForgotPasswordPayload, RequestCodePayload } from '../bindings';
+import { ForgotPasswordPayload, RequestCodePayload, PasswordFeedbackPayload } from '../bindings';
 import Loginbutton from '../components/loginbutton';
 import TextInput from '../components/logintextinput';
 import VerificationInput from '../components/loginpageverificationinput';
@@ -10,7 +11,7 @@ import VerificationInput from '../components/loginpageverificationinput';
 // const apiURL: string = import.meta.env.VITE_API_URL;
 
 const Forgot: React.FC = () => {
-    useEffect(() => { document.title = 'Forgot - HiddN'; } );
+    useEffect(() => { document.title = 'Forgot - HiddN'; });
 
     const navigate = useNavigate();
 
@@ -21,6 +22,8 @@ const Forgot: React.FC = () => {
     const [authStatus, setAuthStatus] = useState<AuthStatus>({ type: 'Idle' });
     const [verifyStatus, setVerifyStatus] = useState<EmailVerifyStatus>({ type: 'Idle' });
     const [verifyTimeout, setVerifyTimeout] = useState<number>(0);
+    const [passwordSuggestions, setPasswordSuggestions] = useState<string[]>([]);
+    const [passwordStrength, setPasswordStrength] = useState<number>(0);
 
     const handleSendCode = async () => {
         if (email === '' || !email.includes('@')) {
@@ -55,6 +58,20 @@ const Forgot: React.FC = () => {
         }
     };
 
+    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newPassword = e.target.value;
+        setPassword(newPassword);
+
+        const result = zxcvbn(newPassword);
+        setPasswordStrength(result.score);
+        setPasswordSuggestions(result.feedback.suggestions);
+        if (passwordStrength < 3) {
+            setPasswordSuggestions(result.feedback.suggestions);
+        } else {
+            setPasswordSuggestions([]);
+        }
+    };
+
     const handleRegister = async () => {
         if (email === '' || !email.includes('@')) {
             setAuthStatus({ type: 'Error', message: 'Please enter a valid email.' });
@@ -66,28 +83,10 @@ const Forgot: React.FC = () => {
             return;
         }
 
-        // // Verify password strength
-        // // Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number.
-        // // Check length first
-        // if (password.length < 8) {
-        //     setAuthStatus({ type: 'Error', message: 'Password must be at least 8 characters long.' });
-        //     return;
-        // }
-        // // Check for uppercase letter
-        // if (!/[A-Z]/.test(password)) {
-        //     setAuthStatus({ type: 'Error', message: 'Password must contain at least one uppercase letter.' });
-        //     return;
-        // }
-        // // Check for lowercase letter
-        // if (!/[a-z]/.test(password)) {
-        //     setAuthStatus({ type: 'Error', message: 'Password must contain at least one lowercase letter.' });
-        //     return;
-        // }
-        // // Check for number
-        // if (!/[0-9]/.test(password)) {
-        //     setAuthStatus({ type: 'Error', message: 'Password must contain at least one number.' });
-        //     return;
-        // }
+        if (passwordStrength < 3) {
+            setAuthStatus({ type: 'Error', message: 'Password is too weak.' });
+            return;
+        }
 
         setAuthStatus({ type: 'Loading' });
 
@@ -140,9 +139,12 @@ const Forgot: React.FC = () => {
             case 403:
                 setAuthStatus({ type: 'Error', message: 'Incorrect email verification code.' });
                 break;
-            case 409:
-                setAuthStatus({ type: 'Error', message: 'Server failed to validate passwords. Try again.' });
+            case 409: {
+                const feedback: PasswordFeedbackPayload = await result.json();
+                setAuthStatus({ type: 'Error', message: 'Password is too weak: ' + feedback.warning || 'Password validation failed.' });
+                setPasswordSuggestions(feedback.suggestions);
                 break;
+            }
             default:
                 setAuthStatus({ type: 'Error', message: 'An error occurred. (' + result.status + ')' });
         }
@@ -181,7 +183,7 @@ const Forgot: React.FC = () => {
                     placeholder="Password"
                     value={password}
                     is_last_position={false}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={handlePasswordChange}
                 />
                 <TextInput
                     type="password"
@@ -205,6 +207,19 @@ const Forgot: React.FC = () => {
                 {verifyStatus.type === 'Error' && (
                     <div className="mb-4 text-red-500">
                         {verifyStatus.message}
+                    </div>
+                )}
+                {passwordSuggestions.length > 0 && password.length > 0 && (
+                    <div className="mb-4 text-yellow-500">
+                        <ul>
+                            Your password is too weak. Suggestions:
+                            {passwordSuggestions.map((suggestion, index) => (
+                                <li key={index}>{suggestion}</li>
+                            ))}
+                            {password.length < 9 && (
+                                <li>Password must be 8 or more characters long.</li>
+                            )}
+                        </ul>
                     </div>
                 )}
                 <div className="flex flex-row space-x-4">

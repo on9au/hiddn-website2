@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import zxcvbn from 'zxcvbn';
 import { AuthStatus, EmailVerifyStatus } from '../auth';
 import CommonLink from '../components/commonlink';
-import { RegisterPayload, RequestCodePayload } from '../bindings';
+import { RegisterPayload, RequestCodePayload, PasswordFeedbackPayload } from '../bindings';
 import Loginbutton from '../components/loginbutton';
 import TextInput from '../components/logintextinput';
 import VerificationInput from '../components/loginpageverificationinput';
@@ -22,6 +23,8 @@ const Register: React.FC = () => {
     const [authStatus, setAuthStatus] = useState<AuthStatus>({ type: 'Idle' });
     const [verifyStatus, setVerifyStatus] = useState<EmailVerifyStatus>({ type: 'Idle' });
     const [verifyTimeout, setVerifyTimeout] = useState<number>(0);
+    const [passwordSuggestions, setPasswordSuggestions] = useState<string[]>([]);
+    const [passwordStrength, setPasswordStrength] = useState<number>(0);
 
     const handleSendCode = async () => {
         if (email === '' || !email.includes('@')) {
@@ -56,7 +59,20 @@ const Register: React.FC = () => {
         }
     };
 
-    const handleRegister = async () => {
+    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newPassword = e.target.value;
+        setPassword(newPassword);
+
+        const result = zxcvbn(newPassword);
+        setPasswordStrength(result.score);
+        if (passwordStrength < 3) {
+            setPasswordSuggestions(result.feedback.suggestions);
+        } else {
+            setPasswordSuggestions([]);
+        }
+    };
+
+    const handleRegister = async () => {        
         if (email === '' || !email.includes('@')) {
             setAuthStatus({ type: 'Error', message: 'Please enter a valid email.' });
             return;
@@ -67,28 +83,10 @@ const Register: React.FC = () => {
             return;
         }
 
-        // // Verify password strength
-        // // Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number.
-        // // Check length first
-        // if (password.length < 8) {
-        //     setAuthStatus({ type: 'Error', message: 'Password must be at least 8 characters long.' });
-        //     return;
-        // }
-        // // Check for uppercase letter
-        // if (!/[A-Z]/.test(password)) {
-        //     setAuthStatus({ type: 'Error', message: 'Password must contain at least one uppercase letter.' });
-        //     return;
-        // }
-        // // Check for lowercase letter
-        // if (!/[a-z]/.test(password)) {
-        //     setAuthStatus({ type: 'Error', message: 'Password must contain at least one lowercase letter.' });
-        //     return;
-        // }
-        // // Check for number
-        // if (!/[0-9]/.test(password)) {
-        //     setAuthStatus({ type: 'Error', message: 'Password must contain at least one number.' });
-        //     return;
-        // }
+        if (passwordStrength < 3) {
+            setAuthStatus({ type: 'Error', message: 'Password is too weak.' });
+            return;
+        }
 
         setAuthStatus({ type: 'Loading' });
 
@@ -142,9 +140,12 @@ const Register: React.FC = () => {
             case 403:
                 setAuthStatus({ type: 'Error', message: 'Incorrect email verification code.' });
                 break;
-            case 409:
-                setAuthStatus({ type: 'Error', message: 'Server failed to validate passwords. Try again.' });
+            case 409: {
+                const feedback: PasswordFeedbackPayload = await result.json();
+                setAuthStatus({ type: 'Error', message: 'Password is too weak: ' + feedback.warning || 'Password validation failed.' });
+                setPasswordSuggestions(feedback.suggestions);
                 break;
+            }
             default:
                 setAuthStatus({ type: 'Error', message: 'An error occurred. (' + result.status + ')' });
         }
@@ -171,27 +172,6 @@ const Register: React.FC = () => {
                     is_last_position={false}
                     onChange={(e) => setEmail(e.target.value)}
                 />
-                {/* <div className="relative w-full">
-                    <input
-                        className="w-full px-4 py-2 mb-2 border border-gray-300 outline-none dark:border-gray-700 dark:bg-gray-800 dark:hover:border-hiddn-600 hover:border-hiddn-200 focus:border-hiddn-500 rounded-xl"
-                        type="text"
-                        placeholder="Verification Code"
-                        maxLength={20}
-                        value={emailVerificationCode}
-                        onChange={(e) => setEmailVerificationCode(e.target.value)}
-                    />
-                    <button
-                        className={`absolute right-0 w-20 px-4 py-2 text-white border rounded-xl ${verifyStatus.type === 'Idle' || verifyStatus.type === 'Error' ? 'bg-hiddn-500 hover:bg-hiddn-400 border-hiddn-500 hover:border-hiddn-400' : 'bg-gray-400 border-gray-400 cursor-not-allowed'}`}
-                        onClick={async () => {
-                            if (verifyStatus.type === 'Idle' || verifyStatus.type === 'Error') {
-                                await handleSendCode();
-                            }
-                        }}
-                        disabled={verifyStatus.type !== 'Idle' && verifyStatus.type !== 'Error'}
-                    >
-                        {verifyStatus.type === 'Idle' ? 'Send' : verifyStatus.type === 'Error' ? 'Send' : verifyStatus.type === 'Loading' ? '...' : verifyTimeout.toString()}
-                    </button>
-                </div> */}
                 <VerificationInput
                     value={emailVerificationCode}
                     onChange={(e) => setEmailVerificationCode(e.target.value)}
@@ -204,7 +184,7 @@ const Register: React.FC = () => {
                     placeholder="Password"
                     value={password}
                     is_last_position={false}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={handlePasswordChange}
                 />
                 <TextInput
                     type="password"
@@ -236,6 +216,19 @@ const Register: React.FC = () => {
                 {verifyStatus.type === 'Error' && (
                     <div className="mb-4 text-red-500">
                         {verifyStatus.message}
+                    </div>
+                )}
+                {passwordSuggestions.length > 0 && password.length > 0 && (
+                    <div className="mb-4 text-yellow-500">
+                        <ul>
+                            Your password is too weak. Suggestions:
+                            {passwordSuggestions.map((suggestion, index) => (
+                                <li key={index}>{suggestion}</li>
+                            ))}
+                            {password.length < 9 && (
+                                <li>Password must be 8 or more characters long.</li>
+                            )}
+                        </ul>
                     </div>
                 )}
                 <div className="flex flex-row space-x-4">
