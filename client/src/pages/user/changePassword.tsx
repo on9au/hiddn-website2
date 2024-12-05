@@ -71,11 +71,14 @@ const ChangePassword: React.FC = () => {
                 body,
                 { withCredentials: true }
             );
-            setSuccessMessage('Your password has been changed successfully.');
-            // Clear form fields
+            setSuccessMessage('Your password has been changed successfully. Logging you out in 3 seconds...');
             setCurrentPassword('');
             setNewPassword('');
             setConfirmPassword('');
+            setTimeout(() => {
+                navigate('/logout');
+            }, 3000);
+            // Clear form fields
         } catch (err) {
             setIsSubmitting(false);
             if (axios.isAxiosError(err) && err.response) {
