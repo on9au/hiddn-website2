@@ -9,6 +9,7 @@ const AdminDashboard: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        document.title = "Admin - HiddN";
         const amIAdmin = async () => {
             try {
                 await axios.get("/api/admin/me", {
@@ -31,8 +32,6 @@ const AdminDashboard: React.FC = () => {
         };
 
         amIAdmin();
-
-        document.title = "Admin - HiddN";
     }, [navigate]);
 
     const currentTime = new Date();

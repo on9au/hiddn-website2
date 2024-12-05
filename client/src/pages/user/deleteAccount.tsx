@@ -26,6 +26,10 @@ const DeleteProfile: React.FC = () => {
         };
     }, [isCheckboxChecked, secondsRemaining]);
 
+    useEffect(() => {
+        document.title = 'Delete Account - HiddN';
+    })
+
     // Handle checkbox change
     const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setIsCheckboxChecked(e.target.checked);

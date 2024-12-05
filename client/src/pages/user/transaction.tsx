@@ -63,7 +63,7 @@ const Transaction: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        document.title = 'Hiddn | Transactions';
+        document.title = 'Transactions - HiddN';
 
         const fetchTransactions = async () => {
             try {

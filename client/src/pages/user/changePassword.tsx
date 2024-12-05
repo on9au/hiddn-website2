@@ -12,7 +12,7 @@ const ChangePassword: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        document.title = 'Hiddn | Change Password';
+        document.title = 'Change Password - HiddN';
     }, []);
 
     const validateForm = () => {
