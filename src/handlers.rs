@@ -14,7 +14,7 @@ use marzban_api::models::user::UserStatus;
 use serde_json::json;
 use sqlx::{query, MySqlPool};
 use tokio::sync::RwLock;
-use tracing::{debug, error};
+use tracing::error;
 
 use crate::payloads::{ChangePasswordPayload, PlanDetailsRust, UserProfileSettingsChangePayload};
 use crate::{
@@ -135,10 +135,22 @@ pub async fn register_user(
     Extension(pool): Extension<MySqlPool>,
     Json(payload): Json<RegisterPayload>,
 ) -> impl IntoResponse {
-    // TODO: Implement actual registration logic interfacing with db
+    // Check if email is already taken
+    let user_exists = query!(
+        r#"
+        SELECT COUNT(*) as user_count
+        FROM users
+        WHERE email = ?
+        "#,
+        payload.email
+    )
+    .fetch_one(&pool)
+    .await
+    .expect("Failed to check if user exists");
 
-    // Check if the email is already taken
-    debug!("Checking if email is already taken...");
+    if user_exists.user_count > 0 {
+        return StatusCode::BAD_REQUEST.into_response();
+    }
 
     // Check if code is valid
     // Example code here since email client is not implemented
@@ -222,40 +234,93 @@ pub async fn register_user(
 /// If password is too weak, it will return CONFLICT.
 /// If verification code is invalid, it will return FORBIDDEN.
 /// The server will use axum_login to keep the user authenticated.
-pub async fn forgot_password(Json(payload): Json<ForgotPasswordPayload>) -> impl IntoResponse {
-    // TODO: Implement actual registration logic interfacing with db
+pub async fn forgot_password(
+    Extension(pool): Extension<MySqlPool>,
+    Json(payload): Json<ForgotPasswordPayload>,
+) -> impl IntoResponse {
+    // Check if user exists
+    let user_exists = query!(
+        r#"
+        SELECT COUNT(*) as user_count
+        FROM users
+        WHERE email = ?
+        "#,
+        payload.email
+    )
+    .fetch_one(&pool)
+    .await
+    .expect("Failed to check if user exists");
 
-    // Check if the user exists
-    if payload.email != "test@test.com" {
+    if user_exists.user_count == 0 {
         return StatusCode::NOT_FOUND.into_response();
     }
 
     // Check if code is valid
+    // Example code here since email client is not implemented
     if payload.email_verification_code != "123456" {
         return StatusCode::FORBIDDEN.into_response();
     }
 
-    // Check if password is valid
-    // Check if password is too weak
+    // Check if password is valid using zxcvbn
     // Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number.
-    // We can use regex to check this.
-    // We can also use a library like zxcvbn to check password strength.
-    // For now, we will just check if the password is at least 8 characters long.
-    if payload.password.len() < 8 {
-        return StatusCode::CONFLICT.into_response();
+    let zxcvbn = zxcvbn::zxcvbn(
+        &payload.password,
+        &[&payload.email, &payload.email_verification_code],
+    );
+
+    if zxcvbn.score() < zxcvbn::Score::Three {
+        return (
+            StatusCode::CONFLICT,
+            Json(PasswordFeedbackPayload {
+                warning: zxcvbn
+                    .feedback()
+                    .expect("should not be None")
+                    .warning()
+                    .map(|s| s.to_string()),
+                suggestions: zxcvbn
+                    .feedback()
+                    .expect("should not be None")
+                    .suggestions()
+                    .iter()
+                    .map(|s| s.to_string())
+                    .collect::<Vec<String>>(),
+            }),
+        )
+            .into_response();
     }
 
     // Check if password and confirm password match
     if payload.password != payload.confirm_password {
-        return StatusCode::CONFLICT.into_response();
+        return (
+            StatusCode::CONFLICT,
+            Json(PasswordFeedbackPayload {
+                warning: "Passwords do not match".to_string().into(),
+                suggestions: vec![],
+            }),
+        )
+            .into_response();
     }
 
-    // Register the user
-    // We would hash the password before storing it in the db.
-    // Verification code can be safely discarded after registration.
-    // New db entry for the user. After, use axum_login to authenticate the user.
-    // db new user
-    // let registered_user = that db entry into User struct
+    // Hash the password
+    let argon2 = argon2::Argon2::default();
+    let salt = SaltString::generate(&mut rand::thread_rng());
+    let password_hash = argon2
+        .hash_password(payload.password.as_bytes(), &salt)
+        .expect("Failed to hash password");
+
+    // Update the user's password
+    query!(
+        r#"
+        UPDATE users
+        SET password_hash = ?
+        WHERE email = ?
+        "#,
+        password_hash.to_string(),
+        payload.email
+    )
+    .execute(&pool)
+    .await
+    .expect("Failed to update password");
 
     // Return OK, user is registered, client must now login.
     StatusCode::OK.into_response()
