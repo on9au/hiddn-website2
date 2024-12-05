@@ -9,6 +9,7 @@ use axum_login::{
 };
 use axum_server::tls_rustls::RustlsConfig;
 use config::{HttpOrHttps, GLOBAL_CONFIG};
+use marzban_api::{client::MarzbanAPIClient, models::auth::BodyAdminTokenApiAdminTokenPost};
 use payloads::AnnouncementPayload;
 use reqwest::StatusCode;
 use routes::create_router;
@@ -49,6 +50,22 @@ async fn main() {
         .run(&pool)
         .await
         .expect("Failed to migrate database");
+
+    // Marzban Panel Client setup
+    let marzban_client = MarzbanAPIClient::new(&GLOBAL_CONFIG.marzban_panel_url);
+
+    // Authentication setup
+    marzban_client
+        .authenticate(&BodyAdminTokenApiAdminTokenPost {
+            grant_type: Some("password".to_string()),
+            username: GLOBAL_CONFIG.marzban_panel_username.clone(),
+            password: GLOBAL_CONFIG.marzban_panel_password.clone(),
+            scope: "".to_string(),
+            client_id: None,
+            client_secret: None,
+        })
+        .await
+        .expect("Failed to authenticate with Marzban Panel");
 
     // Session layer.
     let session_store = MemoryStore::default();
