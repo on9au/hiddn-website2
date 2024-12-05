@@ -136,7 +136,11 @@ const Dashboard: React.FC = () => {
                                         </p>
                                         <div className="w-full h-4 bg-gray-300 rounded-full dark:bg-gray-700">
                                             <div
-                                                className="h-4 rounded-full bg-hiddn-500"
+                                                className={
+                                                    dataUsagePercentage >= 100
+                                                        ? 'h-4 rounded-full bg-red-500'
+                                                        : "h-4 rounded-full bg-hiddn-500"
+                                                }
                                                 style={{ width: `${dataUsagePercentage}%` }}
                                             ></div>
                                         </div>

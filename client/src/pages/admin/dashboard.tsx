@@ -19,7 +19,7 @@ const AdminDashboard: React.FC = () => {
             } catch (err) {
                 if (axios.isAxiosError(err)) {
                     if (err.response) {
-                        if (err.response.status === 401) {
+                        if (err.response.status === 401 || err.response.status === 403) {
                             setError('Unauthorized. Please log in.');
                             navigate('/logout');
                         }

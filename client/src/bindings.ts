@@ -11,8 +11,8 @@ export interface AdminUser {
 	id: number;
 	email: string;
 	admin: boolean;
-	created_at: DateTime<Utc>;
-	updated_at: DateTime<Utc>;
+	created_at: string;
+	updated_at: string;
 }
 
 export interface AnnouncementPayload {

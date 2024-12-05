@@ -223,8 +223,8 @@ pub struct AdminUser {
     pub id: u32,
     pub email: String,
     pub admin: bool,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
+    pub created_at: String,
+    pub updated_at: String,
 }
 
 #[derive(Debug, Deserialize)]

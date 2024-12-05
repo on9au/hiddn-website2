@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { NewPlanPayload, PlanPayload } from '../../bindings';
+import { useNavigate } from 'react-router-dom';
 // import { useNavigate } from 'react-router-dom';
 
 const AdminPlanManager: React.FC = () => {
@@ -14,7 +15,7 @@ const AdminPlanManager: React.FC = () => {
         duration_days: 0,
         description: '',
     });
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
 
     useEffect(() => {
         document.title = 'Admin Plan Manager - HiddN';
@@ -75,6 +76,14 @@ const AdminPlanManager: React.FC = () => {
                 description: '',
             });
         } catch (err) {
+            if (axios.isAxiosError(err)) {
+                if (err.response) {
+                    if (err.response.status === 401 || err.response.status === 403) {
+                        setError('Unauthorized. Please log in.');
+                        navigate('/logout');
+                    }
+                }
+            }
             console.error('Failed to create plan. Error:', err);
             setError('Failed to create plan.');
         }
@@ -92,6 +101,14 @@ const AdminPlanManager: React.FC = () => {
             });
             setPlans(plans.filter(plan => plan.id !== planId));
         } catch (err) {
+            if (axios.isAxiosError(err)) {
+                if (err.response) {
+                    if (err.response.status === 401 || err.response.status === 403) {
+                        setError('Unauthorized. Please log in.');
+                        navigate('/logout');
+                    }
+                }
+            }
             console.error('Failed to delete plan. Error:', err);
             setError('Failed to delete plan.');
         }

@@ -60,7 +60,7 @@ const Forgot: React.FC = () => {
 
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newPassword = e.target.value;
-        setPassword(newPassword);
+        setConfirmPassword(newPassword);
 
         const result = zxcvbn(newPassword);
         setPasswordStrength(result.score);
@@ -183,14 +183,14 @@ const Forgot: React.FC = () => {
                     placeholder="Password"
                     value={password}
                     is_last_position={false}
-                    onChange={handlePasswordChange}
+                    onChange={(e) => setPassword(e.target.value)}
                 />
                 <TextInput
                     type="password"
                     placeholder="Confirm Password"
                     value={confirmPassword}
                     is_last_position={true}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onChange={handlePasswordChange}
                     onKeyDown={handleKeyDownRegister}
                 />
                 <Loginbutton content={authStatus.type === 'Loading' ? 'Resetting account...' : 'Reset Password'} handleLogin={handleRegister} />
@@ -209,14 +209,14 @@ const Forgot: React.FC = () => {
                         {verifyStatus.message}
                     </div>
                 )}
-                {passwordSuggestions.length > 0 && password.length > 0 && (
+                {passwordSuggestions.length > 0 && confirmPassword.length > 0 && (
                     <div className="mb-4 text-yellow-500">
                         <ul>
                             Your password is too weak. Suggestions:
                             {passwordSuggestions.map((suggestion, index) => (
                                 <li key={index}>{suggestion}</li>
                             ))}
-                            {password.length < 9 && (
+                            {confirmPassword.length < 9 && (
                                 <li>Password must be 8 or more characters long.</li>
                             )}
                         </ul>

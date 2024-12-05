@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use axum::{extract::Path, response::IntoResponse, Extension, Json};
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use reqwest::StatusCode;
 use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
@@ -146,36 +146,36 @@ pub async fn admin_users(auth_session: AuthSession) -> impl IntoResponse {
             id: 0,
             email: "test@test.com".to_string(),
             admin: true,
-            created_at: DateTime::parse_from_rfc3339("2021-01-01T00:00:00Z").unwrap().into(),
-            updated_at: DateTime::parse_from_rfc3339("2021-01-01T00:00:00Z").unwrap().into(),
+            created_at: "2021-01-01T00:00:00Z".to_string(),
+            updated_at: "2021-01-01T00:00:00Z".to_string(),
         },
         AdminUser {
             id: 1,
             email: "sett@test.com".to_string(),
             admin: false,
-            created_at: DateTime::parse_from_rfc3339("2021-01-01T00:00:00Z").unwrap().into(),
-            updated_at: DateTime::parse_from_rfc3339("2021-01-01T00:00:00Z").unwrap().into(),
+            created_at: "2021-01-01T00:00:00Z".to_string(),
+            updated_at: "2021-01-01T00:00:00Z".to_string(),
         },
         AdminUser {
             id: 2,
             email: "test@test.com".to_string(),
             admin: true,
-            created_at: DateTime::parse_from_rfc3339("2021-01-01T00:00:00Z").unwrap().into(),
-            updated_at: DateTime::parse_from_rfc3339("2021-01-01T00:00:00Z").unwrap().into(),
+            created_at: "2021-01-01T00:00:00Z".to_string(),
+            updated_at: "2021-01-01T00:00:00Z".to_string(),
         },
         AdminUser {
             id: 3,
             email: "test@test.com".to_string(),
             admin: true,
-            created_at: DateTime::parse_from_rfc3339("2021-01-01T00:00:00Z").unwrap().into(),
-            updated_at: DateTime::parse_from_rfc3339("2021-01-01T00:00:00Z").unwrap().into(),
+            created_at: "2021-01-01T00:00:00Z".to_string(),
+            updated_at: "2021-01-01T00:00:00Z".to_string(),
         },
         AdminUser {
             id: 4,
             email: "test@test.com".to_string(),
             admin: true,
-            created_at: DateTime::parse_from_rfc3339("2021-01-01T00:00:00Z").unwrap().into(),
-            updated_at: DateTime::parse_from_rfc3339("2021-01-01T00:00:00Z").unwrap().into(),
+            created_at: "2021-01-01T00:00:00Z".to_string(),
+            updated_at: "2021-01-01T00:00:00Z".to_string(),
         },
     ]})
     .into_response()
