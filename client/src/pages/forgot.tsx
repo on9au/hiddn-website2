@@ -60,7 +60,7 @@ const Forgot: React.FC = () => {
 
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const newPassword = e.target.value;
-        setConfirmPassword(newPassword);
+        setPassword(newPassword);
 
         const result = zxcvbn(newPassword);
         setPasswordStrength(result.score);
@@ -183,14 +183,14 @@ const Forgot: React.FC = () => {
                     placeholder="Password"
                     value={password}
                     is_last_position={false}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={handlePasswordChange}
                 />
                 <TextInput
                     type="password"
                     placeholder="Confirm Password"
                     value={confirmPassword}
                     is_last_position={true}
-                    onChange={handlePasswordChange}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     onKeyDown={handleKeyDownRegister}
                 />
                 <Loginbutton content={authStatus.type === 'Loading' ? 'Resetting account...' : 'Reset Password'} handleLogin={handleRegister} />
