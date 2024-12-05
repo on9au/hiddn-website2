@@ -40,6 +40,15 @@ const SkeletonDashboard: React.FC = () => {
     );
 };
 
+const formatBytes = (bytes: number, decimals = 2): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
 const Dashboard: React.FC = () => {
     const [planDetails, setPlanDetails] = useState<PlanDetailsPayload | null>(null);
     const [announcements, setAnnouncements] = useState<AnnouncementPayload[]>([]);
@@ -101,7 +110,7 @@ const Dashboard: React.FC = () => {
 
     // Calculate data usage percentage
     const dataUsagePercentage = planDetails
-        ? Math.min((planDetails.dataUsed / planDetails.dataLimit) * 100, 100)
+        ? planDetails.dataLimit ? (planDetails.dataUsed / planDetails.dataLimit) * 100 : 0
         : 0;
 
     return (
@@ -132,7 +141,7 @@ const Dashboard: React.FC = () => {
                                     {/* Data Usage Progress Bar */}
                                     <div className="mb-4">
                                         <p className="mb-1 text-base text-gray-700 dark:text-gray-300">
-                                            Data Usage: {planDetails.dataUsed}GB / {planDetails.dataLimit}GB
+                                            Data Usage: {formatBytes(planDetails.dataUsed)} {planDetails.dataLimit && `/ ${formatBytes(planDetails.dataLimit)}`}
                                         </p>
                                         <div className="w-full h-4 bg-gray-300 rounded-full dark:bg-gray-700">
                                             <div

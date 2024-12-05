@@ -110,20 +110,22 @@ pub enum UserTransactionStatusEnum {
 #[derive(Clone, Debug, Serialize)]
 #[typeshare::typeshare]
 pub struct PlanDetailsPayload {
-    pub expiration: String,
+    pub expiration: Option<U53>,
     pub status: PlanStatusEnum,
     #[serde(rename = "dataUsed")]
-    pub data_used: f64,
+    pub data_used: U53,
     #[serde(rename = "dataLimit")]
-    pub data_limit: f64,
+    pub data_limit: Option<U53>,
 }
 
 #[derive(Clone, Debug, Serialize)]
 #[typeshare::typeshare]
 pub enum PlanStatusEnum {
     Active,
+    Disabled,
+    Limited,
     Expired,
-    Cancelled,
+    OnHold,
 }
 
 #[derive(Clone, Debug, Serialize)]

@@ -62,15 +62,17 @@ export interface PasswordFeedbackPayload {
 
 export enum PlanStatusEnum {
 	Active = "Active",
+	Disabled = "Disabled",
+	Limited = "Limited",
 	Expired = "Expired",
-	Cancelled = "Cancelled",
+	OnHold = "OnHold",
 }
 
 export interface PlanDetailsPayload {
-	expiration: string;
+	expiration?: number;
 	status: PlanStatusEnum;
 	dataUsed: number;
-	dataLimit: number;
+	dataLimit?: number;
 }
 
 export interface PlanPayload {
