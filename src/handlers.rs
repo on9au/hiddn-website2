@@ -473,15 +473,6 @@ pub async fn plan_details(
     Extension(marzban_client): Extension<MarzbanAPIClient>,
     auth_session: AuthSession,
 ) -> impl IntoResponse {
-    // let plan_details = PlanDetailsPayload {
-    //     expiration: "2021-01-01T00:00:00Z".to_string(), // Placeholder
-    //     status: PlanStatusEnum::Active,
-    //     data_used: 15.9,
-    //     data_limit: 40.0,
-    // };
-
-    // Json(plan_details).into_response()
-
     // Get the user's details from the db
     let user = auth_session.user.unwrap();
 
