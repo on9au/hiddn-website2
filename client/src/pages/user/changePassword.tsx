@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import zxcvbn from 'zxcvbn';
+import { ChangePasswordPayload } from '../../bindings';
 
 const ChangePassword: React.FC = () => {
     const [currentPassword, setCurrentPassword] = useState('');
@@ -58,13 +59,16 @@ const ChangePassword: React.FC = () => {
 
         setIsSubmitting(true);
 
+        const body: ChangePasswordPayload = {
+            old_password: currentPassword,
+            new_password: newPassword,
+            confirm_password: confirmPassword,
+        }
+
         try {
             await axios.post(
                 '/api/change_password',
-                {
-                    current_password: currentPassword,
-                    new_password: newPassword,
-                },
+                body,
                 { withCredentials: true }
             );
             setSuccessMessage('Your password has been changed successfully.');
