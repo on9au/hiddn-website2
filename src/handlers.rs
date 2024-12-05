@@ -95,8 +95,9 @@ pub async fn logout_user(mut auth_session: AuthSession) -> impl IntoResponse {
 
 /// Handler for the POST '/verify_email' route.
 /// This handler will receive a JSON(VerifyEmailPayload) payload from the client.
-/// It will send code to email to verify the email.
-/// Should have a rate limit to prevent spamming.
+/// It will validate the email verification code.
+/// This route should only be used if you need to just verify the email.
+/// If you need to register or reset password, use the respective routes instead.
 /// This acts as a way to verify the email's ownership and existence.
 pub async fn verify_email(Json(_payload): Json<VerifyEmailPayload>) -> impl IntoResponse {
     // TODO: Implement actual email verification logic
