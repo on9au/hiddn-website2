@@ -45,11 +45,15 @@ async fn main() {
         .await
         .expect("Failed to connect to database");
 
+    info!("Connected to database");
+
     // Migrate database
     sqlx::migrate!("./migrations")
         .run(&pool)
         .await
         .expect("Failed to migrate database");
+
+    info!("Migrated database");
 
     // Marzban Panel Client setup
     let marzban_client = MarzbanAPIClient::new(&GLOBAL_CONFIG.marzban_panel_url);
@@ -67,16 +71,22 @@ async fn main() {
         .await
         .expect("Failed to authenticate with Marzban Panel");
 
+    info!("Authenticated with Marzban Panel");
+
     // Session layer.
     let session_store = MemoryStore::default();
     let session_layer = SessionManagerLayer::new(session_store)
         .with_http_only(true)
         .with_expiry(Expiry::OnInactivity(Duration::days(7)));
 
+    info!("Session layer setup");
+
     // Auth service.
     let backend = Backend::default();
     let auth_layer: AuthManagerLayer<Backend, MemoryStore> =
         AuthManagerLayerBuilder::new(backend, session_layer).build();
+
+    info!("Auth layer setup");
 
     // Load documentation and announcements
     let docs: Arc<RwLock<HashMap<String, HashMap<String, String>>>> =
@@ -84,11 +94,17 @@ async fn main() {
     let announcements: Arc<RwLock<Vec<AnnouncementPayload>>> =
         Arc::new(RwLock::new(load_announcements().await));
 
+    info!("Loaded documentation and announcements");
+
     // Shared app state for SSR
     let shared_app_state = ssr::setup_app_state_ssr().await;
 
+    info!("SSR shared app state setup");
+
     // Create router
     let app = create_router(docs, announcements, auth_layer, shared_app_state, pool);
+
+    info!("Router setup");
 
     // let listener = TcpListener::bind(GLOBAL_CONFIG.http_socket_addr.clone())
     //     .await
