@@ -16,7 +16,7 @@ use routes::create_router;
 use sessions::Backend;
 use sqlx::mysql::MySqlPoolOptions;
 use tokio::sync::RwLock;
-use tracing::info;
+use tracing::{debug, info};
 use utils::{load_announcements, load_docs};
 
 mod config;
@@ -38,6 +38,8 @@ async fn main() {
     // Logging/Tracing setup
     tracing_subscriber::fmt::init();
 
+    debug!("Connecting to database");
+
     // Database setup
     let pool = MySqlPoolOptions::new()
         .max_connections(150)
@@ -46,6 +48,8 @@ async fn main() {
         .expect("Failed to connect to database");
 
     info!("Connected to database");
+
+    debug!("Migrating database");
 
     // Migrate database
     sqlx::migrate!("./migrations")
@@ -57,6 +61,8 @@ async fn main() {
 
     // Marzban Panel Client setup
     let marzban_client = MarzbanAPIClient::new(&GLOBAL_CONFIG.marzban_panel_url);
+
+    debug!("Authenticating with Marzban Panel");
 
     // Authentication setup
     marzban_client
@@ -73,6 +79,8 @@ async fn main() {
 
     info!("Authenticated with Marzban Panel");
 
+    debug!("Setting up session layer");
+
     // Session layer.
     let session_store = MemoryStore::default();
     let session_layer = SessionManagerLayer::new(session_store)
@@ -81,12 +89,16 @@ async fn main() {
 
     info!("Session layer setup");
 
+    debug!("Setting up auth layer");
+
     // Auth service.
     let backend = Backend::default();
     let auth_layer: AuthManagerLayer<Backend, MemoryStore> =
         AuthManagerLayerBuilder::new(backend, session_layer).build();
 
     info!("Auth layer setup");
+
+    debug!("Loading documentation and announcements");
 
     // Load documentation and announcements
     let docs: Arc<RwLock<HashMap<String, HashMap<String, String>>>> =
@@ -96,10 +108,14 @@ async fn main() {
 
     info!("Loaded documentation and announcements");
 
+    debug!("Setting up SSR shared app state");
+
     // Shared app state for SSR
     let shared_app_state = ssr::setup_app_state_ssr().await;
 
     info!("SSR shared app state setup");
+
+    debug!("Setting up router");
 
     // Create router
     let app = create_router(docs, announcements, auth_layer, shared_app_state, pool);
@@ -119,6 +135,7 @@ async fn main() {
 
     match GLOBAL_CONFIG.http_or_https {
         HttpOrHttps::Http => {
+            debug!("We are listening on HTTP only");
             let addr = format!(
                 "{}:{}",
                 GLOBAL_CONFIG.ip_addr.clone(),
@@ -134,12 +151,13 @@ async fn main() {
                 .unwrap();
         }
         HttpOrHttps::Https => {
+            debug!("We are listening on HTTPS");
             let config = RustlsConfig::from_pem_file(
                 GLOBAL_CONFIG.https_cert_path.clone(),
                 GLOBAL_CONFIG.https_key_path.clone(),
             )
             .await
-            .unwrap();
+            .expect("Failed to load HTTPS config. Please check your certs/keys and their paths");
 
             let addr = format!(
                 "{}:{}",
@@ -151,7 +169,10 @@ async fn main() {
             info!("listening on https://{}", addr);
 
             if GLOBAL_CONFIG.redirect_to_https {
+                debug!("Redirecting HTTP to HTTPS");
                 tokio::spawn(redirect_http_to_https());
+            } else {
+                debug!("Not redirecting HTTP to HTTPS");
             }
 
             axum_server::bind_rustls(addr, config)
