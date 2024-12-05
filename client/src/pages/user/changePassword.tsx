@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import zxcvbn from 'zxcvbn';
 
 const ChangePassword: React.FC = () => {
     const [currentPassword, setCurrentPassword] = useState('');
@@ -9,6 +10,8 @@ const ChangePassword: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [passwordSuggestions, setPasswordSuggestions] = useState<string[]>([]);
+    const [passwordStrength, setPasswordStrength] = useState<number>(0);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -24,11 +27,24 @@ const ChangePassword: React.FC = () => {
             setError('New passwords do not match.');
             return false;
         }
-        if (newPassword.length < 8) {
-            setError('New password must be at least 8 characters long.');
+        if (passwordStrength < 3) {
+            setError('New password is too weak.');
             return false;
         }
         return true;
+    };
+
+    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newPassword = e.target.value;
+        setNewPassword(newPassword);
+
+        const result = zxcvbn(newPassword);
+        setPasswordStrength(result.score);
+        if (result.score < 3) {
+            setPasswordSuggestions(result.feedback.suggestions);
+        } else {
+            setPasswordSuggestions([]);
+        }
     };
 
     const handleChangePassword = async (e: React.FormEvent) => {
@@ -110,7 +126,7 @@ const ChangePassword: React.FC = () => {
                                 type="password"
                                 className="w-full px-3 py-2 text-gray-700 bg-gray-200 border rounded-md focus:outline-none focus:ring focus:ring-hiddn-500 dark:bg-gray-700 dark:text-gray-300"
                                 value={newPassword}
-                                onChange={(e) => setNewPassword(e.target.value)}
+                                onChange={handlePasswordChange}
                                 required
                                 minLength={8}
                             />
@@ -132,6 +148,19 @@ const ChangePassword: React.FC = () => {
                                 minLength={8}
                             />
                         </div>
+                        {passwordSuggestions.length > 0 && newPassword.length > 0 && (
+                            <div className="mb-4 text-yellow-500">
+                                <ul>
+                                    Your password is too weak. Suggestions:
+                                    {passwordSuggestions.map((suggestion, index) => (
+                                        <li key={index}>{suggestion}</li>
+                                    ))}
+                                    {newPassword.length < 9 && (
+                                        <li>Password must be 8 or more characters long.</li>
+                                    )}
+                                </ul>
+                            </div>
+                        )}
                         <button
                             type="submit"
                             className={`w-full px-4 py-2 text-white bg-hiddn-500 rounded-md hover:bg-hiddn-600 focus:outline-none ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''

@@ -31,6 +31,10 @@ impl User {
     pub fn id(&self) -> i64 {
         self.id
     }
+
+    pub fn password_hash(&self) -> &str {
+        &self.password_hash
+    }
 }
 
 // To avoid leaking the password in logs, we implement a custom Debug implementation

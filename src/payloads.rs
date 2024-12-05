@@ -253,3 +253,11 @@ pub struct AdminCreateAnnouncement {
     pub title: String,
     pub content: String,
 }
+
+#[derive(Debug, Deserialize)]
+#[typeshare::typeshare]
+pub struct ChangePasswordPayload {
+    pub old_password: String,
+    pub new_password: String,
+    pub confirm_password: String,
+}

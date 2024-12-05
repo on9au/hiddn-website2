@@ -1,7 +1,7 @@
 use std::{collections::HashMap, sync::Arc};
 
 use argon2::password_hash::SaltString;
-use argon2::PasswordHasher;
+use argon2::{PasswordHash, PasswordHasher, PasswordVerifier};
 
 use axum::response::IntoResponse;
 use axum::{
@@ -16,7 +16,7 @@ use sqlx::{query, MySqlPool};
 use tokio::sync::RwLock;
 use tracing::{debug, error};
 
-use crate::payloads::{PlanDetailsRust, UserProfileSettingsChangePayload};
+use crate::payloads::{ChangePasswordPayload, PlanDetailsRust, UserProfileSettingsChangePayload};
 use crate::{
     payloads::{
         AnnouncementPayload, CreateOrderResponsePayload, ForgotPasswordPayload, LoginPayload,
@@ -624,11 +624,85 @@ pub async fn delete_account() -> impl IntoResponse {
 /// Handler for the POST '/change_password' route.
 /// This handler will change the user's password.
 /// This handler requires authentication (managed by axum_login).
-pub async fn change_password() -> impl IntoResponse {
-    // Typically, would change the user's password in the db, as well as:
-    // - Verify if the password is valid
-    // - Invalidate all sessions
-    // - Send an email to the user notifying them of the password change
+pub async fn change_password(
+    auth_session: AuthSession,
+    Extension(pool): Extension<MySqlPool>,
+    Json(payload): Json<ChangePasswordPayload>,
+) -> impl IntoResponse {
+    let user = auth_session.user.unwrap();
+
+    // Check if password is valid using zxcvbn
+    // Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number.
+    let zxcvbn = zxcvbn::zxcvbn(&payload.new_password, &[&user.email]);
+
+    if zxcvbn.score() < zxcvbn::Score::Three {
+        return (
+            StatusCode::CONFLICT,
+            Json(PasswordFeedbackPayload {
+                warning: zxcvbn
+                    .feedback()
+                    .expect("should not be None")
+                    .warning()
+                    .map(|s| s.to_string()),
+                suggestions: zxcvbn
+                    .feedback()
+                    .expect("should not be None")
+                    .suggestions()
+                    .iter()
+                    .map(|s| s.to_string())
+                    .collect::<Vec<String>>(),
+            }),
+        )
+            .into_response();
+    }
+
+    // Check if password and confirm password match
+    if payload.new_password != payload.confirm_password {
+        return (
+            StatusCode::CONFLICT,
+            Json(PasswordFeedbackPayload {
+                warning: "Passwords do not match".to_string().into(),
+                suggestions: vec![],
+            }),
+        )
+            .into_response();
+    }
+
+    // Hash the old password
+    let argon2 = argon2::Argon2::default();
+
+    // We need to convert the password hash from the database to a PasswordHash
+    let password_hash = PasswordHash::new(user.password_hash())
+        .expect("Failed to decode password hash from user db");
+
+    // Verify the password
+    let validation = argon2.verify_password(payload.old_password.as_bytes(), &password_hash);
+
+    if validation.is_err() {
+        return StatusCode::UNAUTHORIZED.into_response();
+    }
+
+    // Verify password
+    let argon2 = argon2::Argon2::default();
+    let salt = SaltString::generate(&mut rand::thread_rng());
+    let password_hash = argon2
+        .hash_password(payload.new_password.as_bytes(), &salt)
+        .expect("Failed to hash password");
+
+    // Update the user's password
+    query!(
+        r#"
+        UPDATE users
+        SET password_hash = ?
+        WHERE id = ?
+        "#,
+        password_hash.to_string(),
+        user.id()
+    )
+    .execute(&pool)
+    .await
+    .expect("Failed to update password");
+
     StatusCode::OK.into_response()
 }
 
