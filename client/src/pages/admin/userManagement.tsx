@@ -13,7 +13,7 @@ const AdminUserManagement: React.FC = () => {
     useEffect(() => {
         const getMyId = async () => {
             try {
-                const response = await axios.get('/api/auth/me', { withCredentials: true });
+                const response = await axios.get('/api/admin/my_id', { withCredentials: true });
                 setMyId(response.data);
             } catch (err) {
                 if (axios.isAxiosError(err)) {
