@@ -11,6 +11,7 @@ use axum::{
 };
 use marzban_api::client::MarzbanAPIClient;
 use marzban_api::models::user::UserStatus;
+use num_traits::ToPrimitive;
 use serde_json::json;
 use sqlx::{query, MySqlPool};
 use tokio::sync::RwLock;
@@ -561,6 +562,16 @@ pub async fn plan_details(
         .await
         .expect("Failed to get user");
 
+    // If the plan has been expired for more than 14 days, assume the plan doesn't exist.
+    match user.expire {
+        Some(expire) => {
+            if expire < (chrono::Utc::now() - chrono::Duration::days(14)).timestamp() as u64 {
+                return Json(()).into_response();
+            }
+        }
+        None => return Json(()).into_response(),
+    }
+
     let status = match user.status {
         UserStatus::Active => PlanStatusEnum::Active,
         UserStatus::Disabled => PlanStatusEnum::Disabled,
@@ -583,25 +594,64 @@ pub async fn plan_details(
 /// This handler will return Json(Vec<PlanDetailsPayload>)
 /// This handler will return all the plans available.
 /// This handler requires authentication (managed by axum_login).
-pub async fn plans() -> impl IntoResponse {
-    let plans = vec![
-        PlanPayload {
-            id: 0_u32.into(),
-            name: "Basic".to_string(),
-            price: 5.0,
-            data_limit: Some(20.0),
-            duration_days: 30_u32.into(),
-            description: Some("Basic plan".to_string()),
-        },
-        PlanPayload {
-            id: 1_u32.into(),
-            name: "Premium".to_string(),
-            price: 10.0,
-            data_limit: Some(40.0),
-            duration_days: 30_u32.into(),
-            description: Some("Premium plan".to_string()),
-        },
-    ];
+/// Note: All prices are in AUD.
+pub async fn plans(Extension(pool): Extension<MySqlPool>) -> impl IntoResponse {
+    // let plans = vec![
+    //     PlanPayload {
+    //         id: 0_u32.into(),
+    //         name: "Basic".to_string(),
+    //         price: 5.0,
+    //         data_limit: Some(20.0),
+    //         duration_days: 30_u32.into(),
+    //         description: Some("Basic plan".to_string()),
+    //     },
+    //     PlanPayload {
+    //         id: 1_u32.into(),
+    //         name: "Premium".to_string(),
+    //         price: 10.0,
+    //         data_limit: Some(40.0),
+    //         duration_days: 30_u32.into(),
+    //         description: Some("Premium plan".to_string()),
+    //     },
+    // ];
+
+    // Json(plans).into_response()
+
+    // Get plans from db
+    let plans = query!(
+        r#"
+        SELECT
+            id,
+            name,
+            price,
+            data_limit,
+            duration_days,
+            description
+        FROM plans
+        "#,
+    )
+    .fetch_all(&pool)
+    .await
+    .expect("Failed to fetch plans");
+
+    let plans = plans
+        .into_iter()
+        .map(|plan| PlanPayload {
+            id: (plan.id as u32).into(),
+            name: plan.name,
+            price: plan
+                .price
+                .to_f64()
+                .expect("Failed to convert BigDecimal to f64"),
+            data_limit: if plan.data_limit == 0 {
+                None
+            } else {
+                Some(plan.data_limit as f64)
+            },
+            duration_days: (plan.duration_days as u32).into(),
+            description: plan.description,
+        })
+        .collect::<Vec<PlanPayload>>();
 
     Json(plans).into_response()
 }
