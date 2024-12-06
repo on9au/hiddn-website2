@@ -13,8 +13,8 @@ use tower_http::{services::ServeDir, trace::TraceLayer};
 use crate::{
     handlers::*,
     handlers_admin::{
-        admin_me, admin_user, admin_users, delete_announcement, delete_plan, delete_user,
-        post_announcement, post_plan, update_user,
+        admin_me, admin_my_id, admin_user, admin_users, delete_announcement, delete_plan,
+        delete_user, post_announcement, post_plan, update_user,
     },
     payloads::AnnouncementPayload,
     sessions::Backend,
@@ -61,6 +61,7 @@ pub fn create_router(
                 .route("/me", get(user_me))
                 // Admin routes
                 .route("/admin/me", get(admin_me))
+                .route("/admin/my_id", get(admin_my_id))
                 .route("/admin/users", get(admin_users))
                 .route("/admin/users/:id", get(admin_user))
                 .route("/admin/users/:id", put(update_user))

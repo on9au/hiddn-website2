@@ -7,7 +7,28 @@ const AdminUserManagement: React.FC = () => {
     const [users, setUsers] = useState<AdminUser[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [myId, setMyId] = useState<number | null>(null);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const getMyId = async () => {
+            try {
+                const response = await axios.get('/api/auth/me', { withCredentials: true });
+                setMyId(response.data);
+            } catch (err) {
+                if (axios.isAxiosError(err)) {
+                    if (err.response) {
+                        if (err.response.status === 401 || err.response.status === 403) {
+                            setError('Unauthorized. Please log in.');
+                            navigate('/logout');
+                        }
+                    }
+                }
+                setError('Failed to load user.');
+            }
+        }
+        getMyId();
+    }, [navigate]);
 
     useEffect(() => {
         document.title = 'Admin User Management - HiddN';
@@ -34,14 +55,39 @@ const AdminUserManagement: React.FC = () => {
     }, [navigate]);
 
     const handleDeleteUser = async (id: number, email: string) => {
-        const confirmDelete = window.confirm('Are you sure you want to delete this user ( ' + email + ' )? This action cannot be undone.');
-        if (!confirmDelete) {
-            return;
+        // Prevent the user from deleting themselves unless they really want to
+        let deletingSelf = false;
+
+        if (myId === id) {
+            const confirmDelete = window.confirm('Are you sure you want to delete yourself? This action cannot be undone.');
+            if (!confirmDelete) {
+                return;
+            }
+
+            const confirmDelete2 = window.confirm('Are you really sure you want to delete yourself? This action cannot be undone.');
+            if (!confirmDelete2) {
+                return;
+            }
+
+            const confirmDelete4 = window.prompt('If you really really want to delete yourself, please type "I AM AN IDIOT AND I\'D LIKE TO DELETE MYSELF" in the box below.');
+            if (confirmDelete4 !== 'I AM AN IDIOT AND I\'D LIKE TO DELETE MYSELF') {
+                return;
+            }
+            deletingSelf = true;
+        } else {
+            const confirmDelete = window.confirm('Are you sure you want to delete this user ( ' + email + ' )? This action cannot be undone.');
+            if (!confirmDelete) {
+                return;
+            }
         }
+        
         try {
             await axios.delete(`/api/admin/users/${id}`, { withCredentials: true });
             alert('User deleted successfully.');
             setUsers(users.filter((user) => user.id !== id));
+            if (deletingSelf) {
+                navigate('/goodbye');
+            }
         } catch (err) {
             if (axios.isAxiosError(err)) {
                 if (err.response) {

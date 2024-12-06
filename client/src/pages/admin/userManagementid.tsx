@@ -42,8 +42,8 @@ const UserManagementId: React.FC = () => {
 
     const handleUpdateUser = async () => {
         const payload: AdminUserModify = {
-            email,
-            marzban_username: marzbanUsername,
+            email: email,
+            marzban_username: marzbanUsername.trim() === '' ? undefined : marzbanUsername,
             admin: isAdmin,
         }
 

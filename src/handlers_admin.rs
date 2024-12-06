@@ -23,12 +23,21 @@ async fn is_admin(auth_session: &AuthSession) -> bool {
     user.is_admin()
 }
 
-/// /api/admin/me
+/// GET '/api/admin/me'
 pub async fn admin_me(auth_session: AuthSession) -> impl IntoResponse {
     if is_admin(&auth_session).await {
         StatusCode::OK
     } else {
         StatusCode::FORBIDDEN
+    }
+}
+
+/// GET '/api/admin/my_id'
+pub async fn admin_my_id(auth_session: AuthSession) -> impl IntoResponse {
+    if is_admin(&auth_session).await {
+        axum::Json(auth_session.user.as_ref().unwrap().id).into_response()
+    } else {
+        StatusCode::FORBIDDEN.into_response()
     }
 }
 
