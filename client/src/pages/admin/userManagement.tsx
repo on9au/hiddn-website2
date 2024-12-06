@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { AdminUser } from '../../bindings';
 
 const AdminUserManagement: React.FC = () => {
@@ -64,7 +64,7 @@ const AdminUserManagement: React.FC = () => {
                                                 <input type="checkbox" checked={user.admin} readOnly />
                                             </td>
                                             <td className="px-4 py-2 text-gray-700 border-b dark:text-gray-300">
-                                                <button className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700">Edit</button>
+                                                <Link to={`/admin/user-management/${user.id}`} className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700">Edit</Link>
                                                 <button className="px-4 py-2 ml-2 text-white bg-red-500 rounded-md hover:bg-red-600">Delete</button>
                                             </td>
                                         </tr>

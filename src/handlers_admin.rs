@@ -189,3 +189,42 @@ pub async fn admin_users(
     // Return all users
     axum::Json(users).into_response()
 }
+
+/// GET '/api/admin/users/:id'
+pub async fn admin_user(
+    Extension(pool): Extension<MySqlPool>,
+    auth_session: AuthSession,
+    Path(id): Path<u32>,
+) -> impl IntoResponse {
+    // Validate that the user is an admin
+    if !is_admin(&auth_session).await {
+        return StatusCode::FORBIDDEN.into_response();
+    }
+
+    // Fetch the user
+    let user = query_as!(
+        AdminUserRust,
+        r#"
+        SELECT 
+            id as `id: u32`,
+            email,
+            marzban_username,
+            is_admin as `admin: bool`,
+            created_at as `created_at: u64`,
+            updated_at as `updated_at: u64`
+        FROM users
+        WHERE id = ?
+        "#,
+        id
+    )
+    .fetch_optional(&pool)
+    .await
+    .expect("Failed to fetch user");
+
+    // Return the user
+    if let Some(user) = user {
+        axum::Json(user).into_response()
+    } else {
+        StatusCode::NOT_FOUND.into_response()
+    }
+}

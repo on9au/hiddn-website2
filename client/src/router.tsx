@@ -26,6 +26,7 @@ import AdminPageRedirect from './pages/admin/adminPageRedirect';
 import AdminUserManagement from './pages/admin/userManagement';
 import AdminAnnouncementsEditor from './pages/admin/announcementsEditor';
 import AdminPlanManager from './pages/admin/planManager';
+import UserManagementId from './pages/admin/userManagementid';
 
 const Router = () => {
     return (
@@ -56,6 +57,7 @@ const Router = () => {
             <Route path="/admin" element={<PrivateRoute element={UserLayoutAdmin} />}>
                 <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="user-management" element={<AdminUserManagement />} />
+                <Route path="user-management/:id" element={<UserManagementId />} />
                 <Route path="announcement" element={<AdminAnnouncementsEditor />} />
                 <Route path="plan" element={<AdminPlanManager/>}/>
                 {/*
