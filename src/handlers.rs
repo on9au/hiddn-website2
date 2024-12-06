@@ -203,11 +203,16 @@ pub async fn register_user(
     }
 
     // Hash the password
-    let argon2 = argon2::Argon2::default();
-    let salt = SaltString::generate(&mut rand::thread_rng());
-    let password_hash = argon2
-        .hash_password(payload.password.as_bytes(), &salt)
-        .expect("Failed to hash password");
+    let password_hash = tokio::task::spawn_blocking(move || {
+        let argon2 = argon2::Argon2::default();
+        let salt = SaltString::generate(&mut rand::thread_rng());
+        argon2
+            .hash_password(payload.password.as_bytes(), &salt)
+            .expect("Failed to hash password")
+            .to_string()
+    })
+    .await
+    .expect("Failed to hash password in thread");
 
     // Register the user
     query!(
@@ -216,7 +221,7 @@ pub async fn register_user(
         VALUES (?, ?, NOW(), NOW())
         "#,
         payload.email,
-        password_hash.to_string()
+        password_hash
     )
     .execute(&pool)
     .await
@@ -302,11 +307,16 @@ pub async fn forgot_password(
     }
 
     // Hash the password
-    let argon2 = argon2::Argon2::default();
-    let salt = SaltString::generate(&mut rand::thread_rng());
-    let password_hash = argon2
-        .hash_password(payload.password.as_bytes(), &salt)
-        .expect("Failed to hash password");
+    let password_hash = tokio::task::spawn_blocking(move || {
+        let argon2 = argon2::Argon2::default();
+        let salt = SaltString::generate(&mut rand::thread_rng());
+        argon2
+            .hash_password(payload.password.as_bytes(), &salt)
+            .expect("Failed to hash password")
+            .to_string()
+    })
+    .await
+    .expect("Failed to hash password in thread");
 
     // Update the user's password
     query!(
@@ -315,7 +325,7 @@ pub async fn forgot_password(
         SET password_hash = ?
         WHERE email = ?
         "#,
-        password_hash.to_string(),
+        password_hash,
         payload.email
     )
     .execute(&pool)
@@ -736,23 +746,35 @@ pub async fn change_password(
     // Hash the old password
     let argon2 = argon2::Argon2::default();
 
-    // We need to convert the password hash from the database to a PasswordHash
-    let password_hash = PasswordHash::new(user.password_hash())
-        .expect("Failed to decode password hash from user db");
+    let password_hash = user.password_hash().to_string();
 
-    // Verify the password
-    let validation = argon2.verify_password(payload.old_password.as_bytes(), &password_hash);
+    let validation = tokio::task::spawn_blocking(move || {
+        // Verify password
+        let password_hash =
+            PasswordHash::new(&password_hash).expect("Failed to decode password hash from user db");
 
-    if validation.is_err() {
+        argon2
+            .verify_password(payload.old_password.as_bytes(), &password_hash)
+            .is_ok()
+    })
+    .await
+    .expect("Failed to hash password in thread");
+
+    if !validation {
         return StatusCode::UNAUTHORIZED.into_response();
     }
 
     // Verify password
-    let argon2 = argon2::Argon2::default();
-    let salt = SaltString::generate(&mut rand::thread_rng());
-    let password_hash = argon2
-        .hash_password(payload.new_password.as_bytes(), &salt)
-        .expect("Failed to hash password");
+    let password_hash = tokio::task::spawn_blocking(move || {
+        let argon2 = argon2::Argon2::default();
+        let salt = SaltString::generate(&mut rand::thread_rng());
+        argon2
+            .hash_password(payload.new_password.as_bytes(), &salt)
+            .expect("Failed to hash password")
+            .to_string()
+    })
+    .await
+    .expect("Failed to hash password in thread");
 
     // Update the user's password
     query!(
@@ -761,7 +783,7 @@ pub async fn change_password(
         SET password_hash = ?
         WHERE id = ?
         "#,
-        password_hash.to_string(),
+        password_hash,
         user.id()
     )
     .execute(&pool)

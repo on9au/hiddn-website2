@@ -119,24 +119,29 @@ impl AuthnBackend for Backend {
         .fetch_optional(&self.users)
         .await?;
 
-        let user = match user {
-            Some(user) => user,
-            None => return Ok(None),
-        };
+        if let Some(user) = user {
+            // Spawn blocking task to verify password hash
+            let password_hash = user.password_hash.clone();
+            let validation = tokio::task::spawn_blocking(move || {
+                // Verify password
+                let argon2 = Argon2::default();
 
-        // Verify password
-        let argon2 = Argon2::default();
+                // We need to convert the password hash from the database to a PasswordHash
+                let password_hash = PasswordHash::new(&password_hash)
+                    .expect("Failed to decode password hash from user db");
 
-        // We need to convert the password hash from the database to a PasswordHash
-        let password_hash = PasswordHash::new(&user.password_hash)
-            .expect("Failed to decode password hash from user db");
+                // Verify the password
+                argon2.verify_password(creds.password.as_bytes(), &password_hash)
+            })
+            .await
+            .expect("Failed to verify password hash in thread");
 
-        // Verify the password
-        let validation = argon2.verify_password(creds.password.as_bytes(), &password_hash);
-
-        match validation {
-            Ok(_) => Ok(Some(user)),
-            Err(_) => Ok(None),
+            match validation {
+                Ok(()) => Ok(Some(user)),
+                _ => Ok(None),
+            }
+        } else {
+            Ok(None)
         }
     }
 
