@@ -228,3 +228,58 @@ pub async fn admin_user(
         StatusCode::NOT_FOUND.into_response()
     }
 }
+
+/// PUT '/api/admin/users/:id'
+pub async fn update_user(
+    Extension(pool): Extension<MySqlPool>,
+    auth_session: AuthSession,
+    Path(id): Path<u32>,
+    Json(payload): Json<AdminUserRust>,
+) -> impl IntoResponse {
+    // Validate that the user is an admin
+    if !is_admin(&auth_session).await {
+        return StatusCode::FORBIDDEN.into_response();
+    }
+
+    // Update the user in the database
+    let result = query!(
+        "UPDATE users SET email = ?, marzban_username = ?, is_admin = ? WHERE id = ?",
+        payload.email,
+        payload.marzban_username,
+        payload.admin,
+        id
+    )
+    .execute(&pool)
+    .await;
+
+    // Return the result
+    if result.is_err() {
+        return StatusCode::NOT_FOUND.into_response();
+    }
+
+    StatusCode::NO_CONTENT.into_response()
+}
+
+/// DELETE '/api/admin/users/:id'
+pub async fn delete_user(
+    Extension(pool): Extension<MySqlPool>,
+    auth_session: AuthSession,
+    Path(id): Path<u32>,
+) -> impl IntoResponse {
+    // Validate that the user is an admin
+    if !is_admin(&auth_session).await {
+        return StatusCode::FORBIDDEN.into_response();
+    }
+
+    // Delete the user from the database
+    let result = query!("DELETE FROM users WHERE id = ?", id)
+        .execute(&pool)
+        .await;
+
+    // Return the result
+    if result.is_err() {
+        return StatusCode::NOT_FOUND.into_response();
+    }
+
+    StatusCode::NO_CONTENT.into_response()
+}

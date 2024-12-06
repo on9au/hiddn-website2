@@ -2,7 +2,7 @@ use std::{collections::HashMap, sync::Arc};
 
 use axum::{
     handler::HandlerWithoutStateExt,
-    routing::{delete, get, post},
+    routing::{delete, get, post, put},
     Extension, Router,
 };
 use axum_login::{login_required, tower_sessions::MemoryStore, AuthManagerLayer};
@@ -13,8 +13,8 @@ use tower_http::{services::ServeDir, trace::TraceLayer};
 use crate::{
     handlers::*,
     handlers_admin::{
-        admin_me, admin_user, admin_users, delete_announcement, delete_plan, post_announcement,
-        post_plan,
+        admin_me, admin_user, admin_users, delete_announcement, delete_plan, delete_user,
+        post_announcement, post_plan, update_user,
     },
     payloads::AnnouncementPayload,
     sessions::Backend,
@@ -63,6 +63,8 @@ pub fn create_router(
                 .route("/admin/me", get(admin_me))
                 .route("/admin/users", get(admin_users))
                 .route("/admin/users/:id", get(admin_user))
+                .route("/admin/users/:id", put(update_user))
+                .route("/admin/users/:id", delete(delete_user))
                 .route("/admin/plans", post(post_plan))
                 .route("/admin/plans/:id", delete(delete_plan))
                 .route_layer(login_required!(Backend))

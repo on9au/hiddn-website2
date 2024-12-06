@@ -248,7 +248,7 @@ pub struct AdminUser {
     pub updated_at: U53,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct AdminUserRust {
     pub id: u32,
     pub email: String,

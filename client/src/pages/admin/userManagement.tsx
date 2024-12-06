@@ -33,6 +33,32 @@ const AdminUserManagement: React.FC = () => {
         fetchUsers();
     }, [navigate]);
 
+    const handleDeleteUser = async (id: number, email: string) => {
+        const confirmDelete = window.confirm('Are you sure you want to delete this user ( ' + email + ' )? This action cannot be undone.');
+        if (!confirmDelete) {
+            return;
+        }
+        try {
+            await axios.delete(`/api/admin/users/${id}`, { withCredentials: true });
+            alert('User deleted successfully.');
+            setUsers(users.filter((user) => user.id !== id));
+        } catch (err) {
+            if (axios.isAxiosError(err)) {
+                if (err.response) {
+                    if (err.response.status === 401 || err.response.status === 403) {
+                        setError('Unauthorized. Please log in.');
+                        navigate('/logout');
+                    }
+                }
+            }
+            if (axios.isAxiosError(err) && err.response) {
+                setError(err.response.data.message || 'Failed to delete user. Please try again.');
+            } else {
+                setError('An unexpected error occurred. Please try again.');
+            }
+        }
+    }
+
     return (
         <div className="flex flex-col pt-7">
             <span className="w-full mb-6 text-left">
@@ -65,7 +91,7 @@ const AdminUserManagement: React.FC = () => {
                                             </td>
                                             <td className="px-4 py-2 text-gray-700 border-b dark:text-gray-300">
                                                 <Link to={`/admin/user-management/${user.id}`} className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700">Edit</Link>
-                                                <button className="px-4 py-2 ml-2 text-white bg-red-500 rounded-md hover:bg-red-600">Delete</button>
+                                                <button onClick={() => handleDeleteUser(user.id, user.email)} className="px-4 py-2 ml-2 text-white bg-red-500 rounded-md hover:bg-red-600">Delete</button>
                                             </td>
                                         </tr>
                                     ))}
