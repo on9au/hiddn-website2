@@ -27,7 +27,16 @@ sqlx = { version = "0.8.2", features = ["chrono", "macros", "mysql", "runtime-to
 marzban_api = "0.2.3"
 zxcvbn = "3.1.0"
 num-traits = "0.2.19"
+clap = { version = "4.5.23", features = ["derive"] }
 # async-stripe = { version = "0.39.1", features = ["runtime-tokio-hyper"] }
+
+[[bin]]
+name = "hiddn-website"
+path = "src/main.rs"
+
+[[bin]]
+name = "hiddn-cli"
+path = "src/cli.rs"
 
 [profile.release]
 lto = true

@@ -10,11 +10,13 @@ typeshare:
 
 dev: $(env) typeshare
 	cd client && npm i && npm run build
-	RUST_LOG=debug cargo run
+	cargo build
+	RUST_LOG=debug cargo run --bin hiddn-website
 
 preview: $(env) typeshare
 	cd client && npm i && npm run build
-	cargo run --release
+	cargo build --release
+	cargo run --release --bin hiddn-website
 
 build: $(env) typeshare
 	cd client && npm i && npm run build
