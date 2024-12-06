@@ -16,6 +16,12 @@ export interface AdminUser {
 	updated_at: number;
 }
 
+export interface AdminUserModify {
+	email: string;
+	marzban_username?: string;
+	admin: boolean;
+}
+
 export interface AnnouncementPayload {
 	id: number;
 	title: string;

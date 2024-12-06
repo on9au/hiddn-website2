@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
-import { AdminUser } from '../../bindings';
+import { AdminUser, AdminUserModify } from '../../bindings';
 
 const UserManagementId: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -41,14 +41,16 @@ const UserManagementId: React.FC = () => {
     }, [id, navigate]);
 
     const handleUpdateUser = async () => {
+        const payload: AdminUserModify = {
+            email,
+            marzban_username: marzbanUsername,
+            admin: isAdmin,
+        }
+
         try {
             await axios.put(
                 `/api/admin/users/${id}`,
-                {
-                    email,
-                    marzban_username: marzbanUsername,
-                    admin: isAdmin,
-                },
+                payload,
                 { withCredentials: true }
             );
             alert('User updated successfully.');

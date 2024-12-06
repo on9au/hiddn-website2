@@ -12,7 +12,8 @@ use tokio::sync::RwLock;
 use crate::{
     config::GLOBAL_CONFIG,
     payloads::{
-        AdminCreateAnnouncement, AdminUserRust, AnnouncementPayload, NewPlanPayload, PlanPayload,
+        AdminCreateAnnouncement, AdminUserModify, AdminUserRust, AnnouncementPayload,
+        NewPlanPayload, PlanPayload,
     },
     sessions::AuthSession,
 };
@@ -233,7 +234,7 @@ pub async fn update_user(
     Extension(pool): Extension<MySqlPool>,
     auth_session: AuthSession,
     Path(id): Path<u32>,
-    Json(payload): Json<AdminUserRust>,
+    Json(payload): Json<AdminUserModify>,
 ) -> impl IntoResponse {
     // Validate that the user is an admin
     if !is_admin(&auth_session).await {

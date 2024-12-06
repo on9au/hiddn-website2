@@ -248,6 +248,14 @@ pub struct AdminUser {
     pub updated_at: U53,
 }
 
+#[derive(Debug, Deserialize)]
+#[typeshare::typeshare]
+pub struct AdminUserModify {
+    pub email: String,
+    pub marzban_username: Option<String>,
+    pub admin: bool,
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AdminUserRust {
     pub id: u32,
