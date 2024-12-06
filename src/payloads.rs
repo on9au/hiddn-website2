@@ -242,9 +242,20 @@ pub struct PaymentTransaction {
 pub struct AdminUser {
     pub id: u32,
     pub email: String,
+    pub marzban_username: Option<String>,
     pub admin: bool,
-    pub created_at: String,
-    pub updated_at: String,
+    pub created_at: U53,
+    pub updated_at: U53,
+}
+
+#[derive(Debug, Serialize)]
+pub struct AdminUserRust {
+    pub id: u32,
+    pub email: String,
+    pub marzban_username: Option<String>,
+    pub admin: bool,
+    pub created_at: u64,
+    pub updated_at: u64,
 }
 
 #[derive(Debug, Deserialize)]

@@ -10,9 +10,10 @@ export interface AdminCreateAnnouncement {
 export interface AdminUser {
 	id: number;
 	email: string;
+	marzban_username?: string;
 	admin: boolean;
-	created_at: string;
-	updated_at: string;
+	created_at: number;
+	updated_at: number;
 }
 
 export interface AnnouncementPayload {

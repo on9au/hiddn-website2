@@ -1,8 +1,10 @@
 use std::sync::Arc;
 
 use axum::{extract::Path, response::IntoResponse, Extension, Json};
-use chrono::Utc;
+use chrono::{DateTime, Utc};
+use num_traits::FromPrimitive;
 use reqwest::StatusCode;
+use sqlx::{query, query_as, types::BigDecimal, MySqlPool};
 use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
 use tokio::sync::RwLock;
@@ -10,7 +12,8 @@ use tokio::sync::RwLock;
 use crate::{
     config::GLOBAL_CONFIG,
     payloads::{
-        AdminCreateAnnouncement, AdminUser, AnnouncementPayload, NewPlanPayload, PlanPayload,
+        AdminCreateAnnouncement, AdminUser, AdminUserRust, AnnouncementPayload, NewPlanPayload,
+        PlanPayload,
     },
     sessions::AuthSession,
 };
@@ -96,6 +99,7 @@ pub async fn delete_announcement(
 /// POST '/api/admin/plans'
 pub async fn post_plan(
     auth_session: AuthSession,
+    Extension(pool): Extension<MySqlPool>,
     Json(new_announcement): Json<NewPlanPayload>,
 ) -> impl IntoResponse {
     // Validate that the user is an admin
@@ -103,10 +107,24 @@ pub async fn post_plan(
         return StatusCode::FORBIDDEN.into_response();
     }
 
-    // impl db call here
+    let duration_days: u64 = new_announcement.duration_days.into();
+
+    // Add the new plan to the database
+    let result = query!(
+        "INSERT INTO plans (name, price, data_limit, duration_days, description) VALUES (?, ?, ?, ?, ?)",
+        new_announcement.name,
+        BigDecimal::from_f64(new_announcement.price).expect("Failed to convert price to BigDecimal"),
+        (new_announcement.data_limit.unwrap_or(0.0).floor() as u32),
+        duration_days,
+        new_announcement.description
+    ).execute(&pool).await.expect("Failed to insert new plan");
+
+    let plan_id = result.last_insert_id();
+
+    // Return the new plan
 
     axum::Json(PlanPayload {
-        id: 2_u32.into(),
+        id: (plan_id as u32).into(),
         name: new_announcement.name,
         price: new_announcement.price,
         data_limit: new_announcement.data_limit,
@@ -117,66 +135,57 @@ pub async fn post_plan(
 }
 
 /// DELETE '/api/admin/plans/:id'
-pub async fn delete_plan(auth_session: AuthSession, Path(id): Path<u32>) -> impl IntoResponse {
+pub async fn delete_plan(
+    Extension(pool): Extension<MySqlPool>,
+    auth_session: AuthSession,
+    Path(id): Path<u32>,
+) -> impl IntoResponse {
     // Validate that the user is an admin
     if !is_admin(&auth_session).await {
         return StatusCode::FORBIDDEN.into_response();
     }
 
-    // impl db call here
+    // Delete the plan from the database
+    let result = query!("DELETE FROM plans WHERE id = ?", id)
+        .execute(&pool)
+        .await;
+
+    // Return the result
+    if result.is_err() {
+        return StatusCode::NOT_FOUND.into_response();
+    }
 
     StatusCode::NO_CONTENT.into_response()
 }
 
 /// /api/admin/users
-pub async fn admin_users(auth_session: AuthSession) -> impl IntoResponse {
+pub async fn admin_users(
+    Extension(pool): Extension<MySqlPool>,
+    auth_session: AuthSession,
+) -> impl IntoResponse {
     // Validate that the user is an admin
     if !is_admin(&auth_session).await {
         return StatusCode::FORBIDDEN.into_response();
     }
 
     // Fetch all users
-    // impl db call here
+    let users = query_as!(
+        AdminUserRust,
+        r#"
+        SELECT 
+            id as `id: u32`,
+            email,
+            marzban_username,
+            is_admin as `admin: bool`,
+            created_at as `created_at: u64`,
+            updated_at as `updated_at: u64`
+        FROM users
+        "#,
+    )
+    .fetch_all(&pool)
+    .await
+    .expect("Failed to fetch users");
 
     // Return all users
-
-    axum::Json(serde_json::json! {
-    vec![
-        AdminUser {
-            id: 0,
-            email: "test@test.com".to_string(),
-            admin: true,
-            created_at: "2021-01-01T00:00:00Z".to_string(),
-            updated_at: "2021-01-01T00:00:00Z".to_string(),
-        },
-        AdminUser {
-            id: 1,
-            email: "sett@test.com".to_string(),
-            admin: false,
-            created_at: "2021-01-01T00:00:00Z".to_string(),
-            updated_at: "2021-01-01T00:00:00Z".to_string(),
-        },
-        AdminUser {
-            id: 2,
-            email: "test@test.com".to_string(),
-            admin: true,
-            created_at: "2021-01-01T00:00:00Z".to_string(),
-            updated_at: "2021-01-01T00:00:00Z".to_string(),
-        },
-        AdminUser {
-            id: 3,
-            email: "test@test.com".to_string(),
-            admin: true,
-            created_at: "2021-01-01T00:00:00Z".to_string(),
-            updated_at: "2021-01-01T00:00:00Z".to_string(),
-        },
-        AdminUser {
-            id: 4,
-            email: "test@test.com".to_string(),
-            admin: true,
-            created_at: "2021-01-01T00:00:00Z".to_string(),
-            updated_at: "2021-01-01T00:00:00Z".to_string(),
-        },
-    ]})
-    .into_response()
+    axum::Json(users).into_response()
 }

@@ -12,11 +12,11 @@ pub type AuthSession = axum_login::AuthSession<Backend>;
 
 #[derive(Clone)]
 pub struct User {
-    id: i64,
+    pub id: i64,
     pub marzban_username: Option<String>,
     pub email: String,
     password_hash: String,
-    is_admin: bool,
+    pub is_admin: bool,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub email_data_reminder: bool,
