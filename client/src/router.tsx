@@ -27,6 +27,7 @@ import AdminUserManagement from './pages/admin/userManagement';
 import AdminAnnouncementsEditor from './pages/admin/announcementsEditor';
 import AdminPlanManager from './pages/admin/planManager';
 import UserManagementId from './pages/admin/userManagementid';
+import TransactionIDComplete from './pages/user/transactionidcomplete';
 
 const Router = () => {
     return (
@@ -47,6 +48,7 @@ const Router = () => {
                 <Route path="plan/:id" element={<PlanID />} />
                 <Route path="transaction" element={<Transaction />} />
                 <Route path="transaction/:id" element={<TransactionID />} />
+                <Route path="transaction/:id/complete" element={<TransactionIDComplete />} />
                 <Route path="status" element={<Status />} />
                 <Route path="support" element={<Support />} />
                 <Route path="profile" element={<Profile />} />
