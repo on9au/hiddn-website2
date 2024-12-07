@@ -29,7 +29,7 @@ use sqlx::types::BigDecimal;
 use sqlx::{query, MySqlPool};
 use stripe::{CreatePaymentIntent, EventObject, EventType, PaymentIntent};
 use tokio::sync::RwLock;
-use tracing::{debug, error};
+use tracing::{debug, error, info};
 
 use crate::payloads::{
     ChangePasswordPayload, CreateOrderPayload, PlanDetailsRust, UserProfileSettingsChangePayload,
@@ -1077,8 +1077,10 @@ pub async fn stripe_webhook(
     Extension(marzban_client): Extension<MarzbanAPIClient>,
     StripeEvent(event): StripeEvent,
 ) {
+    info!("Received stripe event: {:?}", event);
     match event.type_ {
         EventType::PaymentIntentSucceeded => {
+            info!("PaymentIntentSucceeded event received");
             if let EventObject::PaymentIntent(payment_intent) = event.data.object {
                 let payment_intent_id = payment_intent.id.to_string();
                 let user_id = payment_intent
@@ -1351,6 +1353,7 @@ pub async fn stripe_webhook(
             }
         }
         EventType::PaymentIntentPaymentFailed => {
+            info!("PaymentIntentPaymentFailed event received");
             if let EventObject::PaymentIntent(payment_intent) = event.data.object {
                 let payment_intent_id = payment_intent.id.to_string();
 
@@ -1370,6 +1373,7 @@ pub async fn stripe_webhook(
             }
         }
         EventType::PaymentIntentCanceled => {
+            info!("PaymentIntentCanceled event received");
             if let EventObject::PaymentIntent(payment_intent) = event.data.object {
                 let payment_intent_id = payment_intent.id.to_string();
 
@@ -1389,6 +1393,7 @@ pub async fn stripe_webhook(
             }
         }
         EventType::PaymentIntentRequiresAction => {
+            info!("PaymentIntentRequiresAction event received");
             if let EventObject::PaymentIntent(payment_intent) = event.data.object {
                 let payment_intent_id = payment_intent.id.to_string();
 
@@ -1408,6 +1413,7 @@ pub async fn stripe_webhook(
             }
         }
         EventType::PaymentIntentRequiresCapture => {
+            info!("PaymentIntentRequiresCapture event received");
             if let EventObject::PaymentIntent(payment_intent) = event.data.object {
                 let payment_intent_id = payment_intent.id.to_string();
 
@@ -1427,6 +1433,7 @@ pub async fn stripe_webhook(
             }
         }
         EventType::PaymentIntentProcessing => {
+            info!("PaymentIntentProcessing event received");
             if let EventObject::PaymentIntent(payment_intent) = event.data.object {
                 let payment_intent_id = payment_intent.id.to_string();
 
