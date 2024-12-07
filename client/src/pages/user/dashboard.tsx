@@ -143,25 +143,32 @@ const Dashboard: React.FC = () => {
                                         <strong>Status:</strong> {planDetails.status}
                                     </p>
                                     {/* Data Usage Progress Bar */}
-                                    {
-                                        planDetails.dataLimit && (
-                                            <div className="mb-4">
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                                        Data Usage
-                                                    </span>
-                                                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                                        {formatBytes(planDetails.dataUsed)} / {formatBytes(planDetails.dataLimit)}
-                                                    </span>
-                                                </div>
-                                                <div className="w-full h-2 bg-gray-200 rounded-full">
-                                                    <div
-                                                        className={`h-2 bg-hiddn-500 rounded-full w-${dataUsagePercentage} transition-all`}
-                                                    ></div>
-                                                </div>
-                                            </div>
-                                        )
-                                    }
+                                    <div className="mb-4">
+                                        <p className="mb-1 text-base text-gray-700 dark:text-gray-300">
+                                            Data Usage: {formatBytes(planDetails.dataUsed)}{planDetails.dataLimit && `/ ${formatBytes(planDetails.dataLimit)}`}
+                                        </p>
+                                        {
+                                            planDetails.dataLimit && (
+                                                <>
+                                                    <div className="w-full h-4 bg-gray-300 rounded-full dark:bg-gray-700">
+                                                        <div
+                                                            className={
+                                                                dataUsagePercentage >= 80
+                                                                    ? "h-4 rounded-full bg-orange-600"
+                                                                    : dataUsagePercentage >= 100
+                                                                        ? "h-4 rounded-full bg-red-500"
+                                                                        : "h-4 rounded-full bg-hiddn-500"
+                                                            }
+                                                            style={{ width: `${dataUsagePercentage}%` }}
+                                                        ></div>
+                                                    </div>
+                                                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                                                        {dataUsagePercentage.toFixed(2)}% used
+                                                    </p>
+                                                </>
+                                            )
+                                        }
+                                    </div>
                                     {/* Quick Actions */}
                                     <div className="flex space-x-4">
                                         <button
