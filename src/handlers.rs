@@ -1342,7 +1342,7 @@ pub async fn stripe_webhook(
                                 },
                                 data_limit: {
                                     // Convert data limit to bytes (where kb = 1024 bytes)
-                                    plan.data_limit as u64 * 1024
+                                    plan.data_limit as u64 * 1024 * 1024 * 1024
                                 },
                                 data_limit_reset_strategy:
                                     marzban_api::models::user::UserDataLimitResetStrategy::NoReset,
