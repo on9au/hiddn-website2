@@ -82,8 +82,17 @@ pub struct ServerStatusPayload {
 #[typeshare::typeshare]
 pub struct UserProfilePayload {
     pub email: String,
-    pub created_at: String,
-    pub updated_at: String,
+    pub created_at: U53,
+    pub updated_at: U53,
+    pub email_expiration_reminder: bool,
+    pub email_data_reminder: bool,
+}
+
+#[derive(Clone, Debug, Serialize)]
+pub struct UserProfileRust {
+    pub email: String,
+    pub created_at: u64,
+    pub updated_at: u64,
     pub email_expiration_reminder: bool,
     pub email_data_reminder: bool,
 }

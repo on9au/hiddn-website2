@@ -33,15 +33,15 @@ use tracing::{debug, error};
 
 use crate::config::GLOBAL_CONFIG;
 use crate::payloads::{
-    ChangePasswordPayload, CreateOrderPayload, PlanDetailsRust, UserProfileSettingsChangePayload,
-    UserTransactionRust,
+    ChangePasswordPayload, CreateOrderPayload, PlanDetailsRust, UserProfileRust,
+    UserProfileSettingsChangePayload, UserTransactionRust,
 };
 use crate::{
     payloads::{
         AnnouncementPayload, CreateOrderResponsePayload, ForgotPasswordPayload, LoginPayload,
         LoginResponsePayload, PasswordFeedbackPayload, PlanPayload, PlanStatusEnum,
-        RegisterPayload, RequestCodePayload, ServerStatusPayload, UserProfilePayload,
-        UserTransactionStatusEnum, VerifyEmailPayload,
+        RegisterPayload, RequestCodePayload, ServerStatusPayload, UserTransactionStatusEnum,
+        VerifyEmailPayload,
     },
     sessions::AuthSession,
     SharedDocs,
@@ -632,20 +632,38 @@ pub async fn server_status() -> impl IntoResponse {
 /// This handler requires authentication (managed by axum_login).
 pub async fn plan_details(
     Extension(marzban_client): Extension<MarzbanAPIClient>,
+    Extension(pool): Extension<MySqlPool>,
     auth_session: AuthSession,
 ) -> impl IntoResponse {
     // Get the user's details from the db
     let user = auth_session.user.unwrap();
 
-    let marzban_username = match user.marzban_username {
-        Some(ref username) => username,
-        // No marzban username, no plan details possible.
+    // let marzban_username = match user.marzban_username {
+    //     Some(ref username) => username,
+    //     // No marzban username, no plan details possible.
+    //     None => return Json(()).into_response(),
+    // };
+
+    let marzban_username = query!(
+        r#"
+        SELECT marzban_username
+        FROM users
+        WHERE id = ?
+        "#,
+        user.id
+    )
+    .fetch_one(&pool)
+    .await
+    .expect("Failed to fetch marzban username");
+
+    let marzban_username = match marzban_username.marzban_username {
+        Some(username) => username,
         None => return Json(()).into_response(),
     };
 
     // Get the user's plan details from Marzban
     let user = marzban_client
-        .get_user(marzban_username)
+        .get_user(&marzban_username)
         .await
         .expect("Failed to get user");
 
@@ -1029,15 +1047,35 @@ pub async fn get_announcements(
 /// This handler will return Json(UserProfilePayload)
 /// This handler will return the user's profile.
 /// This handler requires authentication (managed by axum_login).
-pub async fn user_me(auth_session: AuthSession) -> impl IntoResponse {
+pub async fn user_me(
+    auth_session: AuthSession,
+    Extension(pool): Extension<MySqlPool>,
+) -> impl IntoResponse {
     let user = auth_session.user.unwrap();
 
-    let user_profile = UserProfilePayload {
+    let user_profile = query!(
+        r#"
+        SELECT
+            email,
+            created_at as `created_at: DateTime<Utc>`,
+            updated_at as `updated_at: DateTime<Utc>`,
+            email_expiration_reminder as `email_expiration_reminder: bool`,
+            email_data_reminder as `email_data_reminder: bool`
+        FROM users
+        WHERE id = ?
+        "#,
+        user.id
+    )
+    .fetch_one(&pool)
+    .await
+    .expect("Failed to fetch user profile");
+
+    let user_profile = UserProfileRust {
         email: user.email,
-        created_at: user.created_at.to_string(),
-        updated_at: user.updated_at.to_string(),
-        email_expiration_reminder: user.email_expiration_reminder,
-        email_data_reminder: user.email_data_reminder,
+        created_at: user_profile.created_at.timestamp() as u64,
+        updated_at: user_profile.updated_at.timestamp() as u64,
+        email_expiration_reminder: user_profile.email_expiration_reminder,
+        email_data_reminder: user_profile.email_data_reminder,
     };
 
     Json(user_profile).into_response()
@@ -1321,6 +1359,8 @@ pub async fn stripe_webhook(
                             })
                             .await
                             .expect("Failed to create user");
+
+                        // Also add the marzban username to the user in the Auth session since they are not in sync
                     }
                     Some(marzban_username) => {
                         // Get the user's current plan

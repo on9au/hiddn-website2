@@ -116,8 +116,8 @@ export interface ServerStatusPayload {
 
 export interface UserProfilePayload {
 	email: string;
-	created_at: string;
-	updated_at: string;
+	created_at: number;
+	updated_at: number;
 	email_expiration_reminder: boolean;
 	email_data_reminder: boolean;
 }

@@ -27,6 +27,10 @@ const SkeletonProfile: React.FC = () => {
     );
 };
 
+const formatUnixTimestamp = (timestamp: number): string => {
+    return new Date(timestamp * 1000).toLocaleString(undefined, { timeZoneName: 'short' });
+}
+
 const Profile: React.FC = () => {
     const [userProfile, setUserProfile] = useState<UserProfilePayload | null>(null);
     const [fetchServerStatus, setFetchServerStatus] = useState<FetchUserStatusEnum>({ status: 'loading' });
@@ -150,11 +154,11 @@ const Profile: React.FC = () => {
                                     </p>
                                     <p className="mb-2 text-base text-gray-700 dark:text-gray-300">
                                         <strong>Joined:</strong>{' '}
-                                        {new Date(userProfile.created_at).toLocaleDateString()}
+                                        {formatUnixTimestamp(userProfile.created_at)}
                                     </p>
                                     <p className="mb-2 text-base text-gray-700 dark:text-gray-300">
                                         <strong>Last Updated:</strong>{' '}
-                                        {new Date(userProfile.updated_at).toLocaleDateString()}
+                                        {formatUnixTimestamp(userProfile.updated_at)}
                                     </p>
                                 </div>
                             </div>
