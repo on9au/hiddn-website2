@@ -66,6 +66,8 @@ const DeleteProfile: React.FC = () => {
             </span>
             <div className="container mx-auto">
                 <div className="w-full p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
+                    <h1 className="mb-4 text-2xl font-semibold text-red-500">STOP AND READ! YOU ARE ABOUT TO PERFORM A DESTRUCTIVE TASK!</h1>
+                    <hr className="my-6 border-gray-300 dark:border-gray-600" />
                     <h1 className="mb-4 text-2xl font-semibold text-red-500">Before you delete your account:</h1>
                     <p className="mb-4 text-gray-700 dark:text-gray-300">
                         Deleting your account is <span className="font-semibold">permanent</span> and cannot be undone.
@@ -77,7 +79,7 @@ const DeleteProfile: React.FC = () => {
                         <li>Your profile information</li>
                         <li>Your settings and preferences</li>
                         <li>Your subscription details</li>
-                        <li>All associated data with your account</li>
+                        <li>All associated data with your account (unless otherwise stated)</li>
                     </ul>
                     <p className="mb-4 text-gray-700 dark:text-gray-300">
                         What will not be removed:
@@ -96,7 +98,7 @@ const DeleteProfile: React.FC = () => {
                     <p className="mb-4 text-gray-700 dark:text-gray-300">
                         If you're sure you want to proceed, please confirm below.
                     </p>
-                    
+
                     <div className="flex items-center mb-4">
                         <input
                             id="confirmation-checkbox"

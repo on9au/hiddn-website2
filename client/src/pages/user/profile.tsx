@@ -83,6 +83,11 @@ const Profile: React.FC = () => {
     };
 
     const handleResetSubscriptionURL = async () => {
+        // Ask the user to confirm
+        if (!window.confirm('Are you sure you want to reset your subscription URL? You will need to update your subscription URL for all of your devices.')) {
+            return;
+        }
+
         try {
             await axios.post(
                 '/api/reset_subscription_url',
