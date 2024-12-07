@@ -7,9 +7,9 @@ import { PlanPayload, UserTransactionPayload, UserTransactionStatusEnum } from '
 import { loadStripe } from '@stripe/stripe-js';
 import {
     Elements,
-    CardElement,
     useStripe,
     useElements,
+    PaymentElement,
 } from '@stripe/react-stripe-js';
 // import { FaShoppingCart } from 'react-icons/fa';
 
@@ -89,7 +89,18 @@ const TransactionID: React.FC = () => {
     }
 
     return (
-        <Elements stripe={stripePromise}>
+        <Elements
+            stripe={stripePromise}
+            options={{
+                clientSecret: clientSecret || undefined,
+                appearance: {
+                    theme: 'stripe'
+                },
+                locale: 'auto',
+                
+
+            }}
+        >
             <TransactionForm transaction={transaction} clientSecret={clientSecret} />
         </Elements>
     );
@@ -100,7 +111,7 @@ interface TransactionFormProps {
     clientSecret: string | null;
 }
 
-const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, clientSecret }) => {
+const TransactionForm: React.FC<TransactionFormProps> = ({ transaction }) => {
     const stripe = useStripe();
     const elements = useElements();
     const navigate = useNavigate();
@@ -129,34 +140,34 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, clientSe
         setProcessing(true);
         setError(null);
 
-        const cardElement = elements.getElement(CardElement);
-        if (!cardElement) {
-            setError('Card details not found.');
-            setProcessing(false);
-            return;
-        }
+        // const cardElement = elements.getElement(CardElement);
+        // if (!cardElement) {
+        //     setError('Card details not found.');
+        //     setProcessing(false);
+        //     return;
+        // }
 
         // Confirm the Payment Intent
-        const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(
-            clientSecret!, // Assuming this is the client secret
-            {
-                payment_method: {
-                    card: cardElement,
-                },
-            }
-        );
+        const result = await stripe.confirmPayment({
+            //`Elements` instance that was used to create the Payment Element
+            elements,
+            confirmParams: {
+                return_url: `${window.location.origin}/user/transaction/${transaction.id}/complete`,
+            },
+        });
 
-        if (stripeError) {
-            setError(stripeError.message || 'Payment failed.');
-            setProcessing(false);
-            return;
-        }
 
-        if (paymentIntent && paymentIntent.status === 'succeeded') {
-            setSuccess(true);
+        if (result.error) {
+            // Show error to your customer (for example, payment details incomplete)
+            console.log(result.error.message);
+            setError(result.error.message || 'An unknown error occurred.');
         } else {
-            setError('Payment was not successful.');
+            // Your customer will be redirected to your `return_url`. For some payment
+            // methods like iDEAL, your customer will be redirected to an intermediate
+            // site first to authorize the payment, then redirected to the `return_url`.
+            setSuccess(true);
         }
+
 
         setProcessing(false);
     };
@@ -254,30 +265,34 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, clientSe
                                         Card Details
                                     </label>
                                     <div className="p-3 border rounded-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
-                                        <CardElement
-                                            id="card-element"
-                                            options={{
-                                                style: {
-                                                    base: {
-                                                        fontSize: '16px',
-                                                        color: '#32325d',
-                                                        '::placeholder': {
-                                                            color: '#a0aec0',
-                                                        },
-                                                        backgroundColor: '#f7fafc',
-                                                        ':-webkit-autofill': {
-                                                            color: '#f7fafc',
-                                                        },
-                                                    },
-                                                    invalid: {
-                                                        color: '#e53e3e',
-                                                    },
-                                                    complete: {
-                                                        color: '#38a169',
-                                                    },
-                                                },
-                                            }}
-                                            className="dark:bg-gray-700 dark:text-gray-300"
+                                        <PaymentElement
+                                        // id="card-element"
+                                        // options={
+                                        //     {}
+                                        // }
+                                        // stripe={stripePromise}
+                                        // // options={{
+                                        // //     style: {
+                                        // //         base: {
+                                        // //             fontSize: '16px',
+                                        // //             color: '#32325d',
+                                        // //             '::placeholder': {
+                                        // //                 color: '#a0aec0',
+                                        // //             },
+                                        // //             backgroundColor: '#f7fafc',
+                                        // //             ':-webkit-autofill': {
+                                        // //                 color: '#f7fafc',
+                                        // //             },
+                                        // //         },
+                                        // //         invalid: {
+                                        // //             color: '#e53e3e',
+                                        // //         },
+                                        // //         complete: {
+                                        // //             color: '#38a169',
+                                        // //         },
+                                        // //     },
+                                        // // }}
+                                        // className="dark:bg-gray-700 dark:text-gray-300"
                                         />
                                     </div>
                                     <span className="block mt-2 text-xs text-gray-500 dark:text-gray-400">
@@ -301,18 +316,24 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, clientSe
 
                 {/* Display success message if payment was successful */}
                 {success && (
-                    <div className="flex flex-col items-center justify-center min-h-screen">
-                        <h1 className="mb-4 text-4xl font-semibold text-green-500">Payment Successful!</h1>
-                        <p className="mb-6 text-xl text-gray-700 dark:text-gray-300">
-                            Thank you for your purchase. The plan has been added to your account.
-                        </p>
-                        <button
-                            className="px-6 py-3 text-white rounded-md bg-hiddn-500 hover:bg-hiddn-600 focus:outline-none"
-                            onClick={() => navigate("/user/dashboard")}
-                        >
-                            Go to Dashboard
-                        </button>
-                    </div>
+                    <>
+                        <div className="mb-6">
+                            <hr className="border-gray-300 dark:border-gray-600" />
+                        </div>
+                        <div className="flex flex-col items-center justify-center">
+                            <h1 className="mb-4 text-4xl font-semibold text-green-500">Payment Successful!</h1>
+                            <p className="mb-6 text-xl text-gray-700 dark:text-gray-300">
+                                Thank you for your purchase. The plan has been added to your account.
+                            </p>
+                            <button
+                                className="px-6 py-3 text-white rounded-md bg-hiddn-500 hover:bg-hiddn-600 focus:outline-none"
+                                onClick={() => navigate("/user/dashboard")}
+                            >
+                                Go to Dashboard
+                            </button>
+                        </div>
+                    </>
+
                 )}
             </div>
         </div>
