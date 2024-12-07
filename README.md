@@ -71,6 +71,32 @@ This section explains how to set up, run, and develop on this project.
 
 3. **Fill in the required values in the `.env` file**.
 
+### Stripe Webhook CLI
+
+To test Stripe webhooks locally, you can use the Stripe CLI.
+
+1. **Install the Stripe CLI**:
+
+   Follow the installation instructions from the [Stripe CLI documentation](https://stripe.com/docs/stripe-cli).
+
+2. **Login to your Stripe account**:
+
+   ```sh
+   stripe login
+   ```
+
+3. **Forward webhook events to your local server**:
+
+   ```sh
+   stripe listen --forward-to localhost:3000/webhook
+   ```
+
+4. **Verify webhook signature**:
+
+   Ensure your application verifies the webhook signature using the secret provided by the Stripe CLI.
+
+For more details, refer to the [Stripe webhook documentation](https://stripe.com/docs/webhooks).
+
 ### Running the Application
 
 #### Using Docker
