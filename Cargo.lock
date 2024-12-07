@@ -1769,9 +1769,9 @@ checksum = "a7a70ba024b9dc04c27ea2f0c0548feb474ec5c54bba33a7f72f873a39d07b24"
 
 [[package]]
 name = "marzban_api"
-version = "0.2.6"
+version = "0.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4cdd12feeeb7350f33b39089dd044f351e5dae43246fee4f8c1a2cecee4336f8"
+checksum = "fb7d511a9f57ea67ac35b11e1f036f2af469fadfe722f8b5fa7b437ea224cbd1"
 dependencies = [
  "chrono",
  "reqwest",

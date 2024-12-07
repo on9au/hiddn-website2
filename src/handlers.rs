@@ -29,7 +29,7 @@ use sqlx::types::BigDecimal;
 use sqlx::{query, MySqlPool};
 use stripe::{CreatePaymentIntent, EventObject, EventType, PaymentIntent};
 use tokio::sync::RwLock;
-use tracing::{debug, error};
+use tracing::{debug, error, warn};
 
 use crate::config::GLOBAL_CONFIG;
 use crate::payloads::{
@@ -1162,7 +1162,7 @@ pub async fn stripe_webhook(
                         None
                     } else {
                         Some(
-                            inbounds[&ProxyTypes::Trojan]
+                            inbounds[&ProxyTypes::Vless]
                                 .iter()
                                 .map(|x| x.tag.clone())
                                 .collect(),
@@ -1175,7 +1175,7 @@ pub async fn stripe_webhook(
                         None
                     } else {
                         Some(
-                            inbounds[&ProxyTypes::Trojan]
+                            inbounds[&ProxyTypes::Vmess]
                                 .iter()
                                 .map(|x| x.tag.clone())
                                 .collect(),
@@ -1188,7 +1188,7 @@ pub async fn stripe_webhook(
                         None
                     } else {
                         Some(
-                            inbounds[&ProxyTypes::Trojan]
+                            inbounds[&ProxyTypes::ShadowSocks]
                                 .iter()
                                 .map(|x| x.tag.clone())
                                 .collect(),
@@ -1210,7 +1210,7 @@ pub async fn stripe_webhook(
                     } else {
                         Some(Vless {
                             id: None,
-                            flow: Some("xtls-rprx-direct".to_string()),
+                            flow: Some("xtls-rprx-vision".to_string()),
                         })
                     },
                     vmess: if inbounds.vmess.is_none() {
@@ -1249,42 +1249,78 @@ pub async fn stripe_webhook(
                 // If not, create a user
                 match user.marzban_username {
                     None => {
-                        marzban_client
-                            .add_user(&UserCreate {
-                                proxies,
-                                expire: {
-                                    match plan.duration_days {
-                                        0 => None,
-                                        _ => Some(
-                                            chrono::Utc::now()
-                                                .checked_add_signed(chrono::Duration::days(
-                                                    plan.duration_days as i64,
-                                                ))
-                                                .expect("Failed to add days")
-                                                .timestamp()
-                                                as u64,
-                                        ),
-                                    }
-                                },
-                                data_limit: {
-                                    // Convert data limit to bytes (where kb = 1024 bytes)
-                                    plan.data_limit as u64 * 1024
-                                },
-                                data_limit_reset_strategy:
-                                    marzban_api::models::user::UserDataLimitResetStrategy::NoReset,
-                                inbounds,
-                                note: Some(format!("Created by HiddN. ID: {}", user_id)),
-                                sub_updated_at: None,
-                                sub_last_user_agent: None,
-                                online_at: None,
-                                on_hold_expire_duration: None,
-                                on_hold_timeout: None,
-                                auto_delete_in_days: None,
-                                username: user.email.clone(),
-                                status: UserStatusCreate::Active,
-                            })
-                            .await
-                            .expect("Failed to create user");
+                        let res = serde_json::ser::to_string(&UserCreate {
+                            proxies,
+                            expire: {
+                                match plan.duration_days {
+                                    0 => None,
+                                    _ => Some(
+                                        chrono::Utc::now()
+                                            .checked_add_signed(chrono::Duration::days(
+                                                plan.duration_days as i64,
+                                            ))
+                                            .expect("Failed to add days")
+                                            .timestamp()
+                                            as u64,
+                                    ),
+                                }
+                            },
+                            data_limit: {
+                                // Convert data limit to bytes (where kb = 1024 bytes)
+                                plan.data_limit as u64 * 1024 * 1024 * 1024
+                            },
+                            data_limit_reset_strategy:
+                                marzban_api::models::user::UserDataLimitResetStrategy::NoReset,
+                            inbounds,
+                            note: Some(format!("Created by HiddN. ID: {}", user_id)),
+                            sub_updated_at: None,
+                            sub_last_user_agent: None,
+                            online_at: None,
+                            on_hold_expire_duration: None,
+                            on_hold_timeout: None,
+                            auto_delete_in_days: None,
+                            username: user.email.clone(),
+                            status: UserStatusCreate::Active,
+                        });
+
+                        warn!("UserCreate: {:?}", res);
+
+                        // marzban_client
+                        //     .add_user(&UserCreate {
+                        //         proxies,
+                        //         expire: {
+                        //             match plan.duration_days {
+                        //                 0 => None,
+                        //                 _ => Some(
+                        //                     chrono::Utc::now()
+                        //                         .checked_add_signed(chrono::Duration::days(
+                        //                             plan.duration_days as i64,
+                        //                         ))
+                        //                         .expect("Failed to add days")
+                        //                         .timestamp()
+                        //                         as u64,
+                        //                 ),
+                        //             }
+                        //         },
+                        //         data_limit: {
+                        //             // Convert data limit to bytes (where kb = 1024 bytes)
+                        //             plan.data_limit as u64 * 1024
+                        //         },
+                        //         data_limit_reset_strategy:
+                        //             marzban_api::models::user::UserDataLimitResetStrategy::NoReset,
+                        //         inbounds,
+                        //         note: Some(format!("Created by HiddN. ID: {}", user_id)),
+                        //         sub_updated_at: None,
+                        //         sub_last_user_agent: None,
+                        //         online_at: None,
+                        //         on_hold_expire_duration: None,
+                        //         on_hold_timeout: None,
+                        //         auto_delete_in_days: None,
+                        //         username: user.email.clone(),
+                        //         status: UserStatusCreate::Active,
+                        //     })
+                        //     .await
+                        //     .expect("Failed to create user");
                     }
                     Some(marzban_username) => {
                         // Get the user's current plan
