@@ -93,7 +93,7 @@ const TransactionID: React.FC = () => {
                 withCredentials: true,
             });
             alert("Transaction canceled successfully.");
-            navigate('/user/transactions');
+            navigate('/user/transaction');
         } catch (err) {
             console.error('Failed to cancel transaction:', err);
             alert('Failed to cancel transaction.');
