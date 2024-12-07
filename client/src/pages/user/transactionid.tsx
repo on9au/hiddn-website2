@@ -154,10 +154,6 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, clientSe
 
         if (paymentIntent && paymentIntent.status === 'succeeded') {
             setSuccess(true);
-            // Wait for 3 seconds, before returning to the dashboard
-            setTimeout(() => {
-                navigate('/user/dashboard');
-            }, 3000);
         } else {
             setError('Payment was not successful.');
         }
@@ -175,23 +171,23 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, clientSe
     const renderStatus = (status: UserTransactionStatusEnum) => {
         switch (status) {
             case UserTransactionStatusEnum.RequiresPaymentMethod:
-                return <span className="px-2 py-1 text-sm text-yellow-700 bg-yellow-100 rounded">Unpaid</span>;
+                return <span className="px-2 py-1 text-sm text-yellow-700 bg-yellow-100 rounded dark:text-yellow-300 dark:bg-yellow-900">Unpaid</span>;
             case UserTransactionStatusEnum.Processing:
-                return <span className="px-2 py-1 text-sm text-blue-700 bg-blue-100 rounded">Processing</span>;
+                return <span className="px-2 py-1 text-sm text-blue-700 bg-blue-100 rounded dark:text-blue-300 dark:bg-blue-900">Processing</span>;
             case UserTransactionStatusEnum.Succeeded:
-                return <span className="px-2 py-1 text-sm text-green-700 bg-green-100 rounded">Completed</span>;
+                return <span className="px-2 py-1 text-sm text-green-700 bg-green-100 rounded dark:text-green-300 dark:bg-green-900">Completed</span>;
             case UserTransactionStatusEnum.RequiresAction:
-                return <span className="px-2 py-1 text-sm text-red-700 bg-red-100 rounded">Action Required</span>;
+                return <span className="px-2 py-1 text-sm text-red-700 bg-red-100 rounded dark:text-red-300 dark:bg-red-900">Action Required</span>;
             case UserTransactionStatusEnum.RequiresConfirmation:
-                return <span className="px-2 py-1 text-sm text-yellow-700 bg-yellow-100 rounded">Confirmation Required</span>;
+                return <span className="px-2 py-1 text-sm text-yellow-700 bg-yellow-100 rounded dark:text-yellow-300 dark:bg-yellow-900">Confirmation Required</span>;
             case UserTransactionStatusEnum.RequiresCapture:
-                return <span className="px-2 py-1 text-sm text-yellow-700 bg-yellow-100 rounded">Capture Required</span>;
+                return <span className="px-2 py-1 text-sm text-yellow-700 bg-yellow-100 rounded dark:text-yellow-300 dark:bg-yellow-900">Capture Required</span>;
             case UserTransactionStatusEnum.Canceled:
-                return <span className="px-2 py-1 text-sm text-gray-700 bg-gray-100 rounded">Canceled</span>;
+                return <span className="px-2 py-1 text-sm text-gray-700 bg-gray-100 rounded dark:text-gray-300 dark:bg-gray-900">Canceled</span>;
             case UserTransactionStatusEnum.Refunded:
-                return <span className="px-2 py-1 text-sm text-gray-700 bg-gray-100 rounded">Refunded</span>;
+                return <span className="px-2 py-1 text-sm text-gray-700 bg-gray-100 rounded dark:text-gray-300 dark:bg-gray-900">Refunded</span>;
             default:
-                return <span className="px-2 py-1 text-sm text-gray-700 bg-gray-100 rounded">Unknown</span>;
+                return <span className="px-2 py-1 text-sm text-gray-700 bg-gray-100 rounded dark:text-gray-300 dark:bg-gray-900">Unknown</span>;
         }
     };
 
@@ -227,57 +223,80 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, clientSe
                     </p>
                 </div>
 
+                <div className="mb-6">
+                    <hr className="border-gray-300 dark:border-gray-600" />
+                </div>
+
+                <div className="mb-6">
+                    <p className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+                        Total: ${transaction.amount}
+                    </p>
+                </div>
+
                 {/* Conditionally render payment form based on transaction status */}
 
                 {transaction.status === UserTransactionStatusEnum.RequiresPaymentMethod && !success && (
-                    <div className="mb-6">
-                        <h3 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                            Complete Your Payment
-                        </h3>
-                        <p className="mb-4 text-gray-700 dark:text-gray-300">
-                            Please enter your card details to complete the payment for your transaction.
-                        </p>
-                        {error && <p className="mb-4 text-red-500">{error}</p>}
-                        <form onSubmit={handleSubmit}>
-                            <div className="mb-6">
-                                <label htmlFor="card-element" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Card Details
-                                </label>
-                                <div className="p-3 border rounded-md bg-gray-50 dark:bg-gray-700">
-                                    <CardElement
-                                        id="card-element"
-                                        options={{
-                                            style: {
-                                                base: {
-                                                    fontSize: '16px',
-                                                    color: '#32325d',
-                                                    '::placeholder': {
-                                                        color: '#a0aec0',
+                    <>
+                        <div className="mb-6">
+                            <hr className="border-gray-300 dark:border-gray-600" />
+                        </div>
+                        <div className="mb-6">
+                            <h3 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-200">
+                                Complete Your Payment
+                            </h3>
+                            <p className="mb-4 text-gray-700 dark:text-gray-300">
+                                Please enter your card details to complete the payment for your transaction.
+                            </p>
+                            {error && <p className="mb-4 text-red-500">{error}</p>}
+                            <form onSubmit={handleSubmit}>
+                                <div className="mb-6">
+                                    <label htmlFor="card-element" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        Card Details
+                                    </label>
+                                    <div className="p-3 border rounded-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+                                        <CardElement
+                                            id="card-element"
+                                            options={{
+                                                style: {
+                                                    base: {
+                                                        fontSize: '16px',
+                                                        color: '#32325d',
+                                                        '::placeholder': {
+                                                            color: '#a0aec0',
+                                                        },
+                                                        backgroundColor: '#f7fafc',
+                                                        ':-webkit-autofill': {
+                                                            color: '#f7fafc',
+                                                        },
+                                                    },
+                                                    invalid: {
+                                                        color: '#e53e3e',
+                                                    },
+                                                    complete: {
+                                                        color: '#38a169',
                                                     },
                                                 },
-                                                invalid: {
-                                                    color: '#e53e3e',
-                                                },
-                                            },
-                                        }}
-                                    />
+                                            }}
+                                            className="dark:bg-gray-700 dark:text-gray-300"
+                                        />
+                                    </div>
+                                    <span className="block mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                        All transactions are secured and encrypted by Stripe.
+                                    </span>
+                                    <span className="block mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                        We do not store your card details.
+                                    </span>
                                 </div>
-                                <span className="block mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                    All transactions are secured and encrypted by Stripe.
-                                </span>
-                                <span className="block mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                    We do not store your card details.
-                                </span>
-                            </div>
-                            <button
-                                type="submit"
-                                className={`w-full px-4 py-2 text-white bg-hiddn-500 rounded-md hover:bg-hiddn-600 focus:outline-none ${processing ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                disabled={!stripe || processing}
-                            >
-                                {processing ? 'Processing...' : 'Pay Now'}
-                            </button>
-                        </form>
-                    </div>
+                                <button
+                                    type="submit"
+                                    className={`w-full px-4 py-2 text-white bg-hiddn-500 rounded-md hover:bg-hiddn-600 focus:outline-none ${processing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    disabled={!stripe || processing}
+                                >
+                                    {processing ? 'Processing...' : 'Pay Now'}
+                                </button>
+                            </form>
+                        </div>
+                    </>
                 )}
 
                 {/* Display success message if payment was successful */}

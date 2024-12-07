@@ -145,7 +145,7 @@ const Dashboard: React.FC = () => {
                                     {/* Data Usage Progress Bar */}
                                     <div className="mb-4">
                                         <p className="mb-1 text-base text-gray-700 dark:text-gray-300">
-                                            Data Usage: {formatBytes(planDetails.dataUsed)}{planDetails.dataLimit && `/ ${formatBytes(planDetails.dataLimit)}`}
+                                            Data Usage: {formatBytes(planDetails.dataUsed)}{planDetails.dataLimit && ` / ${formatBytes(planDetails.dataLimit)}`}
                                         </p>
                                         {
                                             planDetails.dataLimit && (
