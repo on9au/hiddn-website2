@@ -27,7 +27,7 @@ use num_traits::ToPrimitive;
 use serde_json::json;
 use sqlx::types::BigDecimal;
 use sqlx::{query, MySqlPool};
-use stripe::{CreatePaymentIntent, EventObject, EventType, PaymentIntent};
+use stripe::{CancelPaymentIntent, CreatePaymentIntent, EventObject, EventType, PaymentIntent};
 use tokio::sync::RwLock;
 use tracing::{debug, error};
 
@@ -594,6 +594,66 @@ pub async fn transaction_secret(
         .expect("Failed to retrieve payment intent");
 
     Json(payment_intent.client_secret).into_response()
+}
+
+/// Handler for the POST '/transaction/:id/cancel' route.
+/// This handler will cancel the transaction with the given id.
+/// This is to be used if the user wants to cancel the transaction.
+/// This handler requires authentication (managed by axum_login).
+pub async fn transaction_cancel(
+    Extension(pool): Extension<MySqlPool>,
+    Extension(stripe_client): Extension<stripe::Client>,
+    auth_session: AuthSession,
+    Path(id): Path<u32>,
+) -> impl IntoResponse {
+    let user = auth_session.user.unwrap();
+
+    // Ensure the user_id in the transaction matches user.id
+    let transaction = query!(
+        r#"
+        SELECT
+            id as `id: i64`,
+            user_id as `user_id: i64`,
+            stripe_payment_intent_id as `stripe_payment_intent_id: String`
+        FROM transactions
+        WHERE id = ?
+        "#,
+        id
+    )
+    .fetch_optional(&pool)
+    .await
+    .expect("Failed to fetch transaction");
+
+    let transaction = match transaction {
+        Some(transaction) => transaction,
+        None => return StatusCode::NOT_FOUND.into_response(),
+    };
+
+    if transaction.user_id != user.id {
+        return StatusCode::FORBIDDEN.into_response();
+    }
+
+    let stripe_payment_intent_id = match transaction.stripe_payment_intent_id {
+        Some(payment_intent) => payment_intent,
+        None => return StatusCode::NOT_FOUND.into_response(),
+    };
+
+    // Use Stripe client to cancel the payment intent
+    let payment_intent_id = stripe::PaymentIntentId::from_str(&stripe_payment_intent_id)
+        .expect("Failed to parse payment intent id");
+
+    // Send the request, then let stripe respond to the backend's webhook to update the db.
+    PaymentIntent::cancel(
+        &stripe_client,
+        &payment_intent_id,
+        CancelPaymentIntent {
+            cancellation_reason: Some(stripe::PaymentIntentCancellationReason::RequestedByCustomer),
+        },
+    )
+    .await
+    .expect("Failed to cancel payment intent");
+
+    StatusCode::OK.into_response()
 }
 
 /// Handler for the POST '/transaction/:id/complete' route.

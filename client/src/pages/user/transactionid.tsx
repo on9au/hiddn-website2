@@ -21,6 +21,7 @@ const TransactionID: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [clientSecret, setClientSecret] = useState<string | null>(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         // Get the client secret for the transaction from session storage, then the backend
@@ -80,6 +81,25 @@ const TransactionID: React.FC = () => {
         );
     }
 
+    
+    const handleCancelTransaction = async () => {
+        if (!transaction) return;
+
+        const confirmCancel = window.confirm("Are you sure you want to cancel this transaction?");
+        if (!confirmCancel) return;
+
+        try {
+            await axios.post(`/api/transaction/${transaction.id}/cancel`, {}, {
+                withCredentials: true,
+            });
+            alert("Transaction canceled successfully.");
+            navigate('/user/transactions');
+        } catch (err) {
+            console.error('Failed to cancel transaction:', err);
+            alert('Failed to cancel transaction.');
+        }
+    };
+
     if (error || !transaction) {
         return (
             <div className="flex flex-col items-center justify-center min-h-screen">
@@ -92,16 +112,14 @@ const TransactionID: React.FC = () => {
         <Elements
             stripe={stripePromise}
             options={{
-                clientSecret: clientSecret || undefined,
-                appearance: {
-                    theme: 'stripe'
-                },
-                locale: 'auto',
-                
-
+            clientSecret: clientSecret || undefined,
+            appearance: {
+            theme: document.documentElement.classList.contains('dark') ? 'night' : 'stripe'
+            },
+            locale: 'auto',
             }}
         >
-            <TransactionForm transaction={transaction} clientSecret={clientSecret} />
+            <TransactionForm transaction={transaction} clientSecret={clientSecret} onCancel={handleCancelTransaction} />
         </Elements>
     );
 };
@@ -109,9 +127,10 @@ const TransactionID: React.FC = () => {
 interface TransactionFormProps {
     transaction: UserTransactionPayload;
     clientSecret: string | null;
+    onCancel: () => void;
 }
 
-const TransactionForm: React.FC<TransactionFormProps> = ({ transaction }) => {
+const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onCancel }) => {
     const stripe = useStripe();
     const elements = useElements();
     const navigate = useNavigate();
@@ -333,7 +352,18 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction }) => {
                             </button>
                         </div>
                     </>
+                )}
 
+                {/* Cancel Transaction Button */}
+                {transaction.status === UserTransactionStatusEnum.RequiresPaymentMethod && !success && (
+                    <div className="mt-6">
+                        <button
+                            className="px-4 py-2 text-white bg-red-500 rounded-md hover:bg-red-600 focus:outline-none"
+                            onClick={onCancel}
+                        >
+                            Cancel Transaction
+                        </button>
+                    </div>
                 )}
             </div>
         </div>
