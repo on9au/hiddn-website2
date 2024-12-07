@@ -83,7 +83,7 @@ pub fn create_router(
                 .route("/generate_204", get(generate_204))
                 .route("/request_code", post(request_code))
                 .route("/verify_email", post(verify_email))
-                .route("/stripe_webhook", post(stripe_webhook))
+                .route("/stripe", post(stripe_webhook))
                 .layer(Extension(pool))
                 .layer(Extension(marzban_client))
                 .layer(Extension(stripe_client))

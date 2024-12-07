@@ -32,6 +32,7 @@ pub struct Config {
 
     // Stripe Config
     pub stripe_secret_key: String,
+    pub stripe_webhook_secret: String,
 
     // Announcements and Documentation Config
     pub announcements_dir: String,

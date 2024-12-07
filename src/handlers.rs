@@ -31,6 +31,7 @@ use stripe::{CreatePaymentIntent, EventObject, EventType, PaymentIntent};
 use tokio::sync::RwLock;
 use tracing::{debug, error, info};
 
+use crate::config::GLOBAL_CONFIG;
 use crate::payloads::{
     ChangePasswordPayload, CreateOrderPayload, PlanDetailsRust, UserProfileSettingsChangePayload,
     UserTransactionRust,
@@ -1056,6 +1057,7 @@ where
         let signature = if let Some(sig) = req.headers().get("stripe-signature") {
             sig.to_owned()
         } else {
+            error!("Missing stripe-signature header");
             return Err(StatusCode::BAD_REQUEST.into_response());
         };
 
@@ -1064,8 +1066,15 @@ where
             .map_err(IntoResponse::into_response)?;
 
         Ok(Self(
-            stripe::Webhook::construct_event(&payload, signature.to_str().unwrap(), "whsec_xxxxx")
-                .map_err(|_| StatusCode::BAD_REQUEST.into_response())?,
+            stripe::Webhook::construct_event(
+                &payload,
+                signature.to_str().unwrap(),
+                GLOBAL_CONFIG.stripe_webhook_secret.as_str(),
+            )
+            .map_err(|_| {
+                error!("Failed to construct stripe event");
+                StatusCode::BAD_REQUEST.into_response()
+            })?,
         ))
     }
 }
