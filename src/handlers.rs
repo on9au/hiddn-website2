@@ -1360,7 +1360,15 @@ pub async fn stripe_webhook(
                             .await
                             .expect("Failed to create user");
 
-                        // Also add the marzban username to the user in the Auth session since they are not in sync
+                        // Also add the marzban username to the user in db
+                        query!(
+                            r#"UPDATE users SET marzban_username = ? WHERE id = ?"#,
+                            user.email.clone(),
+                            user_id
+                        )
+                        .execute(&pool)
+                        .await
+                        .expect("Failed to update marzban username");
                     }
                     Some(marzban_username) => {
                         // Get the user's current plan
