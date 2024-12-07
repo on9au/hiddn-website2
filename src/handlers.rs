@@ -15,7 +15,7 @@ use num_traits::ToPrimitive;
 use serde_json::json;
 use sqlx::{query, MySqlPool};
 use tokio::sync::RwLock;
-use tracing::error;
+use tracing::{debug, error};
 
 use crate::payloads::{ChangePasswordPayload, PlanDetailsRust, UserProfileSettingsChangePayload};
 use crate::{
@@ -563,13 +563,13 @@ pub async fn plan_details(
         .expect("Failed to get user");
 
     // If the plan has been expired for more than 14 days, assume the plan doesn't exist.
-    match user.expire {
-        Some(expire) => {
-            if expire < (chrono::Utc::now() - chrono::Duration::days(14)).timestamp() as u64 {
-                return Json(()).into_response();
-            }
+    // If expire is None, the expiration date is 'never'.
+    if let Some(expire) = user.expire {
+        debug!("Expire: {}", expire);
+        if expire < (chrono::Utc::now() - chrono::Duration::days(14)).timestamp() as u64 {
+            debug!("Plan expired more than 14 days ago");
+            return Json(()).into_response();
         }
-        None => return Json(()).into_response(),
     }
 
     let status = match user.status {
