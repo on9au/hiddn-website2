@@ -29,7 +29,7 @@ use sqlx::types::BigDecimal;
 use sqlx::{query, MySqlPool};
 use stripe::{CreatePaymentIntent, EventObject, EventType, PaymentIntent};
 use tokio::sync::RwLock;
-use tracing::{debug, error, info};
+use tracing::{debug, error};
 
 use crate::config::GLOBAL_CONFIG;
 use crate::payloads::{
@@ -1086,10 +1086,10 @@ pub async fn stripe_webhook(
     Extension(marzban_client): Extension<MarzbanAPIClient>,
     StripeEvent(event): StripeEvent,
 ) {
-    info!("Received stripe event: {:?}", event);
+    debug!("Received stripe event: {:?}", event);
     match event.type_ {
         EventType::PaymentIntentSucceeded => {
-            info!("PaymentIntentSucceeded event received");
+            debug!("PaymentIntentSucceeded event received");
             if let EventObject::PaymentIntent(payment_intent) = event.data.object {
                 let payment_intent_id = payment_intent.id.to_string();
                 let user_id = payment_intent
@@ -1142,7 +1142,10 @@ pub async fn stripe_webhook(
                     .expect("Failed to get inbounds");
 
                 let inbounds = Inbounds {
-                    trojan: if inbounds[&ProxyTypes::Trojan].is_empty() {
+                    trojan: if inbounds
+                        .get(&ProxyTypes::Trojan)
+                        .is_none_or(|x| x.is_empty())
+                    {
                         None
                     } else {
                         Some(
@@ -1152,7 +1155,10 @@ pub async fn stripe_webhook(
                                 .collect(),
                         )
                     },
-                    vless: if inbounds[&ProxyTypes::Vless].is_empty() {
+                    vless: if inbounds
+                        .get(&ProxyTypes::Vless)
+                        .is_none_or(|x| x.is_empty())
+                    {
                         None
                     } else {
                         Some(
@@ -1162,7 +1168,10 @@ pub async fn stripe_webhook(
                                 .collect(),
                         )
                     },
-                    vmess: if inbounds[&ProxyTypes::Vmess].is_empty() {
+                    vmess: if inbounds
+                        .get(&ProxyTypes::Vmess)
+                        .is_none_or(|x| x.is_empty())
+                    {
                         None
                     } else {
                         Some(
@@ -1172,7 +1181,10 @@ pub async fn stripe_webhook(
                                 .collect(),
                         )
                     },
-                    shadowsocks: if inbounds[&ProxyTypes::ShadowSocks].is_empty() {
+                    shadowsocks: if inbounds
+                        .get(&ProxyTypes::ShadowSocks)
+                        .is_none_or(|x| x.is_empty())
+                    {
                         None
                     } else {
                         Some(
@@ -1362,7 +1374,7 @@ pub async fn stripe_webhook(
             }
         }
         EventType::PaymentIntentPaymentFailed => {
-            info!("PaymentIntentPaymentFailed event received");
+            debug!("PaymentIntentPaymentFailed event received");
             if let EventObject::PaymentIntent(payment_intent) = event.data.object {
                 let payment_intent_id = payment_intent.id.to_string();
 
@@ -1382,7 +1394,7 @@ pub async fn stripe_webhook(
             }
         }
         EventType::PaymentIntentCanceled => {
-            info!("PaymentIntentCanceled event received");
+            debug!("PaymentIntentCanceled event received");
             if let EventObject::PaymentIntent(payment_intent) = event.data.object {
                 let payment_intent_id = payment_intent.id.to_string();
 
@@ -1402,7 +1414,7 @@ pub async fn stripe_webhook(
             }
         }
         EventType::PaymentIntentRequiresAction => {
-            info!("PaymentIntentRequiresAction event received");
+            debug!("PaymentIntentRequiresAction event received");
             if let EventObject::PaymentIntent(payment_intent) = event.data.object {
                 let payment_intent_id = payment_intent.id.to_string();
 
@@ -1422,7 +1434,7 @@ pub async fn stripe_webhook(
             }
         }
         EventType::PaymentIntentRequiresCapture => {
-            info!("PaymentIntentRequiresCapture event received");
+            debug!("PaymentIntentRequiresCapture event received");
             if let EventObject::PaymentIntent(payment_intent) = event.data.object {
                 let payment_intent_id = payment_intent.id.to_string();
 
@@ -1442,7 +1454,7 @@ pub async fn stripe_webhook(
             }
         }
         EventType::PaymentIntentProcessing => {
-            info!("PaymentIntentProcessing event received");
+            debug!("PaymentIntentProcessing event received");
             if let EventObject::PaymentIntent(payment_intent) = event.data.object {
                 let payment_intent_id = payment_intent.id.to_string();
 
