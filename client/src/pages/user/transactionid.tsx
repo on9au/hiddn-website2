@@ -153,16 +153,11 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, clientSe
         }
 
         if (paymentIntent && paymentIntent.status === 'succeeded') {
-            // Notify the backend to update transaction status
-            try {
-                await axios.post(`/api/transactions/${transaction.id}/complete`, {}, {
-                    withCredentials: true,
-                });
-                setSuccess(true);
-            } catch (err) {
-                console.error('Failed to update transaction status:', err);
-                setError('Payment succeeded, but failed to update transaction status.');
-            }
+            setSuccess(true);
+            // Wait for 3 seconds, before returning to the dashboard
+            setTimeout(() => {
+                navigate('/user/dashboard');
+            }, 3000);
         } else {
             setError('Payment was not successful.');
         }
