@@ -229,55 +229,56 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, clientSe
 
                 {/* Conditionally render payment form based on transaction status */}
 
-                <div className="mb-6">
-                    <h3 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                        Complete Your Payment
-                    </h3>
-                    <p className="mb-4 text-gray-700 dark:text-gray-300">
-                        Please enter your card details to complete the payment for your transaction.
-                    </p>
-                    {error && <p className="mb-4 text-red-500">{error}</p>}
-                    <form onSubmit={handleSubmit}>
-                        <div className="mb-6">
-                            <label htmlFor="card-element" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Card Details
-                            </label>
-                            <div className="p-3 border rounded-md bg-gray-50 dark:bg-gray-700">
-                                <CardElement
-                                    id="card-element"
-                                    options={{
-                                        style: {
-                                            base: {
-                                                fontSize: '16px',
-                                                color: '#32325d',
-                                                '::placeholder': {
-                                                    color: '#a0aec0',
+                {transaction.status === UserTransactionStatusEnum.RequiresPaymentMethod && !success && (
+                    <div className="mb-6">
+                        <h3 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-200">
+                            Complete Your Payment
+                        </h3>
+                        <p className="mb-4 text-gray-700 dark:text-gray-300">
+                            Please enter your card details to complete the payment for your transaction.
+                        </p>
+                        {error && <p className="mb-4 text-red-500">{error}</p>}
+                        <form onSubmit={handleSubmit}>
+                            <div className="mb-6">
+                                <label htmlFor="card-element" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Card Details
+                                </label>
+                                <div className="p-3 border rounded-md bg-gray-50 dark:bg-gray-700">
+                                    <CardElement
+                                        id="card-element"
+                                        options={{
+                                            style: {
+                                                base: {
+                                                    fontSize: '16px',
+                                                    color: '#32325d',
+                                                    '::placeholder': {
+                                                        color: '#a0aec0',
+                                                    },
+                                                },
+                                                invalid: {
+                                                    color: '#e53e3e',
                                                 },
                                             },
-                                            invalid: {
-                                                color: '#e53e3e',
-                                            },
-                                        },
-                                    }}
-                                />
+                                        }}
+                                    />
+                                </div>
+                                <span className="block mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                    All transactions are secured and encrypted by Stripe.
+                                </span>
+                                <span className="block mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                    We do not store your card details.
+                                </span>
                             </div>
-                            <span className="block mt-2 text-xs text-gray-500 dark:text-gray-400">
-                                All transactions are secured and encrypted by Stripe.
-                            </span>
-                            <span className="block mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                We do not store your card details.
-                            </span>
-                        </div>
-                        <button
-                            type="submit"
-                            className={`w-full px-4 py-2 text-white bg-hiddn-500 rounded-md hover:bg-hiddn-600 focus:outline-none ${processing ? 'opacity-50 cursor-not-allowed' : ''
-                                }`}
-                            disabled={!stripe || processing}
-                        >
-                            {processing ? 'Processing...' : 'Pay Now'}
-                        </button>
-                    </form>
-                </div>
+                            <button
+                                type="submit"
+                                className={`w-full px-4 py-2 text-white bg-hiddn-500 rounded-md hover:bg-hiddn-600 focus:outline-none ${processing ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                disabled={!stripe || processing}
+                            >
+                                {processing ? 'Processing...' : 'Pay Now'}
+                            </button>
+                        </form>
+                    </div>
+                )}
 
                 {/* Display success message if payment was successful */}
                 {success && (
