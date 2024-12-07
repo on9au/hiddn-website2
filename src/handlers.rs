@@ -1369,6 +1369,82 @@ pub async fn stripe_webhook(
                 .expect("Failed to update transaction status");
             }
         }
+        EventType::PaymentIntentCanceled => {
+            if let EventObject::PaymentIntent(payment_intent) = event.data.object {
+                let payment_intent_id = payment_intent.id.to_string();
+
+                // Update the transaction status
+                query!(
+                    r#"
+                UPDATE transactions
+                SET status = ?
+                WHERE stripe_payment_intent_id = ?
+                "#,
+                    UserTransactionStatusEnum::Canceled,
+                    payment_intent_id
+                )
+                .execute(&pool)
+                .await
+                .expect("Failed to update transaction status");
+            }
+        }
+        EventType::PaymentIntentRequiresAction => {
+            if let EventObject::PaymentIntent(payment_intent) = event.data.object {
+                let payment_intent_id = payment_intent.id.to_string();
+
+                // Update the transaction status
+                query!(
+                    r#"
+                UPDATE transactions
+                SET status = ?
+                WHERE stripe_payment_intent_id = ?
+                "#,
+                    UserTransactionStatusEnum::RequiresAction,
+                    payment_intent_id
+                )
+                .execute(&pool)
+                .await
+                .expect("Failed to update transaction status");
+            }
+        }
+        EventType::PaymentIntentRequiresCapture => {
+            if let EventObject::PaymentIntent(payment_intent) = event.data.object {
+                let payment_intent_id = payment_intent.id.to_string();
+
+                // Update the transaction status
+                query!(
+                    r#"
+                UPDATE transactions
+                SET status = ?
+                WHERE stripe_payment_intent_id = ?
+                "#,
+                    UserTransactionStatusEnum::RequiresCapture,
+                    payment_intent_id
+                )
+                .execute(&pool)
+                .await
+                .expect("Failed to update transaction status");
+            }
+        }
+        EventType::PaymentIntentProcessing => {
+            if let EventObject::PaymentIntent(payment_intent) = event.data.object {
+                let payment_intent_id = payment_intent.id.to_string();
+
+                // Update the transaction status
+                query!(
+                    r#"
+                UPDATE transactions
+                SET status = ?
+                WHERE stripe_payment_intent_id = ?
+                "#,
+                    UserTransactionStatusEnum::Processing,
+                    payment_intent_id
+                )
+                .execute(&pool)
+                .await
+                .expect("Failed to update transaction status");
+            }
+        }
         _ => {}
     }
 }
