@@ -471,7 +471,8 @@ pub async fn transactions(
         amount: x
             .amount
             .to_f64()
-            .expect("Failed to convert BigDecimal to f64"),
+            .expect("Failed to convert BigDecimal to f64")
+            / 100.0,
         status: x.status.clone(),
         // stripe_payment_intent_id: x.stripe_payment_intent_id.clone(),
         created_at: x.created_at.timestamp() as u64,
@@ -531,7 +532,8 @@ pub async fn transactions_id(
         amount: transaction
             .amount
             .to_f64()
-            .expect("Failed to convert BigDecimal to f64"),
+            .expect("Failed to convert BigDecimal to f64")
+            / 100.0,
         status: transaction.status,
         // stripe_payment_intent_id: transaction.stripe_payment_intent_id,
         created_at: transaction.created_at.timestamp() as u64,
