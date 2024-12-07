@@ -28,6 +28,7 @@ pub fn create_router(
     shared_app_state: Arc<AppState>,
     pool: sqlx::MySqlPool,
     marzban_client: MarzbanAPIClient,
+    stripe_client: stripe::Client,
 ) -> Router {
     Router::new()
         // API Routes
@@ -83,6 +84,7 @@ pub fn create_router(
                 .route("/verify_email", post(verify_email))
                 .layer(Extension(pool))
                 .layer(Extension(marzban_client))
+                .layer(Extension(stripe_client))
                 .layer(TraceLayer::new_for_http()),
         )
         // SSR Frontend

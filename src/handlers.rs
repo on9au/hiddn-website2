@@ -16,12 +16,15 @@ use marzban_api::client::MarzbanAPIClient;
 use marzban_api::models::user::UserStatus;
 use num_traits::ToPrimitive;
 use serde_json::json;
+use sqlx::types::BigDecimal;
 use sqlx::{query, query_as, MySqlPool};
+use stripe::{CreatePaymentIntent, PaymentIntent};
 use tokio::sync::RwLock;
 use tracing::{debug, error};
 
 use crate::payloads::{
-    ChangePasswordPayload, PlanDetailsRust, UserProfileSettingsChangePayload, UserTransactionRust,
+    ChangePasswordPayload, CreateOrderPayload, PlanDetailsRust, UserProfileSettingsChangePayload,
+    UserTransactionRust,
 };
 use crate::{
     payloads::{
@@ -429,7 +432,7 @@ pub async fn transactions(
     auth_session: AuthSession,
 ) -> impl IntoResponse {
     // Get the user's ID from the session
-    let user_id = auth_session.user.unwrap().id();
+    let user_id = auth_session.user.unwrap().id;
 
     // Get the user's transactions from the db
     let transactions = query_as!(
@@ -726,12 +729,82 @@ pub async fn plans_id(
 /// This handler will create an order for the user.
 /// This handler will return Json(CreateOrderResponsePayload)
 /// This handler requires authentication (managed by axum_login).
-pub async fn create_transaction() -> impl IntoResponse {
-    // Would create a new order in the db.
-    // Would also create stripe payment intent.
+pub async fn create_transaction(
+    Extension(pool): Extension<MySqlPool>,
+    Extension(stripe_client): Extension<stripe::Client>,
+    auth_session: AuthSession,
+    Json(payload): Json<CreateOrderPayload>,
+) -> impl IntoResponse {
+    let user = auth_session.user.unwrap();
+
+    // Get the cost of the plan
+    let id: u64 = payload.plan_id.into();
+    let plan = query!(
+        r#"
+        SELECT
+            price,
+            name as `name: String`
+        FROM plans
+        WHERE id = ?
+        "#,
+        id
+    )
+    .fetch_optional(&pool)
+    .await
+    .expect("Failed to fetch plan");
+
+    let plan = match plan {
+        Some(plan) => plan,
+        None => return StatusCode::NOT_FOUND.into_response(),
+    };
+
+    // If there are none, return NOT_FOUND
+    let plan_price: i64 = (plan.price * 100_i32)
+        .to_i64()
+        .expect("Failed to convert BigDecimal to i64");
+
+    let plan_name = plan.name;
+
+    // Create a payment intent
+    let mut payment_intent = CreatePaymentIntent::new(plan_price, stripe::Currency::AUD);
+    payment_intent.statement_descriptor = Some("Payment for HiddN Plan");
+    payment_intent.metadata = Some(
+        [
+            ("plan_id".to_string(), id.to_string()),
+            ("plan_name".to_string(), plan_name),
+            ("user_id".to_string(), user.id.to_string()),
+            ("email".to_string(), user.email.clone()),
+        ]
+        .iter()
+        .cloned()
+        .collect(),
+    );
+
+    let payment_intent = PaymentIntent::create(&stripe_client, payment_intent)
+        .await
+        .expect("Failed to create payment intent");
+
+    let payment_intent_status: UserTransactionStatusEnum = payment_intent.status.into();
+
+    // Add the order to the db
+    let id = query!(
+        r#"
+        INSERT INTO transactions (user_id, plan_id, amount, status, stripe_payment_intent_id, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, NOW(), NOW())
+        "#,
+        user.id,
+        id,
+        plan_price,
+        payment_intent_status,
+        payment_intent.id.to_string()
+    ).execute(&pool).await.expect("Failed to insert transaction into db").last_insert_id();
+
+    // Return the payment intent client secret
     Json(CreateOrderResponsePayload {
-        order_id: 1_u32,
-        payment_intent_client_secret: "pi_123456".to_string(),
+        order_id: id as u32,
+        payment_intent_client_secret: payment_intent
+            .client_secret
+            .expect("Failed to get client secret"),
     })
     .into_response()
 }
@@ -752,7 +825,7 @@ pub async fn update_settings(
     Extension(pool): Extension<MySqlPool>,
     Json(payload): Json<UserProfileSettingsChangePayload>,
 ) -> impl IntoResponse {
-    let user_id = auth_session.user.unwrap().id();
+    let user_id = auth_session.user.unwrap().id;
 
     if payload.email_data_reminder.is_some() {
         query!(
@@ -883,7 +956,7 @@ pub async fn change_password(
         WHERE id = ?
         "#,
         password_hash,
-        user.id()
+        user.id
     )
     .execute(&pool)
     .await

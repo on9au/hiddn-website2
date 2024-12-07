@@ -59,12 +59,12 @@ async fn main() {
 
     info!("Migrated database");
 
+    debug!("Authenticating with Marzban Panel");
+
     // Marzban Panel Client setup
     let marzban_client = MarzbanAPIClient::new(&GLOBAL_CONFIG.marzban_panel_url);
 
-    debug!("Authenticating with Marzban Panel");
-
-    // Authentication setup
+    // Marzban Panel Authentication setup
     marzban_client
         .authenticate(&BodyAdminTokenApiAdminTokenPost {
             grant_type: Some("password".to_string()),
@@ -78,6 +78,13 @@ async fn main() {
         .expect("Failed to authenticate with Marzban Panel");
 
     info!("Authenticated with Marzban Panel");
+
+    debug!("Setting up Stripe client");
+
+    // Stripe setup
+    let stripe_client = stripe::Client::new(GLOBAL_CONFIG.stripe_secret_key.clone());
+
+    info!("Stripe client setup");
 
     debug!("Setting up session layer");
 
@@ -125,6 +132,7 @@ async fn main() {
         shared_app_state,
         pool,
         marzban_client,
+        stripe_client,
     );
 
     info!("Router setup");

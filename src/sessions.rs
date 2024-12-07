@@ -24,14 +24,6 @@ pub struct User {
 }
 
 impl User {
-    pub fn is_admin(&self) -> bool {
-        self.is_admin
-    }
-
-    pub fn id(&self) -> i64 {
-        self.id
-    }
-
     pub fn password_hash(&self) -> &str {
         &self.password_hash
     }

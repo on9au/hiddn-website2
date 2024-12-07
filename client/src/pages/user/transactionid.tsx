@@ -154,16 +154,22 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction }) => {
     // Helper function to display status
     const renderStatus = (status: UserTransactionStatusEnum) => {
         switch (status) {
-            case UserTransactionStatusEnum.Unpaid:
+            case UserTransactionStatusEnum.RequiresPaymentMethod:
                 return <span className="px-2 py-1 text-sm text-yellow-700 bg-yellow-100 rounded">Unpaid</span>;
-            case UserTransactionStatusEnum.Pending:
-                return <span className="px-2 py-1 text-sm text-blue-700 bg-blue-100 rounded">Pending</span>;
-            case UserTransactionStatusEnum.Completed:
+            case UserTransactionStatusEnum.Processing:
+                return <span className="px-2 py-1 text-sm text-blue-700 bg-blue-100 rounded">Processing</span>;
+            case UserTransactionStatusEnum.Succeeded:
                 return <span className="px-2 py-1 text-sm text-green-700 bg-green-100 rounded">Completed</span>;
-            case UserTransactionStatusEnum.Failed:
-                return <span className="px-2 py-1 text-sm text-red-700 bg-red-100 rounded">Failed</span>;
-            case UserTransactionStatusEnum.Cancelled:
-                return <span className="px-2 py-1 text-sm text-gray-700 bg-gray-100 rounded">Cancelled</span>;
+            case UserTransactionStatusEnum.RequiresAction:
+                return <span className="px-2 py-1 text-sm text-red-700 bg-red-100 rounded">Action Required</span>;
+            case UserTransactionStatusEnum.RequiresConfirmation:
+                return <span className="px-2 py-1 text-sm text-yellow-700 bg-yellow-100 rounded">Confirmation Required</span>;
+            case UserTransactionStatusEnum.RequiresCapture:
+                return <span className="px-2 py-1 text-sm text-yellow-700 bg-yellow-100 rounded">Capture Required</span>;
+            case UserTransactionStatusEnum.Canceled:
+                return <span className="px-2 py-1 text-sm text-gray-700 bg-gray-100 rounded">Canceled</span>;
+            case UserTransactionStatusEnum.Refunded:
+                return <span className="px-2 py-1 text-sm text-gray-700 bg-gray-100 rounded">Refunded</span>;
             default:
                 return <span className="px-2 py-1 text-sm text-gray-700 bg-gray-100 rounded">Unknown</span>;
         }
@@ -190,7 +196,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction }) => {
                     <p className="text-gray-700 dark:text-gray-300">
                         <strong>Transaction ID:</strong> {transaction.id}
                     </p>
-                        <strong>Plan:</strong> {planName}
+                    <strong>Plan:</strong> {planName}
                     <p className="text-gray-700 dark:text-gray-300">
                         <strong>Date:</strong> {formatDate(transaction.created_at)}
                     </p>
@@ -203,52 +209,50 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction }) => {
                 </div>
 
                 {/* Conditionally render payment form based on transaction status */}
-                {(transaction.status === UserTransactionStatusEnum.Unpaid ||
-                    transaction.status === UserTransactionStatusEnum.Pending) && (
+
+                <div className="mb-6">
+                    <h3 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-200">
+                        Complete Your Payment
+                    </h3>
+                    <p className="mb-4 text-gray-700 dark:text-gray-300">
+                        Please enter your card details to complete the payment for your transaction.
+                    </p>
+                    {error && <p className="mb-4 text-red-500">{error}</p>}
+                    <form onSubmit={handleSubmit}>
                         <div className="mb-6">
-                            <h3 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                                Complete Your Payment
-                            </h3>
-                            <p className="mb-4 text-gray-700 dark:text-gray-300">
-                                Please enter your card details to complete the payment for your transaction.
-                            </p>
-                            {error && <p className="mb-4 text-red-500">{error}</p>}
-                            <form onSubmit={handleSubmit}>
-                                <div className="mb-6">
-                                    <label htmlFor="card-element" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Card Details
-                                    </label>
-                                    <div className="p-3 border rounded-md bg-gray-50 dark:bg-gray-700">
-                                        <CardElement
-                                            id="card-element"
-                                            options={{
-                                                style: {
-                                                    base: {
-                                                        fontSize: '16px',
-                                                        color: '#32325d',
-                                                        '::placeholder': {
-                                                            color: '#a0aec0',
-                                                        },
-                                                    },
-                                                    invalid: {
-                                                        color: '#e53e3e',
-                                                    },
+                            <label htmlFor="card-element" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Card Details
+                            </label>
+                            <div className="p-3 border rounded-md bg-gray-50 dark:bg-gray-700">
+                                <CardElement
+                                    id="card-element"
+                                    options={{
+                                        style: {
+                                            base: {
+                                                fontSize: '16px',
+                                                color: '#32325d',
+                                                '::placeholder': {
+                                                    color: '#a0aec0',
                                                 },
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                                <button
-                                    type="submit"
-                                    className={`w-full px-4 py-2 text-white bg-hiddn-500 rounded-md hover:bg-hiddn-600 focus:outline-none ${processing ? 'opacity-50 cursor-not-allowed' : ''
-                                        }`}
-                                    disabled={!stripe || processing}
-                                >
-                                    {processing ? 'Processing...' : 'Pay Now'}
-                                </button>
-                            </form>
+                                            },
+                                            invalid: {
+                                                color: '#e53e3e',
+                                            },
+                                        },
+                                    }}
+                                />
+                            </div>
                         </div>
-                    )}
+                        <button
+                            type="submit"
+                            className={`w-full px-4 py-2 text-white bg-hiddn-500 rounded-md hover:bg-hiddn-600 focus:outline-none ${processing ? 'opacity-50 cursor-not-allowed' : ''
+                                }`}
+                            disabled={!stripe || processing}
+                        >
+                            {processing ? 'Processing...' : 'Pay Now'}
+                        </button>
+                    </form>
+                </div>
 
                 {/* Display success message if payment was successful */}
                 {success && (

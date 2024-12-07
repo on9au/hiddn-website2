@@ -20,7 +20,7 @@ use crate::{
 
 async fn is_admin(auth_session: &AuthSession) -> bool {
     let user = auth_session.user.as_ref().unwrap();
-    user.is_admin()
+    user.is_admin
 }
 
 /// GET '/api/admin/me'

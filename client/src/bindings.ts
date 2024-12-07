@@ -128,11 +128,14 @@ export interface UserProfileSettingsChangePayload {
 }
 
 export enum UserTransactionStatusEnum {
-	Unpaid = "Unpaid",
-	Pending = "Pending",
-	Completed = "Completed",
-	Failed = "Failed",
-	Cancelled = "Cancelled",
+	Canceled = "Canceled",
+	Processing = "Processing",
+	RequiresAction = "RequiresAction",
+	RequiresCapture = "RequiresCapture",
+	RequiresConfirmation = "RequiresConfirmation",
+	RequiresPaymentMethod = "RequiresPaymentMethod",
+	Succeeded = "Succeeded",
+	Refunded = "Refunded",
 }
 
 export interface UserTransactionPayload {

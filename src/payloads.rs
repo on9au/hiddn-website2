@@ -8,6 +8,7 @@ use sqlx::{
     prelude::Type,
     Decode, Encode, MySql,
 };
+use stripe::PaymentIntentStatus;
 use typeshare::U53;
 
 #[derive(Clone, Debug, Deserialize)]
@@ -121,12 +122,35 @@ pub struct UserTransactionRust {
 
 #[derive(Clone, Debug, Serialize, Type)]
 #[typeshare::typeshare]
+#[sqlx(type_name = "ENUM")]
+#[sqlx(rename_all = "snake_case")]
 pub enum UserTransactionStatusEnum {
-    Unpaid,
-    Pending,
-    Completed,
-    Failed,
-    Cancelled,
+    Canceled,
+    Processing,
+    RequiresAction,
+    RequiresCapture,
+    RequiresConfirmation,
+    RequiresPaymentMethod,
+    Succeeded,
+    Refunded,
+}
+
+impl From<PaymentIntentStatus> for UserTransactionStatusEnum {
+    fn from(status: PaymentIntentStatus) -> Self {
+        match status {
+            PaymentIntentStatus::Canceled => UserTransactionStatusEnum::Canceled,
+            PaymentIntentStatus::Processing => UserTransactionStatusEnum::Processing,
+            PaymentIntentStatus::RequiresAction => UserTransactionStatusEnum::RequiresAction,
+            PaymentIntentStatus::RequiresCapture => UserTransactionStatusEnum::RequiresCapture,
+            PaymentIntentStatus::RequiresConfirmation => {
+                UserTransactionStatusEnum::RequiresConfirmation
+            }
+            PaymentIntentStatus::RequiresPaymentMethod => {
+                UserTransactionStatusEnum::RequiresPaymentMethod
+            }
+            PaymentIntentStatus::Succeeded => UserTransactionStatusEnum::Succeeded,
+        }
+    }
 }
 
 #[derive(Clone, Debug, Serialize)]

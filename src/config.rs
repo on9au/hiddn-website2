@@ -31,7 +31,7 @@ pub struct Config {
     pub marzban_panel_password: String,
 
     // Stripe Config
-    pub stripe_api_key: String,
+    pub stripe_secret_key: String,
 
     // Announcements and Documentation Config
     pub announcements_dir: String,
