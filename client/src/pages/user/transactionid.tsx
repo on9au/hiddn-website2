@@ -1,9 +1,9 @@
 // TransactionID.tsx
 
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { UserTransactionPayload, UserTransactionStatusEnum } from '../../bindings';
+import { PlanPayload, UserTransactionPayload, UserTransactionStatusEnum } from '../../bindings';
 import { loadStripe } from '@stripe/stripe-js';
 import {
     Elements,
@@ -84,6 +84,16 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction }) => {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<boolean>(false);
 
+    const [planName, setPlanName] = useState<string>('');
+
+    useEffect(() => {
+        const fetchPlanName = async () => {
+            const name = await getPlanName(transaction.plan_id);
+            setPlanName(name);
+        };
+        fetchPlanName();
+    }, [transaction.plan_id]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -120,7 +130,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction }) => {
         if (paymentIntent && paymentIntent.status === 'succeeded') {
             // Notify the backend to update transaction status
             try {
-                await axios.post(`/api/transactions/${transaction.transaction_id}/complete`, {}, {
+                await axios.post(`/api/transactions/${transaction.id}/complete`, {}, {
                     withCredentials: true,
                 });
                 setSuccess(true);
@@ -136,8 +146,8 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction }) => {
     };
 
     // Helper function to format date
-    const formatDate = (dateStr: string) => {
-        const date = new Date(dateStr);
+    const formatDate = (dateStr: number) => {
+        const date = new Date(dateStr * 1000);
         return date.toLocaleString();
     };
 
@@ -159,6 +169,17 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction }) => {
         }
     };
 
+    // Helper function to get plan name
+    const getPlanName = async (planId: number) => {
+        try {
+            const response = await axios.get<PlanPayload>(`/api/plans/${planId}`, { withCredentials: true });
+            return response.data.name;
+        } catch (err) {
+            console.error('Failed to get plan name:', err);
+            return 'Failed to get plan name';
+        }
+    }
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen px-4">
             <div className="w-full max-w-2xl p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
@@ -167,25 +188,18 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction }) => {
                 </h2>
                 <div className="mb-6">
                     <p className="text-gray-700 dark:text-gray-300">
-                        <strong>Transaction ID:</strong> {transaction.transaction_id}
+                        <strong>Transaction ID:</strong> {transaction.id}
                     </p>
+                        <strong>Plan:</strong> {planName}
                     <p className="text-gray-700 dark:text-gray-300">
-                        <strong>Amount:</strong> ${transaction.amount.toFixed(2)}
-                    </p>
-                    <p className="text-gray-700 dark:text-gray-300">
-                        <strong>Date:</strong> {formatDate(transaction.transaction_date)}
-                    </p>
-                    <p className="text-gray-700 dark:text-gray-300">
-                        <strong>Payment Method:</strong> {transaction.payment_method || 'N/A'}
+                        <strong>Date:</strong> {formatDate(transaction.created_at)}
                     </p>
                     <p className="text-gray-700 dark:text-gray-300">
                         <strong>Status:</strong> {renderStatus(transaction.status)}
                     </p>
-                    {transaction.description && (
-                        <p className="text-gray-700 dark:text-gray-300">
-                            <strong>Description:</strong> {transaction.description}
-                        </p>
-                    )}
+                    <Link to={"/user/plan/" + transaction.plan_id}>
+                        <strong>Plan:</strong> {planName}
+                    </Link>
                 </div>
 
                 {/* Conditionally render payment form based on transaction status */}

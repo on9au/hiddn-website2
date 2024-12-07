@@ -147,9 +147,6 @@ const Transaction: React.FC = () => {
                                             Date
                                         </th>
                                         <th className="px-4 py-2 font-semibold text-gray-700 border-b dark:text-gray-300">
-                                            Payment Method
-                                        </th>
-                                        <th className="px-4 py-2 font-semibold text-gray-700 border-b dark:text-gray-300">
                                             Status
                                         </th>
                                     </tr>
@@ -157,20 +154,17 @@ const Transaction: React.FC = () => {
                                 <tbody>
                                     {transactions.map((transaction) => (
                                         <tr
-                                            key={transaction.transaction_id}
+                                            key={transaction.id}
                                             className="hover:bg-gray-100 dark:hover:bg-gray-900"
                                         >
                                             <td className="px-4 py-2 text-gray-700 border-b dark:text-gray-300">
-                                                {transaction.transaction_id}
+                                                {transaction.id}
                                             </td>
                                             <td className="px-4 py-2 text-gray-700 border-b dark:text-gray-300">
                                                 ${transaction.amount.toFixed(2)}
                                             </td>
                                             <td className="px-4 py-2 text-gray-700 border-b dark:text-gray-300">
-                                                {new Date(transaction.transaction_date).toLocaleDateString()}
-                                            </td>
-                                            <td className="px-4 py-2 text-gray-700 border-b dark:text-gray-300">
-                                                {transaction.payment_method || 'N/A'}
+                                                {new Date(transaction.created_at * 1000).toLocaleString()}
                                             </td>
                                             <td
                                                 className={`px-4 py-2 border-b font-semibold ${getStatusStyle(

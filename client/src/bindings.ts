@@ -136,16 +136,14 @@ export enum UserTransactionStatusEnum {
 }
 
 export interface UserTransactionPayload {
-	transaction_id: number;
+	id: number;
+	user_id: number;
+	plan_id: number;
 	amount: number;
-	transaction_date: string;
-	payment_method?: string;
 	status: UserTransactionStatusEnum;
 	stripe_payment_intent_id?: string;
-	created_at: string;
-	updated_at: string;
-	plan_id?: number;
-	description?: string;
+	created_at: number;
+	updated_at: number;
 }
 
 export interface VerifyEmailPayload {

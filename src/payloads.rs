@@ -2,6 +2,12 @@
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use sqlx::{
+    encode::IsNull,
+    mysql::{MySqlTypeInfo, MySqlValueRef},
+    prelude::Type,
+    Decode, Encode, MySql,
+};
 use typeshare::U53;
 
 #[derive(Clone, Debug, Deserialize)]
@@ -91,19 +97,29 @@ pub struct UserProfileSettingsChangePayload {
 #[derive(Clone, Debug, Serialize)]
 #[typeshare::typeshare]
 pub struct UserTransactionPayload {
-    pub transaction_id: U53,
+    pub id: U53,
+    pub user_id: U53,
+    pub plan_id: U53,
     pub amount: f64,
-    pub transaction_date: String,
-    pub payment_method: Option<String>,
     pub status: UserTransactionStatusEnum,
     pub stripe_payment_intent_id: Option<String>,
-    pub created_at: String,
-    pub updated_at: String,
-    pub plan_id: Option<U53>,
-    pub description: Option<String>,
+    pub created_at: U53, // Unix timestamp
+    pub updated_at: U53,
 }
 
 #[derive(Clone, Debug, Serialize)]
+pub struct UserTransactionRust {
+    pub id: i64,
+    pub user_id: i64,
+    pub plan_id: i64,
+    pub amount: f64,
+    pub status: UserTransactionStatusEnum,
+    pub stripe_payment_intent_id: Option<String>,
+    pub created_at: u64,
+    pub updated_at: u64,
+}
+
+#[derive(Clone, Debug, Serialize, Type)]
 #[typeshare::typeshare]
 pub enum UserTransactionStatusEnum {
     Unpaid,

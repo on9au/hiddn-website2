@@ -3,6 +3,9 @@ use std::{collections::HashMap, sync::Arc};
 use argon2::password_hash::SaltString;
 use argon2::{PasswordHash, PasswordHasher, PasswordVerifier};
 
+use chrono::DateTime;
+use chrono::Utc;
+
 use axum::response::IntoResponse;
 use axum::{
     extract::{Path, Query},
@@ -13,11 +16,13 @@ use marzban_api::client::MarzbanAPIClient;
 use marzban_api::models::user::UserStatus;
 use num_traits::ToPrimitive;
 use serde_json::json;
-use sqlx::{query, MySqlPool};
+use sqlx::{query, query_as, MySqlPool};
 use tokio::sync::RwLock;
 use tracing::{debug, error};
 
-use crate::payloads::{ChangePasswordPayload, PlanDetailsRust, UserProfileSettingsChangePayload};
+use crate::payloads::{
+    ChangePasswordPayload, PlanDetailsRust, UserProfileSettingsChangePayload, UserTransactionRust,
+};
 use crate::{
     payloads::{
         AnnouncementPayload, CreateOrderResponsePayload, ForgotPasswordPayload, LoginPayload,
@@ -419,71 +424,101 @@ pub async fn get_documentation_categories(
 /// This handler will return Json(Vec<UserTransactionPayload>)
 /// This handler will return the transactions of the user.
 /// This handler requires authentication (managed by axum_login).
-pub async fn transactions() -> impl IntoResponse {
-    let transactions: Vec<UserTransactionPayload> = vec![
-        UserTransactionPayload {
-            transaction_id: 1_u32.into(),
-            amount: 100.0,
-            transaction_date: "2021-01-01T00:00:00Z".to_string(),
-            payment_method: Some("Credit Card".to_string()),
-            status: UserTransactionStatusEnum::Completed,
-            stripe_payment_intent_id: Some("pi_123456".to_string()),
-            created_at: "2021-01-01T00:00:00Z".to_string(),
-            updated_at: "2021-01-01T00:00:00Z".to_string(),
-            plan_id: Some(2_u32.into()),
-            description: Some("Payment for Premium Plan".to_string()),
-        },
-        UserTransactionPayload {
-            transaction_id: 2_u32.into(),
-            amount: 200.0,
-            transaction_date: "2021-01-01T00:00:00Z".to_string(), // Placeholder
-            payment_method: Some("Cash".to_string()),
-            status: UserTransactionStatusEnum::Pending,
-            stripe_payment_intent_id: Some("pi_123456".to_string()),
-            created_at: "2021-01-01T00:00:00Z".to_string(),
-            updated_at: "2021-01-01T00:00:00Z".to_string(),
-            plan_id: Some(2_u32.into()),
-            description: Some("Payment for Premium Plan".to_string()),
-        },
-        UserTransactionPayload {
-            transaction_id: 3_u32.into(),
-            amount: 300.0,
-            transaction_date: "2021-01-01T00:00:00Z".to_string(), // Placeholder
-            payment_method: None,
-            status: UserTransactionStatusEnum::Unpaid,
-            stripe_payment_intent_id: Some("pi_123456".to_string()),
-            created_at: "2021-01-01T00:00:00Z".to_string(),
-            updated_at: "2021-01-01T00:00:00Z".to_string(),
-            plan_id: Some(2_u32.into()),
-            description: None,
-        },
-        UserTransactionPayload {
-            transaction_id: 4_u32.into(),
-            amount: 400.0,
-            transaction_date: "2021-01-01T00:00:00Z".to_string(), // Placeholder
-            payment_method: Some("Paypal".to_string()),
-            status: UserTransactionStatusEnum::Cancelled,
-            stripe_payment_intent_id: None,
-            created_at: "2021-01-01T00:00:00Z".to_string(),
-            updated_at: "2021-01-01T00:00:00Z".to_string(),
-            plan_id: None,
-            description: Some("Payment for Premium Plan".to_string()),
-        },
-        UserTransactionPayload {
-            transaction_id: 5_u32.into(),
-            amount: 500.0,
-            transaction_date: "2021-01-01T00:00:00Z".to_string(), // Placeholder
-            payment_method: Some("Credit Card".to_string()),
-            status: UserTransactionStatusEnum::Failed,
-            stripe_payment_intent_id: Some("pi_123456".to_string()),
-            created_at: "2021-01-01T00:00:00Z".to_string(),
-            updated_at: "2021-01-01T00:00:00Z".to_string(),
-            plan_id: Some(2_u32.into()),
-            description: Some("Payment for Premium Plan".to_string()),
-        },
-    ];
+pub async fn transactions(
+    Extension(pool): Extension<MySqlPool>,
+    auth_session: AuthSession,
+) -> impl IntoResponse {
+    // Get the user's ID from the session
+    let user_id = auth_session.user.unwrap().id();
+
+    // Get the user's transactions from the db
+    let transactions = query_as!(
+        UserTransactionRust,
+        r#"
+        SELECT
+            id as `id: i64`,
+            user_id as `user_id: i64`,
+            plan_id as `plan_id: i64`,
+            amount as `amount: f64`,
+            status as `status: UserTransactionStatusEnum`,
+            stripe_payment_intent_id as `stripe_payment_intent_id: String`,
+            created_at as `created_at: u64`,
+            updated_at as `updated_at: u64`
+        FROM transactions
+        WHERE user_id = ?
+        "#,
+        user_id
+    )
+    .fetch_all(&pool)
+    .await
+    .expect("Failed to fetch transactions");
 
     Json(transactions).into_response()
+
+    // let transactions: Vec<UserTransactionPayload> = vec![
+    //     UserTransactionPayload {
+    //         transaction_id: 1_u32.into(),
+    //         amount: 100.0,
+    //         transaction_date: "2021-01-01T00:00:00Z".to_string(),
+    //         payment_method: Some("Credit Card".to_string()),
+    //         status: UserTransactionStatusEnum::Completed,
+    //         stripe_payment_intent_id: Some("pi_123456".to_string()),
+    //         created_at: "2021-01-01T00:00:00Z".to_string(),
+    //         updated_at: "2021-01-01T00:00:00Z".to_string(),
+    //         plan_id: Some(2_u32.into()),
+    //         description: Some("Payment for Premium Plan".to_string()),
+    //     },
+    //     UserTransactionPayload {
+    //         transaction_id: 2_u32.into(),
+    //         amount: 200.0,
+    //         transaction_date: "2021-01-01T00:00:00Z".to_string(), // Placeholder
+    //         payment_method: Some("Cash".to_string()),
+    //         status: UserTransactionStatusEnum::Pending,
+    //         stripe_payment_intent_id: Some("pi_123456".to_string()),
+    //         created_at: "2021-01-01T00:00:00Z".to_string(),
+    //         updated_at: "2021-01-01T00:00:00Z".to_string(),
+    //         plan_id: Some(2_u32.into()),
+    //         description: Some("Payment for Premium Plan".to_string()),
+    //     },
+    //     UserTransactionPayload {
+    //         transaction_id: 3_u32.into(),
+    //         amount: 300.0,
+    //         transaction_date: "2021-01-01T00:00:00Z".to_string(), // Placeholder
+    //         payment_method: None,
+    //         status: UserTransactionStatusEnum::Unpaid,
+    //         stripe_payment_intent_id: Some("pi_123456".to_string()),
+    //         created_at: "2021-01-01T00:00:00Z".to_string(),
+    //         updated_at: "2021-01-01T00:00:00Z".to_string(),
+    //         plan_id: Some(2_u32.into()),
+    //         description: None,
+    //     },
+    //     UserTransactionPayload {
+    //         transaction_id: 4_u32.into(),
+    //         amount: 400.0,
+    //         transaction_date: "2021-01-01T00:00:00Z".to_string(), // Placeholder
+    //         payment_method: Some("Paypal".to_string()),
+    //         status: UserTransactionStatusEnum::Cancelled,
+    //         stripe_payment_intent_id: None,
+    //         created_at: "2021-01-01T00:00:00Z".to_string(),
+    //         updated_at: "2021-01-01T00:00:00Z".to_string(),
+    //         plan_id: None,
+    //         description: Some("Payment for Premium Plan".to_string()),
+    //     },
+    //     UserTransactionPayload {
+    //         transaction_id: 5_u32.into(),
+    //         amount: 500.0,
+    //         transaction_date: "2021-01-01T00:00:00Z".to_string(), // Placeholder
+    //         payment_method: Some("Credit Card".to_string()),
+    //         status: UserTransactionStatusEnum::Failed,
+    //         stripe_payment_intent_id: Some("pi_123456".to_string()),
+    //         created_at: "2021-01-01T00:00:00Z".to_string(),
+    //         updated_at: "2021-01-01T00:00:00Z".to_string(),
+    //         plan_id: Some(2_u32.into()),
+    //         description: Some("Payment for Premium Plan".to_string()),
+    //     },
+    // ];
+
+    // Json(transactions).into_response()
 }
 
 /// Handler for the GET '/transaction/:id' route.
@@ -491,20 +526,22 @@ pub async fn transactions() -> impl IntoResponse {
 /// This handler will return the transaction with the given id.
 /// This handler requires authentication (managed by axum_login).
 pub async fn transactions_id(Path(id): Path<u32>) -> impl IntoResponse {
-    let transaction = UserTransactionPayload {
-        transaction_id: id.into(),
-        amount: 100.0,
-        transaction_date: "2021-01-01T00:00:00Z".to_string(),
-        payment_method: Some("Credit Card".to_string()),
-        status: UserTransactionStatusEnum::Pending,
-        stripe_payment_intent_id: Some("pi_123456".to_string()),
-        created_at: "2021-01-01T00:00:00Z".to_string(),
-        updated_at: "2021-01-01T00:00:00Z".to_string(),
-        plan_id: Some(2_u32.into()),
-        description: Some("Payment for Premium Plan".to_string()),
-    };
+    // let transaction = UserTransactionPayload {
+    //     transaction_id: id.into(),
+    //     amount: 100.0,
+    //     transaction_date: "2021-01-01T00:00:00Z".to_string(),
+    //     payment_method: Some("Credit Card".to_string()),
+    //     status: UserTransactionStatusEnum::Pending,
+    //     stripe_payment_intent_id: Some("pi_123456".to_string()),
+    //     created_at: "2021-01-01T00:00:00Z".to_string(),
+    //     updated_at: "2021-01-01T00:00:00Z".to_string(),
+    //     plan_id: Some(2_u32.into()),
+    //     description: Some("Payment for Premium Plan".to_string()),
+    // };
 
-    Json(transaction).into_response()
+    // Json(transaction).into_response()
+
+    todo!()
 }
 
 /// Handler for the POST '/transaction/:id/complete' route.
