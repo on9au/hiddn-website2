@@ -1556,13 +1556,14 @@ checksum = "a7a70ba024b9dc04c27ea2f0c0548feb474ec5c54bba33a7f72f873a39d07b24"
 
 [[package]]
 name = "marzban_api"
-version = "0.2.3"
+version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ae0bd1808ead14a4f6bf69d683186bafa41eb786dd54d406f095334ce0b9dfd3"
+checksum = "c6665da79410f89c37e6e205ae71d7a466420678f05b138259660430b93ac28d"
 dependencies = [
  "chrono",
  "reqwest",
  "serde",
+ "serde_json",
  "thiserror 2.0.4",
  "tokio",
  "validator",
