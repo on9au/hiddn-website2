@@ -109,21 +109,21 @@ const Transaction: React.FC = () => {
             case UserTransactionStatusEnum.RequiresPaymentMethod:
                 return <td className="px-4 py-2 font-semibold text-yellow-700 border-b">Unpaid</td>;
             case UserTransactionStatusEnum.Processing:
-                return <td className="px-4 py-2 font-semibold text-blue-700">Processing</td>;
+                return <td className="px-4 py-2 font-semibold text-blue-700 border-b">Processing</td>;
             case UserTransactionStatusEnum.Succeeded:
-                return <td className="px-4 py-2 font-semibold text-green-700">Completed</td>;
+                return <td className="px-4 py-2 font-semibold text-green-700 border-b">Completed</td>;
             case UserTransactionStatusEnum.RequiresAction:
-                return <td className="px-4 py-2 font-semibold text-red-700">Action Required</td>;
+                return <td className="px-4 py-2 font-semibold text-red-700 border-b">Action Required</td>;
             case UserTransactionStatusEnum.RequiresConfirmation:
-                return <td className="px-4 py-2 font-semibold text-yellow-700">Confirmation Required</td>;
+                return <td className="px-4 py-2 font-semibold text-yellow-700 border-b">Confirmation Required</td>;
             case UserTransactionStatusEnum.RequiresCapture:
-                return <td className="px-4 py-2 font-semibold text-yellow-700">Capture Required</td>;
+                return <td className="px-4 py-2 font-semibold text-yellow-700 border-b">Capture Required</td>;
             case UserTransactionStatusEnum.Canceled:
-                return <td className="px-4 py-2 font-semibold text-gray-700">Canceled</td>;
+                return <td className="px-4 py-2 font-semibold text-gray-700 border-b">Canceled</td>;
             case UserTransactionStatusEnum.Refunded:
-                return <td className="px-4 py-2 font-semibold text-gray-700">Refunded</td>;
+                return <td className="px-4 py-2 font-semibold text-gray-700 border-b">Refunded</td>;
             default:
-                return <td className="px-4 py-2 font-semibold text-gray-700">Unknown</td>;
+                return <td className="px-4 py-2 font-semibold text-gray-700 border-b">Unknown</td>;
         }
     };
 
