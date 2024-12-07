@@ -115,7 +115,7 @@ pub struct UserTransactionRust {
     pub plan_id: i64,
     pub amount: f64,
     pub status: UserTransactionStatusEnum,
-    pub stripe_payment_intent_id: Option<String>,
+    // pub stripe_payment_intent_id: Option<String>,
     pub created_at: u64,
     pub updated_at: u64,
 }

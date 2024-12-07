@@ -73,6 +73,10 @@ const PlanID: React.FC = () => {
             });
 
             const transaction = response.data;
+
+            // Store the client secret in sessionStorage, indexed by the order ID
+            sessionStorage.setItem("order:" + transaction.order_id.toString(), transaction.payment_intent_client_secret);
+
             navigate(`/user/transaction/${transaction.order_id}`);
         } catch (err) {
             console.error('Failed to create order:', err);

@@ -20,7 +20,31 @@ const TransactionID: React.FC = () => {
     const [transaction, setTransaction] = useState<UserTransactionPayload | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    // const navigate = useNavigate();
+    const [clientSecret, setClientSecret] = useState<string | null>(null);
+
+    useEffect(() => {
+        // Get the client secret for the transaction from session storage, then the backend
+        const clientSecret = sessionStorage.getItem(`order:${id}`);
+        if (clientSecret) {
+            setClientSecret(clientSecret);
+        } else {
+            const fetchClientSecret = async () => {
+                try {
+                    const response = await axios.get<string>(`/api/transaction/${id}/secret`, {
+                        withCredentials: true,
+                    });
+                    setClientSecret(response.data);
+                    sessionStorage.setItem(`order:${id}`, response.data);
+                    setError(null);
+                } catch (err) {
+                    console.error('Failed to get client secret:', err);
+                    setError('Failed to get client secret.');
+                    setClientSecret(null);
+                }
+            };
+            fetchClientSecret();
+        }
+    }, [id])
 
     useEffect(() => {
         const fetchTransaction = async () => {
@@ -66,16 +90,17 @@ const TransactionID: React.FC = () => {
 
     return (
         <Elements stripe={stripePromise}>
-            <TransactionForm transaction={transaction} />
+            <TransactionForm transaction={transaction} clientSecret={clientSecret} />
         </Elements>
     );
 };
 
 interface TransactionFormProps {
     transaction: UserTransactionPayload;
+    clientSecret: string | null;
 }
 
-const TransactionForm: React.FC<TransactionFormProps> = ({ transaction }) => {
+const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, clientSecret }) => {
     const stripe = useStripe();
     const elements = useElements();
     const navigate = useNavigate();
@@ -113,7 +138,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction }) => {
 
         // Confirm the Payment Intent
         const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(
-            transaction.stripe_payment_intent_id!, // Assuming this is the client secret
+            clientSecret!, // Assuming this is the client secret
             {
                 payment_method: {
                     card: cardElement,
@@ -196,16 +221,15 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction }) => {
                     <p className="text-gray-700 dark:text-gray-300">
                         <strong>Transaction ID:</strong> {transaction.id}
                     </p>
-                    <strong>Plan:</strong> {planName}
+                    <Link className="text-gray-700 dark:text-gray-300" to={"/user/plan/" + transaction.plan_id}>
+                        <strong>Plan:</strong> {planName}
+                    </Link>
                     <p className="text-gray-700 dark:text-gray-300">
                         <strong>Date:</strong> {formatDate(transaction.created_at)}
                     </p>
                     <p className="text-gray-700 dark:text-gray-300">
                         <strong>Status:</strong> {renderStatus(transaction.status)}
                     </p>
-                    <Link to={"/user/plan/" + transaction.plan_id}>
-                        <strong>Plan:</strong> {planName}
-                    </Link>
                 </div>
 
                 {/* Conditionally render payment form based on transaction status */}
@@ -242,6 +266,12 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction }) => {
                                     }}
                                 />
                             </div>
+                            <span className="block mt-2 text-xs text-gray-500 dark:text-gray-400">
+                                All transactions are secured and encrypted by Stripe.
+                            </span>
+                            <span className="block mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                We do not store your card details.
+                            </span>
                         </div>
                         <button
                             type="submit"
@@ -259,7 +289,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction }) => {
                     <div className="flex flex-col items-center justify-center min-h-screen">
                         <h1 className="mb-4 text-4xl font-semibold text-green-500">Payment Successful!</h1>
                         <p className="mb-6 text-xl text-gray-700 dark:text-gray-300">
-                            Thank you for your purchase. Your VPN service is now active.
+                            Thank you for your purchase. The plan has been added to your account.
                         </p>
                         <button
                             className="px-6 py-3 text-white rounded-md bg-hiddn-500 hover:bg-hiddn-600 focus:outline-none"

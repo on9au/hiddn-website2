@@ -2,23 +2,32 @@ use std::{collections::HashMap, sync::Arc};
 
 use argon2::password_hash::SaltString;
 use argon2::{PasswordHash, PasswordHasher, PasswordVerifier};
+use axum::async_trait;
+use axum::body::Body;
+use axum::extract::{FromRequest, Request};
+use marzban_api::models::proxy::ProxyTypes;
+
+use std::str::FromStr;
 
 use chrono::DateTime;
 use chrono::Utc;
 
-use axum::response::IntoResponse;
+use axum::response::{IntoResponse, Response};
 use axum::{
     extract::{Path, Query},
     http::StatusCode,
     Extension, Json,
 };
 use marzban_api::client::MarzbanAPIClient;
-use marzban_api::models::user::UserStatus;
+use marzban_api::models::user::{
+    Inbounds, Proxies, Shadowsocks, Trojan, UserCreate, UserModify, UserStatus, UserStatusCreate,
+    UserStatusModify, Vless, Vmess,
+};
 use num_traits::ToPrimitive;
 use serde_json::json;
 use sqlx::types::BigDecimal;
-use sqlx::{query, query_as, MySqlPool};
-use stripe::{CreatePaymentIntent, PaymentIntent};
+use sqlx::{query, MySqlPool};
+use stripe::{CreatePaymentIntent, EventObject, EventType, PaymentIntent};
 use tokio::sync::RwLock;
 use tracing::{debug, error};
 
@@ -31,7 +40,7 @@ use crate::{
         AnnouncementPayload, CreateOrderResponsePayload, ForgotPasswordPayload, LoginPayload,
         LoginResponsePayload, PasswordFeedbackPayload, PlanPayload, PlanStatusEnum,
         RegisterPayload, RequestCodePayload, ServerStatusPayload, UserProfilePayload,
-        UserTransactionPayload, UserTransactionStatusEnum, VerifyEmailPayload,
+        UserTransactionStatusEnum, VerifyEmailPayload,
     },
     sessions::AuthSession,
     SharedDocs,
@@ -435,18 +444,16 @@ pub async fn transactions(
     let user_id = auth_session.user.unwrap().id;
 
     // Get the user's transactions from the db
-    let transactions = query_as!(
-        UserTransactionRust,
+    let transactions = query!(
         r#"
         SELECT
             id as `id: i64`,
             user_id as `user_id: i64`,
             plan_id as `plan_id: i64`,
-            amount as `amount: f64`,
+            amount as `amount: BigDecimal`,
             status as `status: UserTransactionStatusEnum`,
-            stripe_payment_intent_id as `stripe_payment_intent_id: String`,
-            created_at as `created_at: u64`,
-            updated_at as `updated_at: u64`
+            created_at as `created_at: DateTime<Utc>`,
+            updated_at as `updated_at: DateTime<Utc>`
         FROM transactions
         WHERE user_id = ?
         "#,
@@ -454,97 +461,136 @@ pub async fn transactions(
     )
     .fetch_all(&pool)
     .await
-    .expect("Failed to fetch transactions");
+    .expect("Failed to fetch transactions")
+    .iter_mut()
+    .map(|x| UserTransactionRust {
+        id: x.id,
+        user_id: x.user_id,
+        plan_id: x.plan_id,
+        amount: x
+            .amount
+            .to_f64()
+            .expect("Failed to convert BigDecimal to f64"),
+        status: x.status.clone(),
+        // stripe_payment_intent_id: x.stripe_payment_intent_id.clone(),
+        created_at: x.created_at.timestamp() as u64,
+        updated_at: x.updated_at.timestamp() as u64,
+    })
+    .collect::<Vec<UserTransactionRust>>();
 
     Json(transactions).into_response()
-
-    // let transactions: Vec<UserTransactionPayload> = vec![
-    //     UserTransactionPayload {
-    //         transaction_id: 1_u32.into(),
-    //         amount: 100.0,
-    //         transaction_date: "2021-01-01T00:00:00Z".to_string(),
-    //         payment_method: Some("Credit Card".to_string()),
-    //         status: UserTransactionStatusEnum::Completed,
-    //         stripe_payment_intent_id: Some("pi_123456".to_string()),
-    //         created_at: "2021-01-01T00:00:00Z".to_string(),
-    //         updated_at: "2021-01-01T00:00:00Z".to_string(),
-    //         plan_id: Some(2_u32.into()),
-    //         description: Some("Payment for Premium Plan".to_string()),
-    //     },
-    //     UserTransactionPayload {
-    //         transaction_id: 2_u32.into(),
-    //         amount: 200.0,
-    //         transaction_date: "2021-01-01T00:00:00Z".to_string(), // Placeholder
-    //         payment_method: Some("Cash".to_string()),
-    //         status: UserTransactionStatusEnum::Pending,
-    //         stripe_payment_intent_id: Some("pi_123456".to_string()),
-    //         created_at: "2021-01-01T00:00:00Z".to_string(),
-    //         updated_at: "2021-01-01T00:00:00Z".to_string(),
-    //         plan_id: Some(2_u32.into()),
-    //         description: Some("Payment for Premium Plan".to_string()),
-    //     },
-    //     UserTransactionPayload {
-    //         transaction_id: 3_u32.into(),
-    //         amount: 300.0,
-    //         transaction_date: "2021-01-01T00:00:00Z".to_string(), // Placeholder
-    //         payment_method: None,
-    //         status: UserTransactionStatusEnum::Unpaid,
-    //         stripe_payment_intent_id: Some("pi_123456".to_string()),
-    //         created_at: "2021-01-01T00:00:00Z".to_string(),
-    //         updated_at: "2021-01-01T00:00:00Z".to_string(),
-    //         plan_id: Some(2_u32.into()),
-    //         description: None,
-    //     },
-    //     UserTransactionPayload {
-    //         transaction_id: 4_u32.into(),
-    //         amount: 400.0,
-    //         transaction_date: "2021-01-01T00:00:00Z".to_string(), // Placeholder
-    //         payment_method: Some("Paypal".to_string()),
-    //         status: UserTransactionStatusEnum::Cancelled,
-    //         stripe_payment_intent_id: None,
-    //         created_at: "2021-01-01T00:00:00Z".to_string(),
-    //         updated_at: "2021-01-01T00:00:00Z".to_string(),
-    //         plan_id: None,
-    //         description: Some("Payment for Premium Plan".to_string()),
-    //     },
-    //     UserTransactionPayload {
-    //         transaction_id: 5_u32.into(),
-    //         amount: 500.0,
-    //         transaction_date: "2021-01-01T00:00:00Z".to_string(), // Placeholder
-    //         payment_method: Some("Credit Card".to_string()),
-    //         status: UserTransactionStatusEnum::Failed,
-    //         stripe_payment_intent_id: Some("pi_123456".to_string()),
-    //         created_at: "2021-01-01T00:00:00Z".to_string(),
-    //         updated_at: "2021-01-01T00:00:00Z".to_string(),
-    //         plan_id: Some(2_u32.into()),
-    //         description: Some("Payment for Premium Plan".to_string()),
-    //     },
-    // ];
-
-    // Json(transactions).into_response()
 }
 
 /// Handler for the GET '/transaction/:id' route.
 /// This handler will return Json(UserTransactionPayload)
 /// This handler will return the transaction with the given id.
 /// This handler requires authentication (managed by axum_login).
-pub async fn transactions_id(Path(id): Path<u32>) -> impl IntoResponse {
-    // let transaction = UserTransactionPayload {
-    //     transaction_id: id.into(),
-    //     amount: 100.0,
-    //     transaction_date: "2021-01-01T00:00:00Z".to_string(),
-    //     payment_method: Some("Credit Card".to_string()),
-    //     status: UserTransactionStatusEnum::Pending,
-    //     stripe_payment_intent_id: Some("pi_123456".to_string()),
-    //     created_at: "2021-01-01T00:00:00Z".to_string(),
-    //     updated_at: "2021-01-01T00:00:00Z".to_string(),
-    //     plan_id: Some(2_u32.into()),
-    //     description: Some("Payment for Premium Plan".to_string()),
-    // };
+pub async fn transactions_id(
+    Extension(pool): Extension<MySqlPool>,
+    auth_session: AuthSession,
+    Path(id): Path<u32>,
+) -> impl IntoResponse {
+    // Get the transaction from the db by id and user_id
+    let user = auth_session.user.unwrap();
 
-    // Json(transaction).into_response()
+    let transaction = query!(
+        r#"
+        SELECT
+            id as `id: i64`,
+            user_id as `user_id: i64`,
+            plan_id as `plan_id: i64`,
+            amount as `amount: BigDecimal`,
+            status as `status: UserTransactionStatusEnum`,
+            created_at as `created_at: DateTime<Utc>`,
+            updated_at as `updated_at: DateTime<Utc>`
+        FROM transactions
+        WHERE id = ?
+        "#,
+        id
+    )
+    .fetch_optional(&pool)
+    .await
+    .expect("Failed to fetch transaction");
 
-    todo!()
+    // If there are none, return NOT_FOUND
+    let transaction = match transaction {
+        Some(transaction) => transaction,
+        None => return StatusCode::NOT_FOUND.into_response(),
+    };
+
+    // If the transaction does not belong to the user, return FORBIDDEN
+    if transaction.user_id != user.id {
+        return StatusCode::FORBIDDEN.into_response();
+    }
+
+    Json(UserTransactionRust {
+        id: transaction.id,
+        user_id: transaction.user_id,
+        plan_id: transaction.plan_id,
+        amount: transaction
+            .amount
+            .to_f64()
+            .expect("Failed to convert BigDecimal to f64"),
+        status: transaction.status,
+        // stripe_payment_intent_id: transaction.stripe_payment_intent_id,
+        created_at: transaction.created_at.timestamp() as u64,
+        updated_at: transaction.updated_at.timestamp() as u64,
+    })
+    .into_response()
+}
+
+/// Handler for the GET '/transaction/:id/secret' route.
+/// This handler will return Json(String)
+/// This handler will return the client secret for the transaction with the given id.
+/// This handler requires authentication (managed by axum_login).
+pub async fn transaction_secret(
+    Extension(pool): Extension<MySqlPool>,
+    Extension(stripe_client): Extension<stripe::Client>,
+    auth_session: AuthSession,
+    Path(id): Path<u32>,
+) -> impl IntoResponse {
+    // Get the transaction from the db by id and user_id
+    let user = auth_session.user.unwrap();
+
+    let transaction = query!(
+        r#"
+        SELECT
+            id as `id: i64`,
+            user_id as `user_id: i64`,
+            stripe_payment_intent_id as `stripe_payment_intent_id: String`
+        FROM transactions
+        WHERE id = ?
+        "#,
+        id
+    )
+    .fetch_optional(&pool)
+    .await
+    .expect("Failed to fetch transaction");
+
+    // If there are none, return NOT_FOUND
+    let transaction = match transaction {
+        Some(transaction) => transaction,
+        None => return StatusCode::NOT_FOUND.into_response(),
+    };
+
+    // If the transaction does not belong to the user, return FORBIDDEN
+    if transaction.user_id != user.id {
+        return StatusCode::FORBIDDEN.into_response();
+    }
+
+    let payment_intent = match transaction.stripe_payment_intent_id {
+        Some(payment_intent) => payment_intent,
+        None => return StatusCode::NOT_FOUND.into_response(),
+    };
+
+    // Get the payment intent
+    let payment_intent_id = stripe::PaymentIntentId::from_str(&payment_intent)
+        .expect("Failed to parse payment intent id");
+    let payment_intent = PaymentIntent::retrieve(&stripe_client, &payment_intent_id, &[])
+        .await
+        .expect("Failed to retrieve payment intent");
+
+    Json(payment_intent.client_secret).into_response()
 }
 
 /// Handler for the POST '/transaction/:id/complete' route.
@@ -767,7 +813,8 @@ pub async fn create_transaction(
 
     // Create a payment intent
     let mut payment_intent = CreatePaymentIntent::new(plan_price, stripe::Currency::AUD);
-    payment_intent.statement_descriptor = Some("Payment for HiddN Plan");
+    payment_intent.statement_descriptor_suffix = Some("Payment for HiddN Plan");
+    payment_intent.receipt_email = Some(user.email.as_str());
     payment_intent.metadata = Some(
         [
             ("plan_id".to_string(), id.to_string()),
@@ -993,4 +1040,335 @@ pub async fn user_me(auth_session: AuthSession) -> impl IntoResponse {
     };
 
     Json(user_profile).into_response()
+}
+
+pub struct StripeEvent(stripe::Event);
+
+#[async_trait]
+impl<S> FromRequest<S> for StripeEvent
+where
+    String: FromRequest<S>,
+    S: Send + Sync,
+{
+    type Rejection = Response;
+
+    async fn from_request(req: Request<Body>, state: &S) -> Result<Self, Self::Rejection> {
+        let signature = if let Some(sig) = req.headers().get("stripe-signature") {
+            sig.to_owned()
+        } else {
+            return Err(StatusCode::BAD_REQUEST.into_response());
+        };
+
+        let payload = String::from_request(req, state)
+            .await
+            .map_err(IntoResponse::into_response)?;
+
+        Ok(Self(
+            stripe::Webhook::construct_event(&payload, signature.to_str().unwrap(), "whsec_xxxxx")
+                .map_err(|_| StatusCode::BAD_REQUEST.into_response())?,
+        ))
+    }
+}
+
+/// Handler for the POST '/stripe_webhook' route.
+/// This handler will handle the stripe webhook.
+pub async fn stripe_webhook(
+    Extension(pool): Extension<MySqlPool>,
+    Extension(marzban_client): Extension<MarzbanAPIClient>,
+    StripeEvent(event): StripeEvent,
+) {
+    match event.type_ {
+        EventType::PaymentIntentSucceeded => {
+            if let EventObject::PaymentIntent(payment_intent) = event.data.object {
+                let payment_intent_id = payment_intent.id.to_string();
+                let user_id = payment_intent
+                    .metadata
+                    .get("user_id")
+                    .expect("Failed to get user_id from metadata")
+                    .parse::<u64>()
+                    .expect("Failed to parse user_id from metadata");
+
+                let plan_id = payment_intent
+                    .metadata
+                    .get("plan_id")
+                    .expect("Failed to get plan_id from metadata")
+                    .parse::<u64>()
+                    .expect("Failed to parse plan_id from metadata");
+
+                // Update the transaction status
+                query!(
+                    r#"
+                UPDATE transactions
+                SET status = ?
+                WHERE stripe_payment_intent_id = ?
+                "#,
+                    UserTransactionStatusEnum::Succeeded,
+                    payment_intent_id
+                )
+                .execute(&pool)
+                .await
+                .expect("Failed to update transaction status");
+
+                // Check if user has a Marzban username
+                let user = query!(
+                    r#"
+                    SELECT
+                        marzban_username,
+                        email
+                    FROM users
+                    WHERE id = ?
+                    "#,
+                    user_id
+                )
+                .fetch_one(&pool)
+                .await
+                .expect("Failed to get marzban username");
+
+                // Get list of inbounds available
+                let inbounds = marzban_client
+                    .get_inbounds()
+                    .await
+                    .expect("Failed to get inbounds");
+
+                let inbounds = Inbounds {
+                    trojan: if inbounds[&ProxyTypes::Trojan].is_empty() {
+                        None
+                    } else {
+                        Some(
+                            inbounds[&ProxyTypes::Trojan]
+                                .iter()
+                                .map(|x| x.tag.clone())
+                                .collect(),
+                        )
+                    },
+                    vless: if inbounds[&ProxyTypes::Vless].is_empty() {
+                        None
+                    } else {
+                        Some(
+                            inbounds[&ProxyTypes::Trojan]
+                                .iter()
+                                .map(|x| x.tag.clone())
+                                .collect(),
+                        )
+                    },
+                    vmess: if inbounds[&ProxyTypes::Vmess].is_empty() {
+                        None
+                    } else {
+                        Some(
+                            inbounds[&ProxyTypes::Trojan]
+                                .iter()
+                                .map(|x| x.tag.clone())
+                                .collect(),
+                        )
+                    },
+                    shadowsocks: if inbounds[&ProxyTypes::ShadowSocks].is_empty() {
+                        None
+                    } else {
+                        Some(
+                            inbounds[&ProxyTypes::Trojan]
+                                .iter()
+                                .map(|x| x.tag.clone())
+                                .collect(),
+                        )
+                    },
+                };
+
+                let proxies = Proxies {
+                    trojan: if inbounds.trojan.is_none() {
+                        None
+                    } else {
+                        Some(Trojan {
+                            password: None,
+                            flow: None,
+                        })
+                    },
+                    vless: if inbounds.vless.is_none() {
+                        None
+                    } else {
+                        Some(Vless {
+                            id: None,
+                            flow: Some("xtls-rprx-direct".to_string()),
+                        })
+                    },
+                    vmess: if inbounds.vmess.is_none() {
+                        None
+                    } else {
+                        Some(Vmess {
+                            id: None,
+                            security: None,
+                        })
+                    },
+                    shadowsocks: if inbounds.shadowsocks.is_none() {
+                        None
+                    } else {
+                        Some(Shadowsocks {
+                            password: None,
+                            method: None,
+                        })
+                    },
+                };
+
+                let plan = query!(
+                    r#"
+                    SELECT
+                        name,
+                        data_limit,
+                        duration_days
+                    FROM plans
+                    WHERE id = ?
+                    "#,
+                    plan_id
+                )
+                .fetch_one(&pool)
+                .await
+                .expect("Failed to get plan");
+
+                // If not, create a user
+                match user.marzban_username {
+                    None => {
+                        marzban_client
+                            .add_user(&UserCreate {
+                                proxies,
+                                expire: {
+                                    match plan.duration_days {
+                                        0 => None,
+                                        _ => Some(
+                                            chrono::Utc::now()
+                                                .checked_add_signed(chrono::Duration::days(
+                                                    plan.duration_days as i64,
+                                                ))
+                                                .expect("Failed to add days")
+                                                .timestamp()
+                                                as u64,
+                                        ),
+                                    }
+                                },
+                                data_limit: {
+                                    // Convert data limit to bytes (where kb = 1024 bytes)
+                                    plan.data_limit as u64 * 1024
+                                },
+                                data_limit_reset_strategy:
+                                    marzban_api::models::user::UserDataLimitResetStrategy::NoReset,
+                                inbounds,
+                                note: Some(format!("Created by HiddN. ID: {}", user_id)),
+                                sub_updated_at: None,
+                                sub_last_user_agent: None,
+                                online_at: None,
+                                on_hold_expire_duration: None,
+                                on_hold_timeout: None,
+                                auto_delete_in_days: None,
+                                username: user.email.clone(),
+                                status: UserStatusCreate::Active,
+                            })
+                            .await
+                            .expect("Failed to create user");
+                    }
+                    Some(marzban_username) => {
+                        // Get the user's current plan
+                        let current_plan = marzban_client
+                            .get_user(&marzban_username)
+                            .await
+                            .expect("Failed to get user");
+
+                        // If user's expiration is 'never', keep it at 'never'.
+                        // If user's expiration is in the past OR data limit has been reached, set it to the new plan's expiration
+                        // If user's expiration is in the future, add the new plan's duration to it
+
+                        // If user's data limit is 0, keep it as 0
+                        // If user's data limit is not 0 and limit has not been reached, add the new plan's data limit to it
+                        // If user's data limit is not 0 and limit has been reached, set it to the new plan's data limit
+
+                        let mut reset_data_usage = false;
+
+                        let new_data_limit = match current_plan.data_limit {
+                            None => 0,
+                            Some(data_limit) if current_plan.used_traffic >= data_limit => {
+                                // If data limit has been reached, set it to the new plan's data limit
+                                reset_data_usage = true;
+                                plan.data_limit as u64 * 1024 * 1024 * 1024
+                            }
+                            Some(data_limit) => {
+                                // If data limit has not been reached, add the new plan's data limit to it
+                                data_limit + plan.data_limit as u64 * 1024 * 1024 * 1024
+                            }
+                        };
+
+                        let new_expiration = match current_plan.expire {
+                            // If expiration is 'never', keep it as 'never'
+                            None => 0,
+                            Some(expire) => {
+                                if expire < chrono::Utc::now().timestamp() as u64
+                                    || reset_data_usage
+                                {
+                                    // If expiration is in the past, set it to the new plan's expiration
+                                    // Or, if data limit has been reached, set it to the new plan's expiration
+                                    chrono::Utc::now()
+                                        .checked_add_signed(chrono::Duration::days(
+                                            plan.duration_days as i64,
+                                        ))
+                                        .expect("Failed to add days")
+                                        .timestamp() as u64
+                                } else {
+                                    // If expiration is in the future, add the new plan's duration to it
+                                    chrono::DateTime::from_timestamp(expire as i64, 0)
+                                        .expect("Failed to convert to chrono")
+                                        .checked_add_signed(chrono::Duration::days(
+                                            plan.duration_days as i64,
+                                        ))
+                                        .expect("Failed to add days")
+                                        .timestamp() as u64
+                                }
+                            }
+                        };
+
+                        // Update the user's plan
+                        marzban_client.modify_user(&marzban_username, &UserModify {
+                            proxies,
+                            expire: Some(new_expiration),
+                            data_limit: new_data_limit,
+                            data_limit_reset_strategy:
+                                marzban_api::models::user::UserDataLimitResetStrategy::NoReset,
+                            inbounds,
+                            note: Some(format!("Updated by HiddN. ID: {}", user_id)),
+                            sub_updated_at: None,
+                            sub_last_user_agent: None,
+                            online_at: None,
+                            on_hold_expire_duration: None,
+                            on_hold_timeout: None,
+                            auto_delete_in_days: None,
+                            status: UserStatusModify::Active,
+                        }).await.expect("Failed to update user");
+
+                        // If reset_data_usage is true, reset the user's data usage
+                        if reset_data_usage {
+                            marzban_client
+                                .reset_user_data_usage(&marzban_username)
+                                .await
+                                .expect("Failed to reset user data usage");
+                        }
+                    }
+                };
+            }
+        }
+        EventType::PaymentIntentPaymentFailed => {
+            if let EventObject::PaymentIntent(payment_intent) = event.data.object {
+                let payment_intent_id = payment_intent.id.to_string();
+
+                // Update the transaction status
+                query!(
+                    r#"
+                UPDATE transactions
+                SET status = ?
+                WHERE stripe_payment_intent_id = ?
+                "#,
+                    UserTransactionStatusEnum::RequiresPaymentMethod,
+                    payment_intent_id
+                )
+                .execute(&pool)
+                .await
+                .expect("Failed to update transaction status");
+            }
+        }
+        _ => {}
+    }
 }

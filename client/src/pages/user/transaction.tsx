@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { UserTransactionPayload } from '../../bindings';
+import { UserTransactionPayload, UserTransactionStatusEnum } from '../../bindings';
 import { useNavigate } from 'react-router-dom';
 
 type FetchTransactionsEnum =
@@ -104,20 +104,26 @@ const Transaction: React.FC = () => {
     }, [navigate]);
 
     // Function to get status styles
-    const getStatusStyle = (status: string) => {
-        switch (status.toLowerCase()) {
-            case 'completed':
-                return 'text-green-500';
-            case 'pending':
-                return 'text-orange-500 dark:text-yellow-300';
-            case 'failed':
-                return 'text-red-500';
-            case 'cancelled':
-                return 'text-gray-500';
-            case 'unpaid':
-                return 'text-blue-500';
+    const getStatusStyle = (status: UserTransactionStatusEnum) => {
+        switch (status) {
+            case UserTransactionStatusEnum.RequiresPaymentMethod:
+                return <td className="px-4 py-2 font-semibold text-yellow-700 border-b">Unpaid</td>;
+            case UserTransactionStatusEnum.Processing:
+                return <td className="px-4 py-2 font-semibold text-blue-700">Processing</td>;
+            case UserTransactionStatusEnum.Succeeded:
+                return <td className="px-4 py-2 font-semibold text-green-700">Completed</td>;
+            case UserTransactionStatusEnum.RequiresAction:
+                return <td className="px-4 py-2 font-semibold text-red-700">Action Required</td>;
+            case UserTransactionStatusEnum.RequiresConfirmation:
+                return <td className="px-4 py-2 font-semibold text-yellow-700">Confirmation Required</td>;
+            case UserTransactionStatusEnum.RequiresCapture:
+                return <td className="px-4 py-2 font-semibold text-yellow-700">Capture Required</td>;
+            case UserTransactionStatusEnum.Canceled:
+                return <td className="px-4 py-2 font-semibold text-gray-700">Canceled</td>;
+            case UserTransactionStatusEnum.Refunded:
+                return <td className="px-4 py-2 font-semibold text-gray-700">Refunded</td>;
             default:
-                return 'text-gray-700 dark:text-gray-300';
+                return <td className="px-4 py-2 font-semibold text-gray-700">Unknown</td>;
         }
     };
 
@@ -155,7 +161,8 @@ const Transaction: React.FC = () => {
                                     {transactions.map((transaction) => (
                                         <tr
                                             key={transaction.id}
-                                            className="hover:bg-gray-100 dark:hover:bg-gray-900"
+                                            className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900"
+                                            onClick={() => navigate(`/user/transaction/${transaction.id}`)}
                                         >
                                             <td className="px-4 py-2 text-gray-700 border-b dark:text-gray-300">
                                                 {transaction.id}
@@ -164,15 +171,9 @@ const Transaction: React.FC = () => {
                                                 ${transaction.amount.toFixed(2)}
                                             </td>
                                             <td className="px-4 py-2 text-gray-700 border-b dark:text-gray-300">
-                                                {new Date(transaction.created_at * 1000).toLocaleString()}
+                                                {new Date(transaction.created_at * 1000).toLocaleString(undefined, { timeZoneName: 'short' })}
                                             </td>
-                                            <td
-                                                className={`px-4 py-2 border-b font-semibold ${getStatusStyle(
-                                                    transaction.status
-                                                )}`}
-                                            >
-                                                {transaction.status}
-                                            </td>
+                                            {getStatusStyle(transaction.status)}
                                         </tr>
                                     ))}
                                 </tbody>
