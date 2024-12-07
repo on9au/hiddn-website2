@@ -989,10 +989,50 @@ pub async fn update_settings(
 }
 
 /// Handler for the DELETE '/delete_account' route.
+/// This is destructive and should be used with caution.
 /// This handler will delete the user's account.
 /// This handler requires authentication (managed by axum_login).
-pub async fn delete_account() -> impl IntoResponse {
-    // Typically, would delete the user's account in the db.
+pub async fn delete_account(
+    auth_session: AuthSession,
+    Extension(pool): Extension<MySqlPool>,
+    Extension(marzban_client): Extension<MarzbanAPIClient>,
+) -> impl IntoResponse {
+    // Get the user's ID from the session
+    let user_id = auth_session.user.unwrap().id;
+
+    // Get the user's marzban username
+    let marzban_username = query!(
+        r#"
+        SELECT marzban_username as `marzban_username: String`
+        FROM users
+        WHERE id = ?
+        "#,
+        user_id
+    )
+    .fetch_one(&pool)
+    .await
+    .expect("Failed to fetch marzban username");
+
+    if let Some(marzban_username) = marzban_username.marzban_username {
+        // Delete the user from Marzban
+        marzban_client
+            .delete_user(&marzban_username)
+            .await
+            .expect("Failed to delete user from Marzban");
+    }
+
+    // Delete the user from the db
+    query!(
+        r#"
+        DELETE FROM users
+        WHERE id = ?
+        "#,
+        user_id
+    )
+    .execute(&pool)
+    .await
+    .expect("Failed to delete user from db");
+
     StatusCode::OK.into_response()
 }
 
