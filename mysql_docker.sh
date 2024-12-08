@@ -16,6 +16,11 @@ stop_container() {
     echo "MySQL container stopped."
 }
 
+restart_container() {
+    sudo docker container restart $CONTAINER_NAME
+    echo "MySQL container restarted."
+}
+
 remove_container() {
     sudo docker rm $CONTAINER_NAME
     echo "MySQL container removed."
@@ -31,8 +36,11 @@ case "$1" in
     remove)
         remove_container
         ;;
+    restart)
+        restart_container
+        ;;
     *)
-        echo "Usage: $0 {start|stop|remove}"
+        echo "Usage: $0 {start|stop|restart|remove}"
         exit 1
         ;;
 esac
