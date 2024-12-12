@@ -53,13 +53,15 @@ const LoginPageLayout: React.FC = () => {
     // }
 
     // If user is authenticated, show the dashboard page
-    if (isAuthenticated) {
-        if (typeof window !== 'undefined') {
-            if (window.location.pathname !== '/logout' && window.location.pathname !== '/goodbye') {
-                navigate('/user/dashboard');
+    React.useEffect(() => {
+        if (isAuthenticated) {
+            if (typeof window !== 'undefined') {
+                if (window.location.pathname !== '/logout' && window.location.pathname !== '/goodbye') {
+                    navigate('/user/dashboard');
+                }
             }
         }
-    }
+    })
 
     return (
         <div className="flex flex-col items-center min-h-screen px-5 py-32 bg-gray-100 max-md:py-16 dark:bg-gray-900 dark:text-white">
