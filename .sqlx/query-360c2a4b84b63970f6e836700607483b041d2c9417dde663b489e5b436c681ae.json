@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n                UPDATE transactions\n                SET status = ?\n                WHERE stripe_payment_intent_id = ?\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "360c2a4b84b63970f6e836700607483b041d2c9417dde663b489e5b436c681ae"
+}

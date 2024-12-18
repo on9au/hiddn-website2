@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "INSERT INTO plans (name, price, data_limit, duration_days, description) VALUES (?, ?, ?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "4d44a693957c347f11149dba5710fb12a91c2d339eb42625bf4287ef67c7c17c"
+}

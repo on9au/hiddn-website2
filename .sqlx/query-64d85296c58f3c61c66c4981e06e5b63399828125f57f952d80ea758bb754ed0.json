@@ -1,0 +1,64 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        SELECT\n            email,\n            created_at as `created_at: DateTime<Utc>`,\n            updated_at as `updated_at: DateTime<Utc>`,\n            email_expiration_reminder as `email_expiration_reminder: bool`,\n            email_data_reminder as `email_data_reminder: bool`\n        FROM users\n        WHERE id = ?\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "email",
+        "type_info": {
+          "type": "VarString",
+          "flags": "NOT_NULL | UNIQUE_KEY | NO_DEFAULT_VALUE",
+          "max_size": 1020
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "created_at: DateTime<Utc>",
+        "type_info": {
+          "type": "Timestamp",
+          "flags": "NOT_NULL | BINARY | TIMESTAMP",
+          "max_size": 19
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "updated_at: DateTime<Utc>",
+        "type_info": {
+          "type": "Timestamp",
+          "flags": "NOT_NULL | BINARY | TIMESTAMP | ON_UPDATE_NOW",
+          "max_size": 19
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "email_expiration_reminder: bool",
+        "type_info": {
+          "type": "Tiny",
+          "flags": "NOT_NULL",
+          "max_size": 1
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "email_data_reminder: bool",
+        "type_info": {
+          "type": "Tiny",
+          "flags": "NOT_NULL",
+          "max_size": 1
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "64d85296c58f3c61c66c4981e06e5b63399828125f57f952d80ea758bb754ed0"
+}

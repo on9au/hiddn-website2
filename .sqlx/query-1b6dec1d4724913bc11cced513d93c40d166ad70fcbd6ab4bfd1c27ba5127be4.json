@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n            UPDATE users\n            SET email_expiration_reminder = ?\n            WHERE id = ?\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "1b6dec1d4724913bc11cced513d93c40d166ad70fcbd6ab4bfd1c27ba5127be4"
+}

@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        INSERT INTO transactions (user_id, plan_id, amount, status, stripe_payment_intent_id, created_at, updated_at)\n        VALUES (?, ?, ?, ?, ?, NOW(), NOW())\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 5
+    },
+    "nullable": []
+  },
+  "hash": "7838b8210136a81b91f029d7d31b794688f48cc441d43098ce16613965d1e3e5"
+}

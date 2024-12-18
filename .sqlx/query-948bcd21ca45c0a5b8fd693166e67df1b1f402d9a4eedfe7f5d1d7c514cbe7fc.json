@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "UPDATE users SET is_admin = TRUE WHERE email = ?",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "948bcd21ca45c0a5b8fd693166e67df1b1f402d9a4eedfe7f5d1d7c514cbe7fc"
+}
