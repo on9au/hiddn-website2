@@ -30,6 +30,7 @@ COPY . .
 RUN export NVM_DIR="$HOME/.nvm" && \
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && \
     cd client && npm install && npm run build && \
+    export SQLX_OFFLINE=true && \
     cd .. && cargo build --release
 
 # Use the same base image for the final image to ensure compatibility
