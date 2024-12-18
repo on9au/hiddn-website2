@@ -1,6 +1,7 @@
 services:
   hiddn_website:
-    build: .
+    image: on9au/hiddn-website:latest
+    # build: .
     restart: always
     env_file: .env
     network_mode: host
