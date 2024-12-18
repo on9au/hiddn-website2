@@ -44,12 +44,26 @@ RUN apt-get update && \
     apt-get install -y libssl-dev ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
+# Install Node.js and npm
+ENV NODE_VERSION=20.18.0
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash && \
+    export NVM_DIR="$HOME/.nvm" && \
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && \
+    nvm install ${NODE_VERSION} && \
+    nvm use v${NODE_VERSION} && \
+    nvm alias default v${NODE_VERSION} && \
+    node --version && \
+    npm --version
+
 # Copy the built files from the builder stage
 COPY --from=builder /usr/src/app/target/release/hiddn-website /usr/src/app/target/release/hiddn-website
 COPY --from=builder /usr/src/app/client/dist /usr/src/app/client/dist
 COPY --from=builder /usr/src/app/client/server-ssr.js /usr/src/app/client/server-ssr.js
 COPY --from=builder /usr/src/app/client/package.json /usr/src/app/client/package.json
 COPY --from=builder /usr/src/app/client/node_modules /usr/src/app/client/node_modules
+
+COPY --from=builder /usr/src/app/docs /var/lib/hiddn_website/docs
+COPY --from=builder /usr/src/app/announcements /var/lib/hiddn_website/announcements
 
 # Set the entry point
 CMD ["./target/release/hiddn-website"]
