@@ -951,8 +951,34 @@ pub async fn create_transaction(
 /// Handler for the POST '/reset_subscription_url' route.
 /// This handler will reset the subscription URL.
 /// This handler requires authentication (managed by axum_login).
-pub async fn reset_subscription_url() -> impl IntoResponse {
-    // Typically, would call marzban api to reset the subscription URL.
+pub async fn reset_subscription_url(
+    Extension(marzban_client): Extension<MarzbanAPIClient>,
+    Extension(pool): Extension<MySqlPool>,
+    auth_session: AuthSession,
+) -> impl IntoResponse {
+    // Get the user's marzban username
+    let user = auth_session.user.unwrap();
+
+    let marzban_username = query!(
+        r#"
+        SELECT marzban_username
+        FROM users
+        WHERE id = ?
+        "#,
+        user.id
+    ).fetch_optional(&pool).await.expect("Failed to fetch marzban username");
+
+    let marzban_username = match marzban_username {
+        Some(username) => username,
+        None => return StatusCode::OK.into_response(), // just return OK if no marzban username
+    };
+
+    // Reset the subscription URL
+    marzban_client
+        .revoke_user_subscription(&marzban_username.marzban_username.unwrap())
+        .await
+        .expect("Failed to reset subscription URL");
+
     StatusCode::OK.into_response()
 }
 
