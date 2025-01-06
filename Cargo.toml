@@ -29,6 +29,7 @@ zxcvbn = "3.1.0"
 num-traits = "0.2.19"
 clap = { version = "4.5.23", features = ["derive"] }
 async-stripe = { version = "0.39.1", features = ["runtime-tokio-hyper-rustls"] }
+rpassword = "7.3.1"
 
 [[bin]]
 name = "hiddn-website"
