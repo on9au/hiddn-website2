@@ -7,7 +7,7 @@ use axum::{
 use axum_login::{login_required, tower_sessions::MemoryStore, AuthManagerLayer};
 use marzban_api::client::MarzbanAPIClient;
 use tokio::sync::RwLock;
-use tower_http::{services::ServeDir, trace::TraceLayer};
+use tower_http::{services::{ServeDir, ServeFile}, trace::TraceLayer};
 
 use crate::{
     handlers::*,
@@ -90,6 +90,6 @@ pub fn create_router(
         // SSR Frontend
         .nest_service(
             "/",
-            ServeDir::new("static"),
+            ServeDir::new("static").fallback(ServeFile::new("static/index.html")),
         )
 }

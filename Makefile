@@ -26,8 +26,8 @@ build: $(env) typeshare
 npm i:
 	cd client && npm i
 
-docker: build
+docker-build: build
 	docker build --tag=on9au/hiddn-website:$(VER) .
 
-docker push: docker
+docker-push: docker-build
 	docker push on9au/hiddn-website:$(VER)
