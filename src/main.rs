@@ -25,7 +25,6 @@ mod handlers_admin;
 mod payloads;
 mod routes;
 mod sessions;
-mod ssr;
 mod utils;
 
 type SharedDocs = Arc<RwLock<HashMap<String, HashMap<String, String>>>>;
@@ -115,13 +114,6 @@ async fn main() {
 
     info!("Loaded documentation and announcements");
 
-    debug!("Setting up SSR shared app state");
-
-    // Shared app state for SSR
-    let shared_app_state = ssr::setup_app_state_ssr().await;
-
-    info!("SSR shared app state setup");
-
     debug!("Setting up router");
 
     // Create router
@@ -129,7 +121,6 @@ async fn main() {
         docs,
         announcements,
         auth_layer,
-        shared_app_state,
         pool,
         marzban_client,
         stripe_client,

@@ -1,7 +1,6 @@
 use std::{collections::HashMap, sync::Arc};
 
 use axum::{
-    handler::HandlerWithoutStateExt,
     routing::{delete, get, post, put},
     Extension, Router,
 };
@@ -18,14 +17,12 @@ use crate::{
     },
     payloads::AnnouncementPayload,
     sessions::Backend,
-    ssr::{handle_ssr, AppState},
 };
 
 pub fn create_router(
     docs: Arc<RwLock<HashMap<String, HashMap<String, String>>>>,
     announcements: Arc<RwLock<Vec<AnnouncementPayload>>>,
     auth_layer: AuthManagerLayer<Backend, MemoryStore>,
-    shared_app_state: Arc<AppState>,
     pool: sqlx::MySqlPool,
     marzban_client: MarzbanAPIClient,
     stripe_client: stripe::Client,
@@ -93,9 +90,6 @@ pub fn create_router(
         // SSR Frontend
         .nest_service(
             "/",
-            ServeDir::new("./client/dist/client")
-                .append_index_html_on_directories(false)
-                .fallback(get(handle_ssr).into_service()),
+            ServeDir::new("static"),
         )
-        .layer(Extension(shared_app_state))
 }
