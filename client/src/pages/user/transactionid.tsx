@@ -81,7 +81,7 @@ const TransactionID: React.FC = () => {
         );
     }
 
-    
+
     const handleCancelTransaction = async () => {
         if (!transaction) return;
 
@@ -112,11 +112,11 @@ const TransactionID: React.FC = () => {
         <Elements
             stripe={stripePromise}
             options={{
-            clientSecret: clientSecret || undefined,
-            appearance: {
-            theme: document.documentElement.classList.contains('dark') ? 'night' : 'stripe'
-            },
-            locale: 'auto',
+                clientSecret: clientSecret || undefined,
+                appearance: {
+                    theme: document.documentElement.classList.contains('dark') ? 'night' : 'stripe'
+                },
+                locale: 'auto',
             }}
         >
             <TransactionForm transaction={transaction} clientSecret={clientSecret} onCancel={handleCancelTransaction} />
@@ -283,7 +283,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onCancel
                                     <label htmlFor="card-element" className="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                                         Card Details
                                     </label>
-                                    <div className="p-3 border rounded-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+                                    <div className="p-3 text-gray-900 border rounded-md bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
                                         <PaymentElement
                                         // id="card-element"
                                         // options={

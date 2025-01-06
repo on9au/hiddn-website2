@@ -653,6 +653,17 @@ pub async fn transaction_cancel(
     .await
     .expect("Failed to cancel payment intent");
 
+    // Mark the transaction as cancelled in the db
+    query!(
+        r#"
+        UPDATE transactions
+        SET status = ?
+        WHERE id = ?
+        "#,
+        UserTransactionStatusEnum::Canceled,
+        id
+    ).execute(&pool).await.expect("Failed to update transaction status");
+
     StatusCode::OK.into_response()
 }
 
