@@ -87,7 +87,7 @@ pub fn create_router(
                 .layer(Extension(stripe_client))
                 .layer(TraceLayer::new_for_http()),
         )
-        // SSR Frontend
+        // CSR Frontend
         .nest_service(
             "/",
             ServeDir::new("static").fallback(ServeFile::new("static/index.html")),
