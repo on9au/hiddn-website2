@@ -1230,7 +1230,7 @@ where
     }
 }
 
-/// Handler for the POST '/stripe_webhook' route.
+/// Handler for the POST '/stripe' route.
 /// This handler will handle the stripe webhook.
 pub async fn stripe_webhook(
     Extension(pool): Extension<MySqlPool>,
