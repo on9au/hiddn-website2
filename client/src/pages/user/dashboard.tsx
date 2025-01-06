@@ -205,7 +205,7 @@ const Dashboard: React.FC = () => {
                             {/* Documentation Section */}
                             <div className="p-6 mt-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
                                 <h3 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                                    Get Started with HiddN VPN
+                                    {planDetails ? 'Need Help setting up the VPN?' : 'Take a look at the documentation'}
                                 </h3>
                                 <p className="mb-4 text-base text-gray-700 dark:text-gray-300">
                                     Need help setting up the VPN client? Check out our documentation to get started.
