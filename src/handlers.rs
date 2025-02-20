@@ -962,7 +962,7 @@ pub async fn reset_subscription_url(
     // Get the user's marzban username
     let user = auth_session.user.unwrap();
 
-    let marzban_username = query!(
+    let record = query!(
         r#"
         SELECT marzban_username
         FROM users
@@ -974,14 +974,19 @@ pub async fn reset_subscription_url(
     .await
     .expect("Failed to fetch marzban username");
 
-    let marzban_username = match marzban_username {
+    let record = match record {
+        Some(username) => username,
+        None => return StatusCode::OK.into_response(), // just return OK if no marzban username
+    };
+
+    let marzban_username = match record.marzban_username {
         Some(username) => username,
         None => return StatusCode::OK.into_response(), // just return OK if no marzban username
     };
 
     // Reset the subscription URL
     marzban_client
-        .revoke_user_subscription(&marzban_username.marzban_username.unwrap())
+        .revoke_user_subscription(&marzban_username)
         .await
         .expect("Failed to reset subscription URL");
 
