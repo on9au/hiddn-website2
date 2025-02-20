@@ -662,7 +662,10 @@ pub async fn transaction_cancel(
         "#,
         UserTransactionStatusEnum::Canceled,
         id
-    ).execute(&pool).await.expect("Failed to update transaction status");
+    )
+    .execute(&pool)
+    .await
+    .expect("Failed to update transaction status");
 
     StatusCode::OK.into_response()
 }
@@ -966,7 +969,10 @@ pub async fn reset_subscription_url(
         WHERE id = ?
         "#,
         user.id
-    ).fetch_optional(&pool).await.expect("Failed to fetch marzban username");
+    )
+    .fetch_optional(&pool)
+    .await
+    .expect("Failed to fetch marzban username");
 
     let marzban_username = match marzban_username {
         Some(username) => username,

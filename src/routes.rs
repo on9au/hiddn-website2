@@ -7,7 +7,10 @@ use axum::{
 use axum_login::{login_required, tower_sessions::MemoryStore, AuthManagerLayer};
 use marzban_api::client::MarzbanAPIClient;
 use tokio::sync::RwLock;
-use tower_http::{services::{ServeDir, ServeFile}, trace::TraceLayer};
+use tower_http::{
+    services::{ServeDir, ServeFile},
+    trace::TraceLayer,
+};
 
 use crate::{
     handlers::*,

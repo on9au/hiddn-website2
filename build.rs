@@ -10,8 +10,11 @@ fn main() {
         .expect("Failed to run typeshare");
 
     if !output.status.success() {
-        println!("cargo:error=Typeshare failed: \n\n{:#?}\n\nDo you have it installed?", output);
-        
+        println!(
+            "cargo:error=Typeshare failed: \n\n{:#?}\n\nDo you have it installed?",
+            output
+        );
+
         panic!(
             "Typeshare failed: \n\n{:#?}\n\nDo you have it installed?",
             output
