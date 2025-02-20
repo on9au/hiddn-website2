@@ -18,6 +18,11 @@ preview: $(env) typeshare
 	cargo build --release
 	cargo run --release --bin hiddn-website
 
+manager: $(env) typeshare
+	cd client && npm i && npm run build && rm -rf ../static && mkdir ../static && cp -r ./dist/* ../static
+	cargo build --release
+	cargo run --release --bin hiddn-cli
+
 build: $(env) typeshare
 	cd client && npm i && npm run build
 	cargo generate-lockfile
