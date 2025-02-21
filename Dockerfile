@@ -91,10 +91,10 @@ RUN cargo build --release --bin hiddn-cli --locked
 FROM debian:bullseye-slim
 WORKDIR /app
 RUN apt-get update && \
-    apt-get install -y libssl3 openssl ca-certificates && \
+    apt-get install -y libssl1.1 openssl ca-certificates && \
     rm -rf /var/lib/apt/lists/* && \
     ln -s libssl.so.3 libssl.so && \
-    sudo ldconfig
+    ldconfig
 COPY --from=server-builder /server-builder/target/release/hiddn-website . 
 COPY --from=client-builder /client-builder/dist/ ./static/
 ENV RUST_LOG=info
