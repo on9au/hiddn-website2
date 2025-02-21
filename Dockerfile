@@ -75,7 +75,7 @@ COPY ./client .
 RUN npm i && npm run build
 
 # Build server
-FROM rust:1.83.0 as server-builder
+FROM rust:latest as server-builder
 WORKDIR /server-builder
 COPY . .
 RUN rm -rf ./client
@@ -91,9 +91,8 @@ RUN cargo build --release --bin hiddn-cli --locked
 FROM debian:bullseye-slim
 WORKDIR /app
 RUN apt-get update && \
-    apt-get install -y libssl1.1 openssl ca-certificates && \
+    apt-get install -y libssl1.1 libssl-dev openssl ca-certificates musl-dev && \
     rm -rf /var/lib/apt/lists/* && \
-    ln -s libssl.so.3 libssl.so && \
     ldconfig
 COPY --from=server-builder /server-builder/target/release/hiddn-website . 
 COPY --from=client-builder /client-builder/dist/ ./static/
