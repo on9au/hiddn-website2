@@ -84,6 +84,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 RUN cargo install typeshare-cli
 RUN cargo build --release --locked
+RUN cargo build --release --bin hiddn-website --locked
+RUN cargo build --release --bin hiddn-cli --locked
 
 # Copy stuff to final image
 FROM debian:bullseye-slim
