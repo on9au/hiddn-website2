@@ -26,12 +26,14 @@ build: $(env) typeshare
 	cd client && npm i && npm run build
 	cargo generate-lockfile
 	cargo build --release
+	cargo build --release --bin hiddn-cli
+	cargo build --release --bin hiddn-website
 
 npm i:
 	cd client && npm i
 
 docker-build: build
-	docker build --tag=on9au/hiddn-website:$(VER) .
+	sudo docker build --tag=on9au/hiddn-website:$(VER) .
 
 docker-push: docker-build
-	docker push on9au/hiddn-website:$(VER)
+	sudo docker push on9au/hiddn-website:$(VER)
