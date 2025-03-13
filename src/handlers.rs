@@ -1242,12 +1242,12 @@ where
     type Rejection = Response;
 
     async fn from_request(req: Request<Body>, state: &S) -> Result<Self, Self::Rejection> {
-        let signature = if let Some(sig) = req.headers().get("stripe-signature") {
+        let signature = match req.headers().get("stripe-signature") { Some(sig) => {
             sig.to_owned()
-        } else {
+        } _ => {
             error!("Missing stripe-signature header");
             return Err(StatusCode::BAD_REQUEST.into_response());
-        };
+        }};
 
         let payload = String::from_request(req, state)
             .await
