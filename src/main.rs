@@ -2,14 +2,14 @@ use std::{collections::HashMap, net::SocketAddr, sync::Arc};
 
 use argon2::PasswordHasher;
 use axum::{
-    extract::Host, handler::HandlerWithoutStateExt, http::Uri, response::Redirect, BoxError,
+    BoxError, extract::Host, handler::HandlerWithoutStateExt, http::Uri, response::Redirect,
 };
 use axum_login::{
-    tower_sessions::{cookie::time::Duration, Expiry, MemoryStore, SessionManagerLayer},
     AuthManagerLayer, AuthManagerLayerBuilder,
+    tower_sessions::{Expiry, MemoryStore, SessionManagerLayer, cookie::time::Duration},
 };
 use axum_server::tls_rustls::RustlsConfig;
-use config::{HttpOrHttps, GLOBAL_CONFIG};
+use config::{GLOBAL_CONFIG, HttpOrHttps};
 use marzban_api::{client::MarzbanAPIClient, models::auth::BodyAdminTokenApiAdminTokenPost};
 use payloads::AnnouncementPayload;
 use reqwest::StatusCode;
@@ -90,11 +90,12 @@ async fn main() {
         // Register the user
         sqlx::query!(
             r#"
-        INSERT INTO users (email, password_hash, created_at, updated_at)
-        VALUES (?, ?, NOW(), NOW())
+        INSERT INTO users (email, password_hash, is_admin, created_at, updated_at)
+        VALUES (?, ?, ?, NOW(), NOW())
         "#,
             default_admin_username,
-            password_hash
+            password_hash,
+            true
         )
         .execute(&pool)
         .await
