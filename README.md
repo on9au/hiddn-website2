@@ -2,6 +2,27 @@
 
 please use rust typeshare cli
 
+## First time setup after build/docker-compose up
+
+By default HiddN Website will check for any users in the database.
+
+If no users are found, it will create a default user with the following credentials:
+
+- **Email**: `admin`
+- **Password**: `admin`
+
+SECURITY WARNING: Please change the default credentials immediately after logging in.
+
+- **Changing password**:
+  - After logging in, go to the profile section on the sidebar.
+  - Click on the "Change Password" button.
+  - Enter the current password and the new password.
+  - Click on the "Change Password" button to save the new password.
+- **Changing email**:
+  - After logging in, change the url to `/admin/dashboard`, then go to the users section on the sidebar.
+  - Click on the "Edit" button on the admin user.
+  - Change the email and click on the "Save" button.
+
 ## Getting Started
 
 This section explains how to set up, run, and develop on this project.
