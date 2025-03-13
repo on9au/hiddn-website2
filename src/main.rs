@@ -1,5 +1,6 @@
 use std::{collections::HashMap, net::SocketAddr, sync::Arc};
 
+use argon2::PasswordHasher;
 use axum::{
     extract::Host, handler::HandlerWithoutStateExt, http::Uri, response::Redirect, BoxError,
 };
@@ -16,7 +17,7 @@ use routes::create_router;
 use sessions::Backend;
 use sqlx::mysql::MySqlPoolOptions;
 use tokio::sync::RwLock;
-use tracing::{debug, info};
+use tracing::{debug, info, warn};
 use utils::{load_announcements, load_docs};
 
 mod config;
@@ -57,6 +58,54 @@ async fn main() {
         .expect("Failed to migrate database");
 
     info!("Migrated database");
+
+    debug!("Checking for users in database");
+
+    // Check for users in database
+    let user_count = sqlx::query!("SELECT COUNT(*) as count FROM users")
+        .fetch_one(&pool)
+        .await
+        .expect("Failed to fetch user count")
+        .count;
+
+    if user_count == 0 {
+        // Create default admin user,, prevent no admin user.
+        info!("No users found in database. Creating default admin user");
+
+        let default_admin_username = "admin";
+        let default_admin_password = "admin";
+
+        // Hash the password
+        let password_hash = tokio::task::spawn_blocking(move || {
+            let argon2 = argon2::Argon2::default();
+            let salt = argon2::password_hash::SaltString::generate(&mut rand::thread_rng());
+            argon2
+                .hash_password(default_admin_password.as_bytes(), &salt)
+                .expect("Failed to hash password")
+                .to_string()
+        })
+        .await
+        .expect("Failed to hash password in thread");
+
+        // Register the user
+        sqlx::query!(
+            r#"
+        INSERT INTO users (email, password_hash, created_at, updated_at)
+        VALUES (?, ?, NOW(), NOW())
+        "#,
+            default_admin_username,
+            password_hash
+        )
+        .execute(&pool)
+        .await
+        .expect("Failed to insert user into db");
+
+        warn!("Default admin user created. Please change the password immediately");
+        warn!("Username: {}", default_admin_username);
+        warn!("Password: {}", default_admin_password);
+    } else {
+        debug!("Users found in database. Doing nothing...");
+    }
 
     debug!("Authenticating with Marzban Panel");
 
