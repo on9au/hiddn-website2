@@ -83,7 +83,6 @@ RUN apt-get update && \
     apt-get install -y libssl-dev ca-certificates musl-dev && \
     rm -rf /var/lib/apt/lists/*
 RUN cargo install typeshare-cli
-RUN cargo build --release --locked
 RUN cargo build --release --bin hiddn-website --locked
 RUN cargo build --release --bin hiddn-cli --locked
 
