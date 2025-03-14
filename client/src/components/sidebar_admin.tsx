@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
-import { CreditCardIcon, GearIcon, HomeIcon, InboxIcon, MegaphoneIcon, MoonIcon, PersonIcon, ServerIcon, SignOutIcon, SunIcon, ThreeBarsIcon, XIcon } from '@primer/octicons-react';
+import { CreditCardIcon, GearIcon, HomeIcon, InboxIcon, MegaphoneIcon, MoonIcon, PersonIcon, SignOutIcon, SunIcon, ThreeBarsIcon, XIcon } from '@primer/octicons-react';
 import { Theme } from '../darkmode';
 
 import ICON_LIGHT from '../assets/hiddn_icon.svg';
@@ -142,7 +142,7 @@ const SidebarAdmin: React.FC = React.memo(() => {
                         <SidebarLink to="/admin/announcement" label="Announcements" icon={<MegaphoneIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
                         <SidebarLink to="/admin/plan" label="Plans" icon={<GearIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
                         <SidebarLink to="/admin/transaction" label="Transactions" icon={<CreditCardIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
-                        <SidebarLink to="/admin/status" label="Server Status" icon={<ServerIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
+                        {/* <SidebarLink to="/admin/status" label="Server Status" icon={<ServerIcon size={24} />} sidebarToggle={setIsSidebarOpen} /> */}
                         <SidebarLink to="/admin/support" label="Support" icon={<InboxIcon size={24} />} sidebarToggle={setIsSidebarOpen} />
                     </div>
                     <div className="flex flex-col">
