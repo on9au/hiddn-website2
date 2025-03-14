@@ -1,10 +1,10 @@
 use std::sync::Arc;
 
-use axum::{extract::Path, response::IntoResponse, Extension, Json};
+use axum::{Extension, Json, extract::Path, response::IntoResponse};
 use chrono::Utc;
 use num_traits::FromPrimitive;
 use reqwest::StatusCode;
-use sqlx::{query, query_as, types::BigDecimal, MySqlPool};
+use sqlx::{MySqlPool, query, query_as, types::BigDecimal};
 use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
 use tokio::sync::RwLock;

@@ -1,11 +1,12 @@
 use std::{collections::HashMap, sync::Arc};
 
 use axum::{
-    routing::{delete, get, post, put},
     Extension, Router,
+    routing::{delete, get, post, put},
 };
-use axum_login::{login_required, tower_sessions::MemoryStore, AuthManagerLayer};
+use axum_login::{AuthManagerLayer, login_required, tower_sessions::MemoryStore};
 use marzban_api::client::MarzbanAPIClient;
+use tera::Tera;
 use tokio::sync::RwLock;
 use tower_http::{
     services::{ServeDir, ServeFile},
@@ -29,6 +30,7 @@ pub fn create_router(
     pool: sqlx::MySqlPool,
     marzban_client: MarzbanAPIClient,
     stripe_client: stripe::Client,
+    tera: Tera,
 ) -> Router {
     Router::new()
         // API Routes
@@ -88,6 +90,7 @@ pub fn create_router(
                 .layer(Extension(pool))
                 .layer(Extension(marzban_client))
                 .layer(Extension(stripe_client))
+                .layer(Extension(tera))
                 .layer(TraceLayer::new_for_http()),
         )
         // CSR Frontend

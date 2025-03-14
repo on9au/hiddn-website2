@@ -5,7 +5,12 @@ use argon2::{PasswordHash, PasswordHasher, PasswordVerifier};
 use axum::async_trait;
 use axum::body::Body;
 use axum::extract::{FromRequest, Request};
+use lettre::message::header::ContentType;
+use lettre::transport::smtp::authentication::Credentials;
+use lettre::{Message, SmtpTransport, Transport};
 use marzban_api::models::proxy::ProxyTypes;
+use rand::Rng;
+use tera::Tera;
 
 use std::str::FromStr;
 
@@ -14,9 +19,9 @@ use chrono::Utc;
 
 use axum::response::{IntoResponse, Response};
 use axum::{
+    Extension, Json,
     extract::{Path, Query},
     http::StatusCode,
-    Extension, Json,
 };
 use marzban_api::client::MarzbanAPIClient;
 use marzban_api::models::user::{
@@ -26,7 +31,7 @@ use marzban_api::models::user::{
 use num_traits::ToPrimitive;
 use serde_json::json;
 use sqlx::types::BigDecimal;
-use sqlx::{query, MySqlPool};
+use sqlx::{MySqlPool, query};
 use stripe::{CancelPaymentIntent, CreatePaymentIntent, EventObject, EventType, PaymentIntent};
 use tokio::sync::RwLock;
 use tracing::{debug, error};
@@ -37,6 +42,7 @@ use crate::payloads::{
     UserProfileSettingsChangePayload, UserTransactionRust,
 };
 use crate::{
+    SharedDocs,
     payloads::{
         AnnouncementPayload, CreateOrderResponsePayload, ForgotPasswordPayload, LoginPayload,
         LoginResponsePayload, PasswordFeedbackPayload, PlanPayload, PlanStatusEnum,
@@ -44,7 +50,6 @@ use crate::{
         VerifyEmailPayload,
     },
     sessions::AuthSession,
-    SharedDocs,
 };
 
 /// Handler for the GET `/` route.
@@ -125,10 +130,7 @@ pub async fn logout_user(mut auth_session: AuthSession) -> impl IntoResponse {
 /// If you need to register or reset password, use the respective routes instead.
 /// This acts as a way to verify the email's ownership and existence.
 pub async fn verify_email(Json(_payload): Json<VerifyEmailPayload>) -> impl IntoResponse {
-    // TODO: Implement actual email verification logic
-    // We would create a temporary verificaton code linked to the email in the db which expires after a certain time.
-    // We would send the verification code to the email.
-
+    // TODO: Implement email verification
     StatusCode::OK.into_response()
 }
 
@@ -137,8 +139,63 @@ pub async fn verify_email(Json(_payload): Json<VerifyEmailPayload>) -> impl Into
 /// It will send code to email to verify the email.
 /// Should have a rate limit to prevent spamming.
 /// This acts as a way to verify the email's ownership and existence.
-pub async fn request_code(Json(_payload): Json<RequestCodePayload>) -> impl IntoResponse {
-    StatusCode::OK.into_response()
+pub async fn request_code(
+    Extension(tera): Extension<Tera>,
+    Json(payload): Json<RequestCodePayload>,
+) -> impl IntoResponse {
+    // Create a random 6 digit code
+    let email_verification_code = rand::thread_rng().gen_range(100000..999999);
+
+    // Create tera context
+    let mut context = tera::Context::new();
+    context.insert("code", &email_verification_code);
+
+    // Render the email template
+    let email_body = match tera.render("verification_email.html", &context) {
+        Ok(email_body) => email_body,
+        Err(e) => {
+            error!("Error: {}", e);
+            return StatusCode::INTERNAL_SERVER_ERROR.into_response();
+        }
+    };
+
+    // Create the email
+    let email = match Message::builder()
+        .from(GLOBAL_CONFIG.from_email.parse().unwrap())
+        .to(payload.email.parse().unwrap())
+        .subject(GLOBAL_CONFIG.default_subject.clone())
+        .header(ContentType::TEXT_HTML)
+        .body(email_body)
+    {
+        Ok(email) => email,
+        Err(e) => {
+            error!("Error: {}", e);
+            return StatusCode::INTERNAL_SERVER_ERROR.into_response();
+        }
+    };
+
+    let creds = Credentials::new(
+        GLOBAL_CONFIG.smtp_username.clone(),
+        GLOBAL_CONFIG.smtp_password.clone(),
+    );
+
+    // Mail
+    let mailer = match SmtpTransport::relay(&GLOBAL_CONFIG.smtp_server) {
+        Ok(mailer) => mailer.credentials(creds).build(),
+        Err(e) => {
+            error!("Error: {}", e);
+            return StatusCode::INTERNAL_SERVER_ERROR.into_response();
+        }
+    };
+
+    // Send the email.
+    match mailer.send(&email) {
+        Ok(_) => StatusCode::OK.into_response(),
+        Err(e) => {
+            error!("Error: {}", e);
+            StatusCode::INTERNAL_SERVER_ERROR.into_response()
+        }
+    }
 }
 
 /// Handler for the POST '/register_user' route.
@@ -1242,12 +1299,13 @@ where
     type Rejection = Response;
 
     async fn from_request(req: Request<Body>, state: &S) -> Result<Self, Self::Rejection> {
-        let signature = match req.headers().get("stripe-signature") { Some(sig) => {
-            sig.to_owned()
-        } _ => {
-            error!("Missing stripe-signature header");
-            return Err(StatusCode::BAD_REQUEST.into_response());
-        }};
+        let signature = match req.headers().get("stripe-signature") {
+            Some(sig) => sig.to_owned(),
+            _ => {
+                error!("Missing stripe-signature header");
+                return Err(StatusCode::BAD_REQUEST.into_response());
+            }
+        };
 
         let payload = String::from_request(req, state)
             .await

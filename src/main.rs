@@ -16,6 +16,7 @@ use reqwest::StatusCode;
 use routes::create_router;
 use sessions::Backend;
 use sqlx::mysql::MySqlPoolOptions;
+use tera::Tera;
 use tokio::sync::RwLock;
 use tracing::{debug, info, warn};
 use utils::{load_announcements, load_docs};
@@ -164,6 +165,14 @@ async fn main() {
 
     info!("Loaded documentation and announcements");
 
+    debug!("Setting up Tera template engine");
+
+    // Tera template engine setup
+    let tera = Tera::new(&(GLOBAL_CONFIG.templates_dir.clone() + "/*.html"))
+        .expect("Failed to load Tera template engine");
+
+    info!("Tera template engine setup");
+
     debug!("Setting up router");
 
     // Create router
@@ -174,6 +183,7 @@ async fn main() {
         pool,
         marzban_client,
         stripe_client,
+        tera,
     );
 
     info!("Router setup");

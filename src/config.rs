@@ -19,8 +19,15 @@ pub struct Config {
     pub https_cert_path: String,
     pub https_key_path: String,
 
-    // Express Config
-    pub express_port: u16,
+    // Email Client Config
+    pub from_email: String,
+    pub default_subject: String,
+    pub smtp_server: String,
+    pub smtp_username: String,
+    pub smtp_password: String,
+
+    // Template Config
+    pub templates_dir: String,
 
     // Database Config
     pub database_url: String,
