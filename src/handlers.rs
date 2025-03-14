@@ -463,12 +463,6 @@ pub async fn forgot_password(
         return StatusCode::NOT_FOUND.into_response();
     }
 
-    // Check if code is valid
-    // Example code here since email client is not implemented
-    if payload.email_verification_code != "123456" {
-        return StatusCode::FORBIDDEN.into_response();
-    }
-
     // Check if password is valid using zxcvbn
     // Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number.
     let zxcvbn = zxcvbn::zxcvbn(
@@ -508,6 +502,43 @@ pub async fn forgot_password(
         )
             .into_response();
     }
+
+    // Check if code is valid
+    let code_id = query!(
+        r#"
+        SELECT id
+        FROM verification_codes
+        WHERE email = ?
+        AND code = ?
+        AND is_used = false
+        AND expires_at > NOW()
+        "#,
+        payload.email,
+        payload.email_verification_code
+    )
+    .fetch_optional(&pool)
+    .await
+    .expect("Failed to check if code is valid");
+
+    let code_id = match code_id {
+        Some(code_id) => Some(code_id.id),
+        None => return StatusCode::FORBIDDEN.into_response(),
+    };
+
+    // All checks passed, register the user and mark the verification code as used
+
+    // Mark the code as used
+    query!(
+        r#"
+        UPDATE verification_codes
+        SET is_used = true
+        WHERE id = ?
+        "#,
+        code_id
+    )
+    .execute(&pool)
+    .await
+    .expect("Failed to mark code as used");
 
     // Hash the password
     let password_hash = tokio::task::spawn_blocking(move || {
