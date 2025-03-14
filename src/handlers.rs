@@ -129,8 +129,48 @@ pub async fn logout_user(mut auth_session: AuthSession) -> impl IntoResponse {
 /// This route should only be used if you need to just verify the email.
 /// If you need to register or reset password, use the respective routes instead.
 /// This acts as a way to verify the email's ownership and existence.
-pub async fn verify_email(Json(_payload): Json<VerifyEmailPayload>) -> impl IntoResponse {
-    // TODO: Implement email verification
+/// Returns OK if the email is verified, and FORBIDDEN if the code is invalid.
+pub async fn verify_email(
+    Extension(pool): Extension<MySqlPool>,
+    Json(payload): Json<VerifyEmailPayload>,
+) -> impl IntoResponse {
+    // Check if code is valid
+    let code_id = query!(
+        r#"
+        SELECT id
+        FROM verification_codes
+        WHERE email = ?
+        AND code = ?
+        AND is_used = false
+        AND expires_at > NOW()
+        "#,
+        payload.email,
+        payload.email_verification_code
+    )
+    .fetch_optional(&pool)
+    .await
+    .expect("Failed to check if code is valid");
+
+    let code_id = match code_id {
+        Some(code_id) => Some(code_id.id),
+        None => return StatusCode::FORBIDDEN.into_response(),
+    };
+
+    // All checks passed, register the user and mark the verification code as used
+
+    // Mark the code as used
+    query!(
+        r#"
+        UPDATE verification_codes
+        SET is_used = true
+        WHERE id = ?
+        "#,
+        code_id
+    )
+    .execute(&pool)
+    .await
+    .expect("Failed to mark code as used");
+
     StatusCode::OK.into_response()
 }
 
@@ -284,12 +324,6 @@ pub async fn register_user(
         return StatusCode::BAD_REQUEST.into_response();
     }
 
-    // Check if code is valid
-    // Example code here since email client is not implemented
-    if payload.email_verification_code != "123456" {
-        return StatusCode::FORBIDDEN.into_response();
-    }
-
     // Check if password is valid using zxcvbn
     // Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one number.
     let zxcvbn = zxcvbn::zxcvbn(
@@ -333,6 +367,43 @@ pub async fn register_user(
         )
             .into_response();
     }
+
+    // Check if code is valid
+    let code_id = query!(
+        r#"
+        SELECT id
+        FROM verification_codes
+        WHERE email = ?
+        AND code = ?
+        AND is_used = false
+        AND expires_at > NOW()
+        "#,
+        payload.email,
+        payload.email_verification_code
+    )
+    .fetch_optional(&pool)
+    .await
+    .expect("Failed to check if code is valid");
+
+    let code_id = match code_id {
+        Some(code_id) => Some(code_id.id),
+        None => return StatusCode::FORBIDDEN.into_response(),
+    };
+
+    // All checks passed, register the user and mark the verification code as used
+
+    // Mark the code as used
+    query!(
+        r#"
+        UPDATE verification_codes
+        SET is_used = true
+        WHERE id = ?
+        "#,
+        code_id
+    )
+    .execute(&pool)
+    .await
+    .expect("Failed to mark code as used");
 
     // Hash the password
     let password_hash = tokio::task::spawn_blocking(move || {
