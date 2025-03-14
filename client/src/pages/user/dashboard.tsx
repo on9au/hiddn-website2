@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { FaArrowUp, FaArrowRight, FaBook } from 'react-icons/fa';
+import { FaArrowUp, FaArrowRight } from 'react-icons/fa';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import { AnnouncementPayload, PlanDetailsPayload } from '../../bindings';
 import { useNavigate } from 'react-router-dom';
+import { DownloadIcon } from '@primer/octicons-react';
 
 const SkeletonDashboard: React.FC = () => {
     return (
@@ -205,16 +206,16 @@ const Dashboard: React.FC = () => {
                             {/* Documentation Section */}
                             <div className="p-6 mt-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
                                 <h3 className="mb-4 text-2xl font-semibold text-gray-800 dark:text-gray-200">
-                                    {planDetails ? 'Need Help setting up the VPN?' : 'Take a look at the documentation'}
+                                    {planDetails ? 'Ready to connect?' : 'Download the app'}
                                 </h3>
                                 <p className="mb-4 text-base text-gray-700 dark:text-gray-300">
-                                    Need help setting up the VPN client? Check out our documentation to get started.
+                                    Install the HiddN VPN App below.
                                 </p>
                                 <button
                                     className="flex items-center px-4 py-2 text-white rounded-md bg-hiddn-500 hover:bg-hiddn-600 focus:outline-none"
                                     onClick={() => navigate('/user/documentation')}
                                 >
-                                    <span>View Documentation</span> <FaBook className="inline-block ml-2" />
+                                    <span>Install App</span> <DownloadIcon className="inline-block ml-2" />
                                 </button>
                             </div>
                         </div>
