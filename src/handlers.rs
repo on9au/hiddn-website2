@@ -231,8 +231,8 @@ pub async fn request_code(
             // Success, insert the code into the db
             query!(
                 r#"
-                INSERT INTO verification_codes (email, code, created_at)
-                VALUES (?, ?, NOW())
+                INSERT INTO verification_codes (email, code, created_at, expires_at)
+                VALUES (?, ?, NOW(), NOW() + INTERVAL 10 MINUTE)
                 "#,
                 payload.email,
                 email_verification_code
