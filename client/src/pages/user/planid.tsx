@@ -104,6 +104,9 @@ const PlanID: React.FC = () => {
                         <p className="mb-2 text-xl text-gray-700 dark:text-gray-300">
                             <strong>Price:</strong> ${plan.price.toFixed(2)}
                         </p>
+                        <p className="mb-2 text-xl text-gray-400 dark:text-gray-600">
+                            All prices are in AUD and include GST.
+                        </p>
                         {plan.data_limit !== null && (
                             <p className="mb-2 text-xl text-gray-700 dark:text-gray-300">
                                 <strong>Data Limit:</strong> {plan.data_limit} GB
