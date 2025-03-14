@@ -141,10 +141,47 @@ pub async fn verify_email(Json(_payload): Json<VerifyEmailPayload>) -> impl Into
 /// This acts as a way to verify the email's ownership and existence.
 pub async fn request_code(
     Extension(tera): Extension<Tera>,
+    Extension(pool): Extension<MySqlPool>,
     Json(payload): Json<RequestCodePayload>,
 ) -> impl IntoResponse {
-    // Create a random 6 digit code
-    let email_verification_code = rand::thread_rng().gen_range(100000..999999);
+    // Ensure that last code was sent at least 30 seconds ago
+    // This is to prevent spamming the email
+    let currently_valid_codes = query!(
+        r#"
+        SELECT created_at
+        FROM verification_codes
+        WHERE email = ?
+        AND expires_at > NOW()
+        AND is_used = false
+        ORDER BY created_at DESC
+        "#,
+        payload.email
+    )
+    .fetch_all(&pool)
+    .await
+    .expect("Failed to fetch verification codes");
+
+    // If the last code was sent less than 30 seconds ago, return TOO_MANY_REQUESTS
+    // Since it is ordered by created_at DESC, the first one is the most recent
+    if let Some(code) = currently_valid_codes.first() {
+        let created_at: DateTime<Utc> = code.created_at;
+        let now = Utc::now();
+        let duration = now - created_at;
+
+        if duration.num_seconds() < 30 {
+            return StatusCode::TOO_MANY_REQUESTS.into_response();
+        }
+    }
+
+    // Create a random 6 digit code that is not a duplicate
+    let mut email_verification_code = rand::thread_rng().gen_range(100000..999999);
+
+    // Ensure that the code is not a duplicate
+    for existing_code in currently_valid_codes.iter() {
+        if existing_code.created_at.timestamp() as u64 == email_verification_code {
+            email_verification_code = rand::thread_rng().gen_range(100000..999999);
+        }
+    }
 
     // Create tera context
     let mut context = tera::Context::new();
@@ -190,7 +227,22 @@ pub async fn request_code(
 
     // Send the email.
     match mailer.send(&email) {
-        Ok(_) => StatusCode::OK.into_response(),
+        Ok(_) => {
+            // Success, insert the code into the db
+            query!(
+                r#"
+                INSERT INTO verification_codes (email, code, created_at)
+                VALUES (?, ?, NOW())
+                "#,
+                payload.email,
+                email_verification_code
+            )
+            .execute(&pool)
+            .await
+            .expect("Failed to insert verification code");
+
+            StatusCode::OK.into_response()
+        }
         Err(e) => {
             error!("Error: {}", e);
             StatusCode::INTERNAL_SERVER_ERROR.into_response()

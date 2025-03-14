@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n                INSERT INTO verification_codes (email, code, created_at)\n                VALUES (?, ?, NOW())\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "1421932c8e35f8c8a66d591065c5224a2f59480b936576a9792b26d566903248"
+}
