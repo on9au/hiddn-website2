@@ -104,9 +104,6 @@ const PlanID: React.FC = () => {
                         <p className="mb-2 text-xl text-gray-700 dark:text-gray-300">
                             <strong>Price:</strong> ${plan.price.toFixed(2)}
                         </p>
-                        <p className="mb-2 text-xl text-gray-400 dark:text-gray-600">
-                            All prices are in AUD and include GST.
-                        </p>
                         {plan.data_limit !== null && (
                             <p className="mb-2 text-xl text-gray-700 dark:text-gray-300">
                                 <strong>Data Limit:</strong> {plan.data_limit} GB
@@ -121,7 +118,7 @@ const PlanID: React.FC = () => {
                             </p>
                         )}
                         <button
-                            className={`flex items-center px-6 py-3 text-white bg-hiddn-500 rounded-md hover:bg-hiddn-600 focus:outline-none ${isOrdering ? 'opacity-50 cursor-not-allowed' : ''
+                            className={`mb-4 flex items-center px-6 py-3 text-white bg-hiddn-500 rounded-md hover:bg-hiddn-600 focus:outline-none ${isOrdering ? 'opacity-50 cursor-not-allowed' : ''
                                 }`}
                             onClick={handleOrder}
                             disabled={isOrdering}
@@ -129,6 +126,9 @@ const PlanID: React.FC = () => {
                             <FaShoppingCart className="mr-2" />
                             {isOrdering ? 'Ordering...' : 'Purchase'}
                         </button>
+                        <p className="mb-2 text-sm text-gray-400 dark:text-gray-600">
+                            All prices are in AUD and include GST.
+                        </p>
                     </div>
                 ) : (
                     <p className="text-gray-700 dark:text-gray-300">No plan details available.</p>

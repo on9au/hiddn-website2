@@ -261,7 +261,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onCancel
                     <p className="text-2xl font-bold text-gray-800 dark:text-gray-200">
                         Total: ${transaction.amount}
                     </p>
-                    <p className="text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
                         All prices are in AUD and include GST.
                     </p>
                 </div>
