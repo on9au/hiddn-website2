@@ -216,6 +216,8 @@ pub async fn request_code(
         GLOBAL_CONFIG.smtp_password.clone(),
     );
 
+    debug!("creating mailer");
+
     // Mail
     let mailer = match SmtpTransport::relay(&GLOBAL_CONFIG.smtp_server) {
         Ok(mailer) => mailer.credentials(creds).build(),
@@ -224,6 +226,8 @@ pub async fn request_code(
             return StatusCode::INTERNAL_SERVER_ERROR.into_response();
         }
     };
+
+    debug!("Sending email to {}", payload.email);
 
     // Send the email.
     match mailer.send(&email) {
