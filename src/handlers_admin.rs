@@ -1,9 +1,12 @@
 use std::sync::Arc;
 
+use crate::payloads::UserTransactionStatusEnum;
 use axum::{Extension, Json, extract::Path, response::IntoResponse};
 use chrono::Utc;
 use num_traits::FromPrimitive;
+use num_traits::ToPrimitive;
 use reqwest::StatusCode;
+use sqlx::types::chrono::DateTime;
 use sqlx::{MySqlPool, query, query_as, types::BigDecimal};
 use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
@@ -13,7 +16,7 @@ use crate::{
     config::GLOBAL_CONFIG,
     payloads::{
         AdminCreateAnnouncement, AdminUserModify, AdminUserRust, AnnouncementPayload,
-        NewPlanPayload, PlanPayload,
+        NewPlanPayload, PlanPayload, UserTransactionRust,
     },
     sessions::AuthSession,
 };
@@ -291,4 +294,104 @@ pub async fn delete_user(
     }
 
     StatusCode::NO_CONTENT.into_response()
+}
+
+/// GET '/api/admin/transactions'
+pub async fn admin_transactions(
+    Extension(pool): Extension<MySqlPool>,
+    auth_session: AuthSession,
+) -> impl IntoResponse {
+    // Validate that the user is an admin
+    if !is_admin(&auth_session).await {
+        return StatusCode::FORBIDDEN.into_response();
+    }
+
+    // Get the user's transactions from the db
+    let transactions = query!(
+        r#"
+        SELECT
+            id as `id: i64`,
+            user_id as `user_id: i64`,
+            plan_id as `plan_id: i64`,
+            amount as `amount: BigDecimal`,
+            status as `status: UserTransactionStatusEnum`,
+            created_at as `created_at: DateTime<Utc>`,
+            updated_at as `updated_at: DateTime<Utc>`
+        FROM transactions
+        "#,
+    )
+    .fetch_all(&pool)
+    .await
+    .expect("Failed to fetch transactions")
+    .iter_mut()
+    .map(|x| UserTransactionRust {
+        id: x.id,
+        user_id: x.user_id,
+        plan_id: x.plan_id,
+        amount: x
+            .amount
+            .to_f64()
+            .expect("Failed to convert BigDecimal to f64")
+            / 100.0,
+        status: x.status.clone(),
+        // stripe_payment_intent_id: x.stripe_payment_intent_id.clone(),
+        created_at: x.created_at.timestamp() as u64,
+        updated_at: x.updated_at.timestamp() as u64,
+    })
+    .collect::<Vec<UserTransactionRust>>();
+
+    Json(transactions).into_response()
+}
+
+/// GET '/api/admin/transaction/:id'
+pub async fn admin_transactions_id(
+    Extension(pool): Extension<MySqlPool>,
+    auth_session: AuthSession,
+    Path(id): Path<u32>,
+) -> impl IntoResponse {
+    // Validate that the user is an admin
+    if !is_admin(&auth_session).await {
+        return StatusCode::FORBIDDEN.into_response();
+    }
+
+    let transaction = query!(
+        r#"
+        SELECT
+            id as `id: i64`,
+            user_id as `user_id: i64`,
+            plan_id as `plan_id: i64`,
+            amount as `amount: BigDecimal`,
+            status as `status: UserTransactionStatusEnum`,
+            created_at as `created_at: DateTime<Utc>`,
+            updated_at as `updated_at: DateTime<Utc>`
+        FROM transactions
+        WHERE id = ?
+        "#,
+        id
+    )
+    .fetch_optional(&pool)
+    .await
+    .expect("Failed to fetch transaction");
+
+    // If there are none, return NOT_FOUND
+    let transaction = match transaction {
+        Some(transaction) => transaction,
+        None => return StatusCode::NOT_FOUND.into_response(),
+    };
+
+    Json(UserTransactionRust {
+        id: transaction.id,
+        user_id: transaction.user_id,
+        plan_id: transaction.plan_id,
+        amount: transaction
+            .amount
+            .to_f64()
+            .expect("Failed to convert BigDecimal to f64")
+            / 100.0,
+        status: transaction.status,
+        // stripe_payment_intent_id: transaction.stripe_payment_intent_id,
+        created_at: transaction.created_at.timestamp() as u64,
+        updated_at: transaction.updated_at.timestamp() as u64,
+    })
+    .into_response()
 }

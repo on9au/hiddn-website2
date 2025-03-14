@@ -16,8 +16,8 @@ use tower_http::{
 use crate::{
     handlers::*,
     handlers_admin::{
-        admin_me, admin_my_id, admin_user, admin_users, delete_announcement, delete_plan,
-        delete_user, post_announcement, post_plan, update_user,
+        admin_me, admin_my_id, admin_transactions, admin_transactions_id, admin_user, admin_users,
+        delete_announcement, delete_plan, delete_user, post_announcement, post_plan, update_user,
     },
     payloads::AnnouncementPayload,
     sessions::Backend,
@@ -73,6 +73,8 @@ pub fn create_router(
                 .route("/admin/users/:id", delete(delete_user))
                 .route("/admin/plans", post(post_plan))
                 .route("/admin/plans/:id", delete(delete_plan))
+                .route("/admin/transactions", get(admin_transactions))
+                .route("/admin/transaction/:id", get(admin_transactions_id))
                 .route_layer(login_required!(Backend))
                 // Routes involving authentication
                 .route("/", get(root))
