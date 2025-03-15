@@ -56,6 +56,7 @@ pub fn create_router(
                 .route("/transaction/:id/cancel", post(transaction_cancel))
                 .route("/server_status", get(server_status))
                 .route("/plan_details", get(plan_details))
+                .route("/hiddnet_config", get(hiddnet_config))
                 .route("/plans", get(plans))
                 .route("/plans/:id", get(plans_id))
                 .route("/orders", post(create_transaction))

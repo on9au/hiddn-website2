@@ -5,6 +5,7 @@ use argon2::{PasswordHash, PasswordHasher, PasswordVerifier};
 use axum::async_trait;
 use axum::body::Body;
 use axum::extract::{FromRequest, Request};
+use futures::StreamExt;
 use lettre::message::header::ContentType;
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::{Message, SmtpTransport, Transport};
@@ -1444,6 +1445,64 @@ pub async fn user_me(
     };
 
     Json(user_profile).into_response()
+}
+
+/// Handler for the GET '/hiddnet_config' route.
+/// Returns Clash Meta `config.yaml` for HiddNet use.
+/// This handler requires authentication (managed by axum_login).
+/// Note: For HiddNet, please ensure that tun[enabled] is set to false initially to
+/// prevent the user from connecting to the VPN before the user has paid.
+pub async fn hiddnet_config(
+    Extension(marzban_client): Extension<MarzbanAPIClient>,
+    Extension(pool): Extension<MySqlPool>,
+    auth_session: AuthSession,
+) -> impl IntoResponse {
+    // Get the user's marzban username
+    let user = auth_session.user.unwrap();
+
+    let record = query!(
+        r#"
+        SELECT marzban_username
+        FROM users
+        WHERE id = ?
+        "#,
+        user.id
+    )
+    .fetch_optional(&pool)
+    .await
+    .expect("Failed to fetch marzban username");
+
+    let record = match record {
+        Some(username) => username,
+        None => return StatusCode::NOT_FOUND.into_response(), // just return NOT_FOUND if no marzban username
+    };
+
+    let marzban_username = match record.marzban_username {
+        Some(username) => username,
+        None => return StatusCode::NOT_FOUND.into_response(), // just return NOT_FOUND if no marzban username
+    };
+
+    // Fetch the user's configuration from Marzban
+    let user_info = marzban_client
+        .get_user(&marzban_username)
+        .await
+        .expect("Failed to get user");
+
+    let subscription_url = user_info.subscription_url + "/clash-meta";
+
+    // Go to the url and get the configuration
+
+    let stream = reqwest::get(subscription_url).await.map_err(|e| {
+        error!("Failed to get clash meta: {:?}", e);
+        StatusCode::INTERNAL_SERVER_ERROR
+    });
+
+    let stream = match stream {
+        Ok(stream) => stream.bytes_stream(),
+        Err(status) => return status.into_response(),
+    };
+
+    Body::from_stream(stream).into_response()
 }
 
 pub struct StripeEvent(stripe::Event);
