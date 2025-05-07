@@ -29,18 +29,18 @@ endif
 dev: $(env) ts-rs-gen generate-licenses
 	make build-client
 	rm -rf static && mkdir -p static && cp -r client/dist/* static
-	cp NOTICE client/dist/NOTICE
+	cp NOTICE static/NOTICE
 	RUST_LOG=debug SQLX_OFFLINE=$(SQLX_OFFLINE) cargo run --bin hiddn-website
 
 preview: $(env) ts-rs-gen generate-licenses
 	make build-client
 	rm -rf static && mkdir -p static && cp -r client/dist/* static
-	cp NOTICE client/dist/NOTICE
+	cp NOTICE static/NOTICE
 	SQLX_OFFLINE=$(SQLX_OFFLINE) cargo run --release --bin hiddn-website
 
 build: $(env) build-client sqlx-prepare ts-rs-gen generate-licenses
 	cargo generate-lockfile
-	cp NOTICE client/dist/NOTICE
+	cp NOTICE static/NOTICE
 	SQLX_OFFLINE=$(SQLX_OFFLINE) cargo build --release --bin hiddn-website
 
 docker-build: build ts-rs-gen generate-licenses
