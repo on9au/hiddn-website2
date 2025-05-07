@@ -84,8 +84,8 @@ pub fn create_router(
         // API Routes
         .nest("/api", api::routes(auth_layer, app_state))
         // CSR Frontend
-        .nest_service(
-            "/",
+        .fallback_service(
+            // "/",
             ServeDir::new("static").fallback(ServeFile::new("static/index.html")),
         )
 }

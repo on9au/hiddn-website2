@@ -24,6 +24,7 @@ RUN apt-get update && \
     ldconfig
 COPY --from=server-builder /server-builder/target/release/hiddn-website . 
 COPY --from=client-builder /client-builder/dist/ ./static/
+COPY --from=server-builder /server-builder/NOTICE ./static/NOTICE
 ENV RUST_LOG=info
 
 # Set the entry point
