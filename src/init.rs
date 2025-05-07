@@ -2,7 +2,12 @@ use std::net::SocketAddr;
 
 use anyhow::{Context, Result};
 use axum::{
-    BoxError, extract::Host, handler::HandlerWithoutStateExt, http::Uri, response::Redirect,
+    BoxError, Router,
+    body::Body,
+    extract::Request,
+    handler::HandlerWithoutStateExt,
+    http::Uri,
+    response::{IntoResponse, Redirect},
 };
 use axum_login::{
     AuthManagerLayer, AuthManagerLayerBuilder,
@@ -21,7 +26,7 @@ use crate::{
     sessions::Backend,
     state::AppState,
 };
-use argon2::PasswordHasher;
+use argon2::{PasswordHasher, password_hash::rand_core::OsRng};
 
 /// Connect to the database from the config file
 async fn init_db() -> Result<MySqlPool> {
@@ -63,7 +68,7 @@ async fn create_initial_admin_user(pool: &MySqlPool) -> Result<()> {
         // Hash the password
         let password_hash = tokio::task::spawn_blocking(move || {
             let argon2 = argon2::Argon2::default();
-            let salt = argon2::password_hash::SaltString::generate(&mut rand::thread_rng());
+            let salt = argon2::password_hash::SaltString::generate(&mut OsRng);
             argon2
                 .hash_password(default_admin_password.as_bytes(), &salt)
                 .expect("Failed to hash password")
@@ -139,33 +144,20 @@ async fn setup_tera() -> Result<Tera> {
 
 /// Redirect HTTP to HTTPS
 async fn redirect_http_to_https() {
-    fn make_https(host: String, uri: Uri) -> Result<Uri, BoxError> {
-        let mut parts = uri.into_parts();
+    /// Redirects all HTTP requests to HTTPS.
+    async fn redirect_http(req: Request<Body>) -> impl IntoResponse {
+        let host = req
+            .headers()
+            .get("host")
+            .and_then(|h| h.to_str().ok())
+            .unwrap_or("localhost");
 
-        parts.scheme = Some(axum::http::uri::Scheme::HTTPS);
-
-        if parts.path_and_query.is_none() {
-            parts.path_and_query = Some("/".parse().unwrap());
-        }
-
-        let https_host = host.replace(
-            &GLOBAL_CONFIG.http_port.to_string(),
-            &GLOBAL_CONFIG.https_port.to_string(),
-        );
-        parts.authority = Some(https_host.parse()?);
-
-        Ok(Uri::from_parts(parts)?)
+        let uri = req.uri();
+        let https_uri = format!("https://{host}{}", uri);
+        (StatusCode::MOVED_PERMANENTLY, [("Location", https_uri)])
     }
 
-    let redirect = move |Host(host): Host, uri: Uri| async move {
-        match make_https(host, uri) {
-            Ok(uri) => Ok(Redirect::permanent(&uri.to_string())),
-            Err(error) => {
-                tracing::warn!(%error, "failed to convert URI to HTTPS");
-                Err(StatusCode::BAD_REQUEST)
-            }
-        }
-    };
+    let app = Router::new().fallback(redirect_http);
 
     let addr = (GLOBAL_CONFIG.ip_addr.clone() + GLOBAL_CONFIG.http_port.to_string().as_str())
         .parse::<SocketAddr>()
@@ -175,9 +167,7 @@ async fn redirect_http_to_https() {
         "Redirecting http://{} to https counterpart",
         listener.local_addr().unwrap()
     );
-    axum::serve(listener, redirect.into_make_service())
-        .await
-        .unwrap();
+    axum::serve(listener, app).await.unwrap();
 }
 
 /// # Entry Point

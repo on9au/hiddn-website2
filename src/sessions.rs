@@ -1,6 +1,5 @@
 use argon2::PasswordHash;
 use argon2::{Argon2, PasswordVerifier};
-use axum::async_trait;
 use axum_login::{AuthUser, AuthnBackend, UserId};
 use sqlx::{MySqlPool, query_as};
 
@@ -71,7 +70,7 @@ impl Backend {
 
 // For credentials, we will use payload::LoginPayload, for simplicity and for typeshare with typescript.
 
-#[async_trait]
+#[async_trait::async_trait]
 impl AuthnBackend for Backend {
     type User = User;
     type Credentials = LoginPayload;

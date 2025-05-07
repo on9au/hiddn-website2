@@ -10,5 +10,5 @@ use crate::handlers::plans::*;
 pub fn routes() -> Router {
     Router::new()
         .route("/", get(get_plans))
-        .route("/:id", get(get_plan_by_id))
+        .route("/{:id}", get(get_plan_by_id))
 }

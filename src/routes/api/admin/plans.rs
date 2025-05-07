@@ -13,5 +13,5 @@ use crate::handlers::admin::plans;
 pub fn routes() -> Router {
     Router::new()
         .route("/", post(plans::admin_create_plan))
-        .route("/:id", delete(plans::admin_delete_plan))
+        .route("/{:id}", delete(plans::admin_delete_plan))
 }

@@ -10,5 +10,5 @@ use crate::handlers::admin::transactions;
 pub fn routes() -> Router {
     Router::new()
         .route("/", get(transactions::admin_get_transactions))
-        .route("/:id", get(transactions::admin_get_transaction))
+        .route("/{:id}", get(transactions::admin_get_transaction))
 }
