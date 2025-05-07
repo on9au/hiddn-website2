@@ -7,6 +7,7 @@
 //! Public:
 //!
 //! - [`auth`]: Authentication routes
+//! - [`stripe`]: Stripe (webhook) routes
 //!
 //! Protected:
 //!
@@ -21,6 +22,7 @@ pub mod announcements;
 pub mod auth;
 pub mod me;
 pub mod plans;
+pub mod stripe_webhook;
 pub mod transactions;
 
 use std::sync::Arc;
@@ -43,7 +45,9 @@ pub fn routes(
     tera: Tera,
 ) -> Router {
     // Public routes which will lack the auth_layer.
-    let public_routes = Router::new().nest("/auth", auth::routes());
+    let public_routes = Router::new()
+        .nest("/auth", auth::routes())
+        .nest("/stripe", stripe_webhook::routes());
 
     // Protected routes which will have the auth_layer applied.
     let protected_routes = Router::new()

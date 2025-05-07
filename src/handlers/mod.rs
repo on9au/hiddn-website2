@@ -3,6 +3,7 @@ pub mod announcements;
 pub mod auth;
 pub mod me;
 pub mod plans;
+pub mod stripe_webhook;
 pub mod transactions;
 
 // use std::{collections::HashMap, sync::Arc};
