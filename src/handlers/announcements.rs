@@ -1,4 +1,4 @@
-use crate::db::PlanRepository;
+use crate::db::AnnouncementRepository;
 use axum::{Json, response::IntoResponse};
 
 pub async fn get_announcements(/* params */) -> impl IntoResponse {
