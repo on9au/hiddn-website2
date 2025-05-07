@@ -1,5 +1,6 @@
 pub mod admin;
 pub mod announcements;
+pub mod app;
 pub mod auth;
 pub mod me;
 pub mod plans;

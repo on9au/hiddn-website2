@@ -13,12 +13,14 @@
 //!
 //! - [`admin`]: Admin routes
 //! - [`announcements`]: Announcement routes
+//! - [`app`]: App routes
 //! - [`me`]: Me routes
 //! - [`plans`]: Plan routes
 //! - [`transactions`]: Transaction routes
 
 pub mod admin;
 pub mod announcements;
+pub mod app;
 pub mod auth;
 pub mod me;
 pub mod plans;
@@ -53,6 +55,7 @@ pub fn routes(
     let protected_routes = Router::new()
         .nest("/admin", admin::routes())
         .nest("/announcements", announcements::routes())
+        .nest("/app", app::routes())
         .nest("/me", me::routes())
         .nest("/plans", plans::routes())
         .nest("/transactions", transactions::routes())
