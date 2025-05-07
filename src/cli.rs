@@ -4,8 +4,8 @@ use clap::{Parser, Subcommand};
 use dotenvy::dotenv;
 use rand::rngs::OsRng;
 use rpassword::read_password;
-use sqlx::mysql::MySqlPoolOptions;
 use sqlx::MySqlPool;
+use sqlx::mysql::MySqlPoolOptions;
 use std::env;
 use std::io::Write;
 
