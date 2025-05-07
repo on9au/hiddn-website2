@@ -5,7 +5,6 @@ use argon2::{PasswordHash, PasswordHasher, PasswordVerifier};
 use axum::async_trait;
 use axum::body::Body;
 use axum::extract::{FromRequest, Request};
-use futures::StreamExt;
 use lettre::message::header::ContentType;
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::{Message, SmtpTransport, Transport};

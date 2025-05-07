@@ -3,7 +3,7 @@
 CONTAINER_NAME="hiddn-website-mysql-container"
 IMAGE_NAME="mysql:latest"
 MYSQL_ROOT_PASSWORD="rootpassword"
-MYSQL_DATABASE="hiddn_db"
+MYSQL_DATABASE="hiddn_website"
 
 case "$1" in
 start)
@@ -19,7 +19,19 @@ start)
             -e MYSQL_DATABASE="$MYSQL_DATABASE" \
             -p 3306:3306 \
             "$IMAGE_NAME"
+
+        # do sqlx database setup
+        echo "🔄 Waiting for MySQL to start"
+        sleep 3
+        echo "🔄 Creating database..."
+        sqlx database setup \
+            --database-url "mysql://root:$MYSQL_ROOT_PASSWORD@localhost:3306/$MYSQL_DATABASE"
     fi
+    ;;
+setup)
+    echo "🔄 Setting up MySQL database..."
+    sqlx database setup \
+        --database-url "mysql://root:$MYSQL_ROOT_PASSWORD@localhost:3306/$MYSQL_DATABASE"
     ;;
 stop)
     echo "🛑 Stopping MySQL container..."
