@@ -51,5 +51,15 @@ docker-push: docker-build
 	@echo "📤 Pushing Docker image..."
 	sudo docker push on9au/hiddn-website:$(VER)
 
+clean: 
+	@echo "🧹 Cleaning up..."
+	rm -rf static
+	rm -rf client/dist
+	rm -rf client/node_modules
+	rm -rf client/.env.local
+	rm -rf client/.env.production.local
+	cargo clean
+	@echo "🧼 Cleaned up."
+
 npm-i:
 	cd client && npm i
