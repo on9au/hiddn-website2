@@ -2,7 +2,6 @@
     "recommendations": [
         "rust-lang.rust-analyzer",
         "esbenp.prettier-vscode",
-        "ms-azuretools.vscode-docker",
         "dbaeumer.vscode-eslint"
     ]
 }
