@@ -12,6 +12,7 @@ impl UserRepository {
         Self { pool }
     }
 
+    /// Get all users (sorted by ID).
     pub async fn get_user_by_id(&self, id: i64) -> Result<Option<UserProfile>> {
         let user = sqlx::query_as!(
             UserProfile,
@@ -34,6 +35,7 @@ impl UserRepository {
         Ok(user)
     }
 
+    /// Get a single user by their email.
     pub async fn get_user_by_email(&self, email: &str) -> Result<Option<UserProfile>> {
         let user = sqlx::query_as!(
             UserProfile,
@@ -56,6 +58,7 @@ impl UserRepository {
         Ok(user)
     }
 
+    /// Check if a user exists by their email.
     pub async fn user_exists(&self, email: &str) -> Result<bool> {
         let user_count = sqlx::query!(
             r#"

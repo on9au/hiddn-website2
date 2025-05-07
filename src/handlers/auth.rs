@@ -1,4 +1,5 @@
 use crate::{
+    errors::AppResult,
     payloads::{LoginPayload, LoginResponse, RegisterPayload},
     sessions::AuthSession,
     state::AppState,
@@ -11,45 +12,34 @@ use tracing::error;
 pub async fn login(
     mut auth_session: AuthSession,
     Json(payload): Json<LoginPayload>,
-) -> impl IntoResponse {
+) -> AppResult<impl IntoResponse> {
     // Authenticate the user with the db
     let user = match auth_session.authenticate(payload).await {
         Ok(Some(user)) => user,
-        Ok(None) => return StatusCode::UNAUTHORIZED.into_response(),
+        Ok(None) => return Ok(StatusCode::UNAUTHORIZED.into_response()),
         Err(e) => {
             error!("Error: {}", e);
-            return StatusCode::INTERNAL_SERVER_ERROR.into_response();
+            return Ok(StatusCode::INTERNAL_SERVER_ERROR.into_response());
         }
     };
 
     // Log the user in
-    match auth_session.login(&user).await {
-        Ok(_) => {}
-        Err(e) => {
-            error!("Error: {}", e);
-            return StatusCode::INTERNAL_SERVER_ERROR.into_response();
-        }
-    }
+    auth_session.login(&user).await?;
 
-    (StatusCode::OK, Json(LoginResponse { logged_in: true })).into_response()
+    Ok((StatusCode::OK, Json(LoginResponse { logged_in: true })).into_response())
 }
 
 /// POST `/api/auth/logout`
-pub async fn logout(mut auth_session: AuthSession) -> impl IntoResponse {
-    match auth_session.logout().await {
-        Ok(_) => StatusCode::OK.into_response(),
-        Err(e) => {
-            error!("Error: {}", e);
-            StatusCode::INTERNAL_SERVER_ERROR.into_response()
-        }
-    }
+pub async fn logout(mut auth_session: AuthSession) -> AppResult<impl IntoResponse> {
+    auth_session.logout().await?;
+    Ok(StatusCode::OK.into_response())
 }
 
 /// GET `/api/auth/is-logged-in`
-pub async fn is_logged_in(auth_session: AuthSession) -> impl IntoResponse {
+pub async fn is_logged_in(auth_session: AuthSession) -> AppResult<impl IntoResponse> {
     match auth_session.user {
-        Some(_) => StatusCode::OK.into_response(),
-        None => StatusCode::UNAUTHORIZED.into_response(),
+        Some(_) => Ok(StatusCode::OK.into_response()),
+        None => Ok(StatusCode::UNAUTHORIZED.into_response()),
     }
 }
 
@@ -57,31 +47,33 @@ pub async fn is_logged_in(auth_session: AuthSession) -> impl IntoResponse {
 pub async fn register_user(
     Extension(app_state): Extension<AppState>,
     Json(payload): Json<RegisterPayload>,
-) -> impl IntoResponse {
+) -> AppResult<impl IntoResponse> {
     // Check if the user already exists
-    let user = app_state
+    if app_state
         .user_repository()
-        .get_user_by_email(&payload.email)
-        .await
-        .unwrap_or(None);
+        .user_exists(&payload.email)
+        .await?
+    {
+        return Ok(StatusCode::CONFLICT.into_response());
+    }
 
-    Json("stub: register_user")
+    Ok(Json("stub: register_user").into_response())
 }
 
 /// POST `/api/auth/forgot-password`
-pub async fn forgot_password(/* params */) -> impl IntoResponse {
+pub async fn forgot_password(/* params */) -> AppResult<impl IntoResponse> {
     // UserRepository::forgot_password(...)
-    Json("stub: forgot_password")
+    Ok(Json("stub: forgot_password"))
 }
 
 /// POST `/api/auth/email/request-code`
-pub async fn request_code(/* params */) -> impl IntoResponse {
+pub async fn request_code(/* params */) -> AppResult<impl IntoResponse> {
     // UserRepository::request_code(...)
-    Json("stub: request_code")
+    Ok(Json("stub: request_code"))
 }
 
 /// POST `/api/auth/email/verify`
-pub async fn verify_email(/* params */) -> impl IntoResponse {
+pub async fn verify_email(/* params */) -> AppResult<impl IntoResponse> {
     // UserRepository::verify_email(...)
-    Json("stub: verify_email")
+    Ok(Json("stub: verify_email"))
 }

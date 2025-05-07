@@ -1,6 +1,6 @@
-use crate::db::AnnouncementRepository;
+use crate::errors::AppResult;
 use axum::{Json, response::IntoResponse};
 
-pub async fn get_announcements(/* params */) -> impl IntoResponse {
-    Json("stub: get_announcements")
+pub async fn get_announcements(/* params */) -> AppResult<impl IntoResponse> {
+    Ok(Json("stub: get_announcements"))
 }
