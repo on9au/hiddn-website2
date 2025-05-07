@@ -30,21 +30,15 @@ pub mod plans;
 pub mod stripe_webhook;
 pub mod transactions;
 
+use std::sync::Arc;
+
 use axum::{Extension, Router};
 use axum_login::{AuthManagerLayer, login_required, tower_sessions::MemoryStore};
-use marzban_api::client::MarzbanAPIClient;
-use tera::Tera;
 use tower_http::trace::TraceLayer;
 
-use crate::sessions::Backend;
+use crate::{sessions::Backend, state::AppState};
 
-pub fn routes(
-    auth_layer: AuthManagerLayer<Backend, MemoryStore>,
-    pool: sqlx::MySqlPool,
-    marzban_client: MarzbanAPIClient,
-    stripe_client: stripe::Client,
-    tera: Tera,
-) -> Router {
+pub fn routes(auth_layer: AuthManagerLayer<Backend, MemoryStore>, app_state: AppState) -> Router {
     // Public routes which will lack the auth_layer.
     let public_routes = Router::new()
         .nest("/auth", auth::routes())
@@ -63,10 +57,7 @@ pub fn routes(
     Router::new()
         .merge(public_routes)
         .merge(protected_routes)
-        .layer(Extension(pool))
-        .layer(Extension(marzban_client))
-        .layer(Extension(stripe_client))
-        .layer(Extension(tera))
+        .layer(Extension(Arc::new(app_state)))
         .layer(auth_layer)
         .layer(TraceLayer::new_for_http())
 }

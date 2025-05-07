@@ -19,6 +19,7 @@ use crate::{
     config::{GLOBAL_CONFIG, HttpOrHttps},
     routes::create_router,
     sessions::Backend,
+    state::AppState,
 };
 use argon2::PasswordHasher;
 
@@ -184,15 +185,15 @@ async fn redirect_http_to_https() {
 /// This serves as the main entry point for the backend.
 pub async fn init() -> Result<()> {
     // Database setup
-    let pool = init_db().await?;
+    let db_pool = init_db().await?;
 
     // Migrate database
-    migrate_db(&pool)
+    migrate_db(&db_pool)
         .await
         .context("Failed to migrate database")?;
 
     // Create initial admin user
-    create_initial_admin_user(&pool)
+    create_initial_admin_user(&db_pool)
         .await
         .context("Failed to create initial admin user")?;
 
@@ -205,7 +206,7 @@ pub async fn init() -> Result<()> {
     let stripe_client = stripe::Client::new(GLOBAL_CONFIG.stripe_secret_key.clone());
 
     // Auth service.
-    let auth_layer = setup_auth_layer(&pool)
+    let auth_layer = setup_auth_layer(&db_pool)
         .await
         .context("Failed to setup auth layer")?;
 
@@ -214,8 +215,16 @@ pub async fn init() -> Result<()> {
         .await
         .context("Failed to setup Tera template engine")?;
 
+    // Create app state
+    let app_state = AppState {
+        db_pool,
+        marzban_client,
+        stripe_client,
+        tera,
+    };
+
     // Create router
-    let app = create_router(auth_layer, pool, marzban_client, stripe_client, tera);
+    let app = create_router(auth_layer, app_state);
 
     info!("Router setup");
 

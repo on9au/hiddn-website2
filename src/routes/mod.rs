@@ -1,19 +1,14 @@
 use axum::Router;
 use axum_login::{AuthManagerLayer, tower_sessions::MemoryStore};
-use marzban_api::client::MarzbanAPIClient;
-use tera::Tera;
 use tower_http::services::{ServeDir, ServeFile};
 
-use crate::sessions::Backend;
+use crate::{sessions::Backend, state::AppState};
 
 pub mod api;
 
 pub fn create_router(
     auth_layer: AuthManagerLayer<Backend, MemoryStore>,
-    pool: sqlx::MySqlPool,
-    marzban_client: MarzbanAPIClient,
-    stripe_client: stripe::Client,
-    tera: Tera,
+    app_state: AppState,
 ) -> Router {
     // Router::new()
     //     // API Routes
@@ -87,10 +82,7 @@ pub fn create_router(
 
     Router::new()
         // API Routes
-        .nest(
-            "/api",
-            api::routes(auth_layer, pool, marzban_client, stripe_client, tera),
-        )
+        .nest("/api", api::routes(auth_layer, app_state))
         // CSR Frontend
         .nest_service(
             "/",
