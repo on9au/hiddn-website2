@@ -1,35 +1,35 @@
 env := .env
 
+.PHONY: dev preview manager build npm-i docker-build docker-push
+
 $(env):
-	echo "No .env file found, creating one..."
-	echo "Please fill in the required values in the .env file"
-	cp .env.example $(env)
+	@echo "No .env file found, creating one..."
+	@cp .env.example $(env)
+	@echo "Please fill in the required values in the .env file."
 
-typeshare:
-	cargo install typeshare-cli
+npm_install:
+	cd client && [ -d node_modules ] || npm i
 
-dev: $(env) typeshare
-	cd client && npm i && npm run build && rm -rf ../static && mkdir ../static && cp -r ./dist/* ../static
-	cargo build
+dev: $(env)
+	cd client && npm i && npm run build
+	rm -rf static && mkdir static && cp -r client/dist/* static
 	RUST_LOG=debug cargo run --bin hiddn-website
 
-preview: $(env) typeshare
-	cd client && npm i && npm run build && rm -rf ../static && mkdir ../static && cp -r ./dist/* ../static
-	cargo build --release
+preview: $(env)
+	cd client && npm i && npm run build
+	rm -rf static && mkdir static && cp -r client/dist/* static
 	cargo run --release --bin hiddn-website
 
-manager: $(env) typeshare
-	cargo build --release
+manager: $(env)
 	cargo run --release --bin hiddn-cli
 
-build: $(env) typeshare
+build: $(env)
 	cd client && npm i && npm run build
 	cargo generate-lockfile
-	cargo build --release
-	cargo build --release --bin hiddn-cli
 	cargo build --release --bin hiddn-website
+	cargo build --release --bin hiddn-cli
 
-npm i:
+npm-i:
 	cd client && npm i
 
 docker-build: build

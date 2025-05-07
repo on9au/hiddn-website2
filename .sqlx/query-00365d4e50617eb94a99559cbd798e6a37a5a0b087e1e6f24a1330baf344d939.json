@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n                INSERT INTO verification_codes (email, code, created_at, expires_at)\n                VALUES (?, ?, NOW(), NOW() + INTERVAL 10 MINUTE)\n                ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "00365d4e50617eb94a99559cbd798e6a37a5a0b087e1e6f24a1330baf344d939"
+}

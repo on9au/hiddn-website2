@@ -2,7 +2,7 @@ use argon2::PasswordHash;
 use argon2::{Argon2, PasswordVerifier};
 use axum::async_trait;
 use axum_login::{AuthUser, AuthnBackend, UserId};
-use sqlx::{query_as, MySqlPool};
+use sqlx::{MySqlPool, query_as};
 
 use crate::payloads::LoginPayload;
 

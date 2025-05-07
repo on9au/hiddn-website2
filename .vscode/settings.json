@@ -1,12 +1,24 @@
 {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
     "files.exclude": {
-        // "**/target": true,
-        "**/node_modules": true
-    },
-    "search.exclude": {
         "**/target": true,
-        "**/node_modules": true
+        "**/node_modules": true,
+        "**/dist": true
     },
+    "rust-analyzer.checkOnSave.command": "clippy",
     "rust-analyzer.cargo.workspaceRoot": "${workspaceFolder}",
-    "typescript.tsdk": "client/node_modules/typescript/lib"
+    "typescript.tsdk": "client/node_modules/typescript/lib",
+    "[rust]": {
+        "editor.defaultFormatter": "rust-lang.rust-analyzer"
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[dotenv]": {
+        "editor.defaultFormatter": "foxundermoon.shell-format"
+    },
 }

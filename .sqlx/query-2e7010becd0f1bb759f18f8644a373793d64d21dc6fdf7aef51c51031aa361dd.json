@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "\n        UPDATE verification_codes\n        SET is_used = true\n        WHERE id = ?\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": []
+  },
+  "hash": "2e7010becd0f1bb759f18f8644a373793d64d21dc6fdf7aef51c51031aa361dd"
+}
