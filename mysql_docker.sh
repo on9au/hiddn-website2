@@ -23,11 +23,11 @@ start)
     ;;
 stop)
     echo "🛑 Stopping MySQL container..."
-    docker stop "$CONTAINER_NAME"
+    sudo docker stop "$CONTAINER_NAME"
     ;;
 remove)
     echo "❌ Removing MySQL container..."
-    docker rm -f "$CONTAINER_NAME"
+    sudo docker rm -f "$CONTAINER_NAME"
     ;;
 *)
     echo "Usage: $0 {start|stop|remove}"
