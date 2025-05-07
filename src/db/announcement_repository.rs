@@ -99,4 +99,20 @@ impl AnnouncementRepository {
 
         Ok(())
     }
+
+    /// Delete an announcement by its ID.
+    pub async fn delete_announcement(&self, id: i64) -> Result<()> {
+        sqlx::query!(
+            r#"
+            DELETE FROM announcements
+            WHERE id = ?
+            "#,
+            id
+        )
+        .execute(&self.pool)
+        .await
+        .context("Failed to delete announcement")?;
+
+        Ok(())
+    }
 }

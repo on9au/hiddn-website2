@@ -13,6 +13,7 @@ pub type AuthSession = axum_login::AuthSession<Backend>;
 pub struct User {
     pub id: i64,
     pub email: String,
+    // redact password_hash in logs
     password_hash: String,
     pub is_admin: bool,
 }
