@@ -92,4 +92,11 @@ generate-licenses:
 
 	@echo "✅ NOTICE file generated!"
 
+	# Now copy it to `static/NOTICE`
+	@echo "📦 Copying NOTICE file to static directory..."
+	mkdir -p static
+	cp NOTICE static/NOTICE
+	@echo "✅ NOTICE file copied to static directory!"
+	@echo "📝 LICENSES/NOTICE file generation completed!"
+
 
