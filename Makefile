@@ -3,7 +3,7 @@ SQLX_OFFLINE ?= true
 VER ?= dev
 
 
-.PHONY: dev preview manager build npm-i docker-build docker-push
+.PHONY: dev preview manager build npm-i docker-build docker-push clean generate-licenses
 
 $(env):
 	@echo "🔧 No .env file found, creating one..."
@@ -26,21 +26,21 @@ endif
 	@echo "📦 Preparing SQLx offline schema..."
 	sqlx prepare --check -- --bin hiddn-website
 
-dev: $(env) ts-rs-gen
+dev: $(env) ts-rs-gen generate-licenses
 	make build-client
 	rm -rf static && mkdir -p static && cp -r client/dist/* static
 	RUST_LOG=debug SQLX_OFFLINE=$(SQLX_OFFLINE) cargo run --bin hiddn-website
 
-preview: $(env) ts-rs-gen
+preview: $(env) ts-rs-gen generate-licenses
 	make build-client
 	rm -rf static && mkdir -p static && cp -r client/dist/* static
 	SQLX_OFFLINE=$(SQLX_OFFLINE) cargo run --release --bin hiddn-website
 
-build: $(env) build-client sqlx-prepare ts-rs-gen
+build: $(env) build-client sqlx-prepare ts-rs-gen generate-licenses
 	cargo generate-lockfile
 	SQLX_OFFLINE=$(SQLX_OFFLINE) cargo build --release --bin hiddn-website
 
-docker-build: build ts-rs-gen
+docker-build: build ts-rs-gen generate-licenses
 	@echo "🐳 Building Docker image..."
 	sudo docker build \
 		--build-arg SQLX_OFFLINE=$(SQLX_OFFLINE) \
@@ -48,7 +48,7 @@ docker-build: build ts-rs-gen
 		--build-arg VERSION=$(VER) \
 		--tag on9au/hiddn-website:$(VER) .
 
-docker-push: docker-build ts-rs-gen
+docker-push: docker-build ts-rs-gen generate-licenses
 	@echo "📤 Pushing Docker image..."
 	sudo docker push on9au/hiddn-website:$(VER)
 
@@ -64,3 +64,32 @@ clean:
 
 npm-i:
 	cd client && npm i
+
+generate-licenses:
+	@echo "📝 Generating LICENSES/NOTICE file..."
+
+	# Generate Rust licenses
+	@echo "🔄 Generating Rust license information..."
+	cargo license --json > licenses.json
+
+	# Generate JavaScript licenses
+	@echo "🔄 Generating JavaScript license information..."
+	cd client && license-checker --json > licenses.json
+
+	# Combine Rust and JS licenses into a NOTICE file
+	@echo "🔄 Combining Rust and JavaScript licenses into NOTICE..."
+	@echo "This product includes third-party software components:" > NOTICE
+	@echo "" >> NOTICE
+
+	# Update this query based on actual JSON structure
+	@echo "Rust dependencies:" >> NOTICE
+	@cat licenses.json | jq -r '.[] | "- \(.name) \(.version) (\(.license))"' >> NOTICE
+	@echo "" >> NOTICE
+
+	# Update this query based on actual JSON structure
+	@echo "JavaScript dependencies:" >> NOTICE
+	@cat client/licenses.json | jq -r 'to_entries | .[] | "- \(.key) \(.value.licenses)"' >> NOTICE
+
+	@echo "✅ NOTICE file generated!"
+
+

@@ -6,6 +6,21 @@ echo "🔧 First-time setup starting..."
 
 export NVM_DIR="$HOME/.nvm"
 
+# Install jq
+if ! command -v jq &>/dev/null; then
+    echo "📦 Installing jq..."
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        sudo apt-get install -y jq
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        brew install jq
+    else
+        echo "❌ Unsupported OS. Please install jq manually."
+        exit 1
+    fi
+else
+    echo "✅ jq is already installed."
+fi
+
 # Check for Rust
 if ! command -v cargo &>/dev/null; then
     echo "🚀 Installing Rust..."
@@ -15,12 +30,12 @@ else
     echo "✅ Rust is already installed."
 fi
 
-# Install typeshare-cli
-if ! command -v typeshare &>/dev/null; then
-    echo "📦 Installing typeshare-cli..."
-    cargo install typeshare-cli
+# Install cargo-license
+if ! command -v cargo-license &>/dev/null; then
+    echo "📦 Installing cargo-license..."
+    cargo install cargo-license
 else
-    echo "✅ typeshare-cli is already installed."
+    echo "✅ cargo-license is already installed."
 fi
 
 # Install sqlx-cli
@@ -51,6 +66,14 @@ echo "📦 Installing npm dependencies..."
 cd client
 npm install
 cd ..
+
+# Install license-checker
+if ! command -v license-checker &>/dev/null; then
+    echo "📦 Installing license-checker..."
+    npm install -g license-checker
+else
+    echo "✅ license-checker is already installed."
+fi
 
 # Create .env if missing
 if [ ! -f .env ]; then

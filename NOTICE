@@ -1,0 +1,1058 @@
+This product includes third-party software components:
+
+Rust dependencies:
+- addr2line 0.24.2 (Apache-2.0 OR MIT)
+- adler2 2.0.0 (0BSD OR Apache-2.0 OR MIT)
+- ahash 0.8.11 (Apache-2.0 OR MIT)
+- aho-corasick 1.1.3 (MIT OR Unlicense)
+- allocator-api2 0.2.21 (Apache-2.0 OR MIT)
+- android-tzdata 0.1.1 (Apache-2.0 OR MIT)
+- android_system_properties 0.1.5 (Apache-2.0 OR MIT)
+- anstream 0.6.18 (Apache-2.0 OR MIT)
+- anstyle 1.0.10 (Apache-2.0 OR MIT)
+- anstyle-parse 0.2.6 (Apache-2.0 OR MIT)
+- anstyle-query 1.1.2 (Apache-2.0 OR MIT)
+- anstyle-wincon 3.0.7 (Apache-2.0 OR MIT)
+- anyhow 1.0.98 (Apache-2.0 OR MIT)
+- arc-swap 1.7.1 (Apache-2.0 OR MIT)
+- argon2 0.5.3 (Apache-2.0 OR MIT)
+- async-channel 1.9.0 (Apache-2.0 OR MIT)
+- async-stripe 0.39.1 (Apache-2.0 OR MIT)
+- async-trait 0.1.88 (Apache-2.0 OR MIT)
+- atoi 2.0.0 (MIT)
+- atomic-waker 1.1.2 (Apache-2.0 OR MIT)
+- autocfg 1.4.0 (Apache-2.0 OR MIT)
+- aws-lc-rs 1.13.0 (ISC AND (Apache-2.0 OR ISC))
+- aws-lc-sys 0.28.2 (ISC AND (Apache-2.0 OR ISC) AND OpenSSL)
+- axum 0.8.4 (MIT)
+- axum-core 0.5.2 (MIT)
+- axum-login 0.17.0 (MIT)
+- axum-macros 0.5.0 (MIT)
+- axum-server 0.7.2 (MIT)
+- backtrace 0.3.75 (Apache-2.0 OR MIT)
+- base64 0.13.1 (Apache-2.0 OR MIT)
+- base64 0.21.7 (Apache-2.0 OR MIT)
+- base64 0.22.1 (Apache-2.0 OR MIT)
+- base64ct 1.7.3 (Apache-2.0 OR MIT)
+- bigdecimal 0.4.8 (Apache-2.0 OR MIT)
+- bindgen 0.69.5 (BSD-3-Clause)
+- bit-set 0.5.3 (Apache-2.0 OR MIT)
+- bit-vec 0.6.3 (Apache-2.0 OR MIT)
+- bitflags 2.9.0 (Apache-2.0 OR MIT)
+- blake2 0.10.6 (Apache-2.0 OR MIT)
+- block-buffer 0.10.4 (Apache-2.0 OR MIT)
+- bstr 1.12.0 (Apache-2.0 OR MIT)
+- bumpalo 3.17.0 (Apache-2.0 OR MIT)
+- byteorder 1.5.0 (MIT OR Unlicense)
+- bytes 1.10.1 (MIT)
+- cc 1.2.21 (Apache-2.0 OR MIT)
+- cexpr 0.6.0 (Apache-2.0 OR MIT)
+- cfg-if 1.0.0 (Apache-2.0 OR MIT)
+- chrono 0.4.41 (Apache-2.0 OR MIT)
+- chrono-tz 0.9.0 (Apache-2.0 OR MIT)
+- chrono-tz-build 0.3.0 (Apache-2.0 OR MIT)
+- chumsky 0.9.3 (MIT)
+- clang-sys 1.8.1 (Apache-2.0)
+- clap 4.5.37 (Apache-2.0 OR MIT)
+- clap_builder 4.5.37 (Apache-2.0 OR MIT)
+- clap_derive 4.5.32 (Apache-2.0 OR MIT)
+- clap_lex 0.7.4 (Apache-2.0 OR MIT)
+- cmake 0.1.54 (Apache-2.0 OR MIT)
+- colorchoice 1.0.3 (Apache-2.0 OR MIT)
+- concurrent-queue 2.5.0 (Apache-2.0 OR MIT)
+- const-oid 0.9.6 (Apache-2.0 OR MIT)
+- cookie 0.18.1 (Apache-2.0 OR MIT)
+- core-foundation 0.9.4 (Apache-2.0 OR MIT)
+- core-foundation-sys 0.8.7 (Apache-2.0 OR MIT)
+- cpufeatures 0.2.17 (Apache-2.0 OR MIT)
+- crc 3.2.1 (Apache-2.0 OR MIT)
+- crc-catalog 2.4.0 (Apache-2.0 OR MIT)
+- crossbeam-deque 0.8.6 (Apache-2.0 OR MIT)
+- crossbeam-epoch 0.9.18 (Apache-2.0 OR MIT)
+- crossbeam-queue 0.3.12 (Apache-2.0 OR MIT)
+- crossbeam-utils 0.8.21 (Apache-2.0 OR MIT)
+- crypto-common 0.1.6 (Apache-2.0 OR MIT)
+- darling 0.20.11 (MIT)
+- darling_core 0.20.11 (MIT)
+- darling_macro 0.20.11 (MIT)
+- der 0.7.10 (Apache-2.0 OR MIT)
+- deranged 0.4.0 (Apache-2.0 OR MIT)
+- derive_builder 0.20.2 (Apache-2.0 OR MIT)
+- derive_builder_core 0.20.2 (Apache-2.0 OR MIT)
+- derive_builder_macro 0.20.2 (Apache-2.0 OR MIT)
+- deunicode 1.6.2 (BSD-3-Clause)
+- digest 0.10.7 (Apache-2.0 OR MIT)
+- displaydoc 0.2.5 (Apache-2.0 OR MIT)
+- dotenvy 0.15.7 (MIT)
+- dunce 1.0.5 (Apache-2.0 OR CC0-1.0 OR MIT-0)
+- either 1.15.0 (Apache-2.0 OR MIT)
+- email-encoding 0.4.1 (Apache-2.0 OR MIT)
+- email_address 0.2.9 (MIT)
+- encoding_rs 0.8.35 ((Apache-2.0 OR MIT) AND BSD-3-Clause)
+- envy 0.4.2 (MIT)
+- equivalent 1.0.2 (Apache-2.0 OR MIT)
+- errno 0.3.11 (Apache-2.0 OR MIT)
+- etcetera 0.8.0 (Apache-2.0 OR MIT)
+- event-listener 2.5.3 (Apache-2.0 OR MIT)
+- event-listener 5.4.0 (Apache-2.0 OR MIT)
+- fancy-regex 0.13.0 (MIT)
+- fastrand 1.9.0 (Apache-2.0 OR MIT)
+- fastrand 2.3.0 (Apache-2.0 OR MIT)
+- flume 0.11.1 (Apache-2.0 OR MIT)
+- fnv 1.0.7 (Apache-2.0 OR MIT)
+- foldhash 0.1.5 (Zlib)
+- foreign-types 0.3.2 (Apache-2.0 OR MIT)
+- foreign-types-shared 0.1.1 (Apache-2.0 OR MIT)
+- form_urlencoded 1.2.1 (Apache-2.0 OR MIT)
+- fs-err 3.1.0 (Apache-2.0 OR MIT)
+- fs_extra 1.3.0 (MIT)
+- futures 0.3.31 (Apache-2.0 OR MIT)
+- futures-channel 0.3.31 (Apache-2.0 OR MIT)
+- futures-core 0.3.31 (Apache-2.0 OR MIT)
+- futures-executor 0.3.31 (Apache-2.0 OR MIT)
+- futures-intrusive 0.5.0 (Apache-2.0 OR MIT)
+- futures-io 0.3.31 (Apache-2.0 OR MIT)
+- futures-lite 1.13.0 (Apache-2.0 OR MIT)
+- futures-macro 0.3.31 (Apache-2.0 OR MIT)
+- futures-sink 0.3.31 (Apache-2.0 OR MIT)
+- futures-task 0.3.31 (Apache-2.0 OR MIT)
+- futures-util 0.3.31 (Apache-2.0 OR MIT)
+- generic-array 0.14.7 (MIT)
+- getrandom 0.1.16 (Apache-2.0 OR MIT)
+- getrandom 0.2.16 (Apache-2.0 OR MIT)
+- getrandom 0.3.2 (Apache-2.0 OR MIT)
+- gimli 0.31.1 (Apache-2.0 OR MIT)
+- glob 0.3.2 (Apache-2.0 OR MIT)
+- globset 0.4.16 (MIT OR Unlicense)
+- globwalk 0.9.1 (MIT)
+- h2 0.3.26 (MIT)
+- h2 0.4.10 (MIT)
+- hashbrown 0.14.5 (Apache-2.0 OR MIT)
+- hashbrown 0.15.3 (Apache-2.0 OR MIT)
+- hashlink 0.10.0 (Apache-2.0 OR MIT)
+- heck 0.5.0 (Apache-2.0 OR MIT)
+- hex 0.4.3 (Apache-2.0 OR MIT)
+- hiddn-website 0.1.0 (null)
+- hkdf 0.12.4 (Apache-2.0 OR MIT)
+- hmac 0.12.1 (Apache-2.0 OR MIT)
+- home 0.5.11 (Apache-2.0 OR MIT)
+- hostname 0.4.1 (MIT)
+- http 0.2.12 (Apache-2.0 OR MIT)
+- http 1.3.1 (Apache-2.0 OR MIT)
+- http-body 0.4.6 (MIT)
+- http-body 1.0.1 (MIT)
+- http-body-util 0.1.3 (MIT)
+- http-range-header 0.4.2 (MIT)
+- http-types 2.12.0 (Apache-2.0 OR MIT)
+- httparse 1.10.1 (Apache-2.0 OR MIT)
+- httpdate 1.0.3 (Apache-2.0 OR MIT)
+- humansize 2.1.3 (Apache-2.0 OR MIT)
+- hyper 0.14.32 (MIT)
+- hyper 1.6.0 (MIT)
+- hyper-rustls 0.24.2 (Apache-2.0 OR ISC OR MIT)
+- hyper-rustls 0.27.5 (Apache-2.0 OR ISC OR MIT)
+- hyper-tls 0.6.0 (Apache-2.0 OR MIT)
+- hyper-util 0.1.11 (MIT)
+- iana-time-zone 0.1.63 (Apache-2.0 OR MIT)
+- iana-time-zone-haiku 0.1.2 (Apache-2.0 OR MIT)
+- icu_collections 1.5.0 (Unicode-3.0)
+- icu_locid 1.5.0 (Unicode-3.0)
+- icu_locid_transform 1.5.0 (Unicode-3.0)
+- icu_locid_transform_data 1.5.1 (Unicode-3.0)
+- icu_normalizer 1.5.0 (Unicode-3.0)
+- icu_normalizer_data 1.5.1 (Unicode-3.0)
+- icu_properties 1.5.1 (Unicode-3.0)
+- icu_properties_data 1.5.1 (Unicode-3.0)
+- icu_provider 1.5.0 (Unicode-3.0)
+- icu_provider_macros 1.5.0 (Unicode-3.0)
+- ident_case 1.0.1 (Apache-2.0 OR MIT)
+- idna 1.0.3 (Apache-2.0 OR MIT)
+- idna_adapter 1.2.0 (Apache-2.0 OR MIT)
+- ignore 0.4.23 (MIT OR Unlicense)
+- indexmap 2.9.0 (Apache-2.0 OR MIT)
+- infer 0.2.3 (MIT)
+- instant 0.1.13 (BSD-3-Clause)
+- ipnet 2.11.0 (Apache-2.0 OR MIT)
+- is_terminal_polyfill 1.70.1 (Apache-2.0 OR MIT)
+- itertools 0.12.1 (Apache-2.0 OR MIT)
+- itertools 0.13.0 (Apache-2.0 OR MIT)
+- itoa 1.0.15 (Apache-2.0 OR MIT)
+- jobserver 0.1.33 (Apache-2.0 OR MIT)
+- js-sys 0.3.77 (Apache-2.0 OR MIT)
+- lazy_static 1.5.0 (Apache-2.0 OR MIT)
+- lazycell 1.3.0 (Apache-2.0 OR MIT)
+- lettre 0.11.15 (MIT)
+- libc 0.2.172 (Apache-2.0 OR MIT)
+- libloading 0.8.6 (ISC)
+- libm 0.2.15 (MIT)
+- libsqlite3-sys 0.30.1 (MIT)
+- linux-raw-sys 0.4.15 (Apache-2.0 OR Apache-2.0 WITH LLVM-exception OR MIT)
+- linux-raw-sys 0.9.4 (Apache-2.0 OR Apache-2.0 WITH LLVM-exception OR MIT)
+- litemap 0.7.5 (Unicode-3.0)
+- lock_api 0.4.12 (Apache-2.0 OR MIT)
+- log 0.4.27 (Apache-2.0 OR MIT)
+- marzban_api 0.2.8 (MIT)
+- matchit 0.8.4 (MIT AND BSD-3-Clause)
+- md-5 0.10.6 (Apache-2.0 OR MIT)
+- memchr 2.7.4 (MIT OR Unlicense)
+- mime 0.3.17 (Apache-2.0 OR MIT)
+- mime_guess 2.0.5 (MIT)
+- minimal-lexical 0.2.1 (Apache-2.0 OR MIT)
+- miniz_oxide 0.8.8 (Apache-2.0 OR MIT OR Zlib)
+- mio 1.0.3 (MIT)
+- native-tls 0.2.14 (Apache-2.0 OR MIT)
+- nom 7.1.3 (MIT)
+- nom 8.0.0 (MIT)
+- nu-ansi-term 0.46.0 (MIT)
+- num-bigint 0.4.6 (Apache-2.0 OR MIT)
+- num-bigint-dig 0.8.4 (Apache-2.0 OR MIT)
+- num-conv 0.1.0 (Apache-2.0 OR MIT)
+- num-integer 0.1.46 (Apache-2.0 OR MIT)
+- num-iter 0.1.45 (Apache-2.0 OR MIT)
+- num-traits 0.2.19 (Apache-2.0 OR MIT)
+- object 0.36.7 (Apache-2.0 OR MIT)
+- once_cell 1.21.3 (Apache-2.0 OR MIT)
+- openssl 0.10.72 (Apache-2.0)
+- openssl-macros 0.1.1 (Apache-2.0 OR MIT)
+- openssl-probe 0.1.6 (Apache-2.0 OR MIT)
+- openssl-sys 0.9.108 (MIT)
+- overload 0.1.1 (MIT)
+- parking 2.2.1 (Apache-2.0 OR MIT)
+- parking_lot 0.12.3 (Apache-2.0 OR MIT)
+- parking_lot_core 0.9.10 (Apache-2.0 OR MIT)
+- parse-zoneinfo 0.3.1 (MIT)
+- password-hash 0.5.0 (Apache-2.0 OR MIT)
+- pem-rfc7468 0.7.0 (Apache-2.0 OR MIT)
+- percent-encoding 2.3.1 (Apache-2.0 OR MIT)
+- pest 2.8.0 (Apache-2.0 OR MIT)
+- pest_derive 2.8.0 (Apache-2.0 OR MIT)
+- pest_generator 2.8.0 (Apache-2.0 OR MIT)
+- pest_meta 2.8.0 (Apache-2.0 OR MIT)
+- phf 0.11.3 (MIT)
+- phf_codegen 0.11.3 (MIT)
+- phf_generator 0.11.3 (MIT)
+- phf_shared 0.11.3 (MIT)
+- pin-project-lite 0.2.16 (Apache-2.0 OR MIT)
+- pin-utils 0.1.0 (Apache-2.0 OR MIT)
+- pkcs1 0.7.5 (Apache-2.0 OR MIT)
+- pkcs8 0.10.2 (Apache-2.0 OR MIT)
+- pkg-config 0.3.32 (Apache-2.0 OR MIT)
+- powerfmt 0.2.0 (Apache-2.0 OR MIT)
+- ppv-lite86 0.2.21 (Apache-2.0 OR MIT)
+- prettyplease 0.2.32 (Apache-2.0 OR MIT)
+- proc-macro-error-attr2 2.0.0 (Apache-2.0 OR MIT)
+- proc-macro-error2 2.0.1 (Apache-2.0 OR MIT)
+- proc-macro2 1.0.95 (Apache-2.0 OR MIT)
+- psm 0.1.26 (Apache-2.0 OR MIT)
+- quote 1.0.40 (Apache-2.0 OR MIT)
+- quoted_printable 0.5.1 (0BSD)
+- r-efi 5.2.0 (Apache-2.0 OR LGPL-2.1-or-later OR MIT)
+- rand 0.7.3 (Apache-2.0 OR MIT)
+- rand 0.8.5 (Apache-2.0 OR MIT)
+- rand 0.9.1 (Apache-2.0 OR MIT)
+- rand_chacha 0.2.2 (Apache-2.0 OR MIT)
+- rand_chacha 0.3.1 (Apache-2.0 OR MIT)
+- rand_chacha 0.9.0 (Apache-2.0 OR MIT)
+- rand_core 0.5.1 (Apache-2.0 OR MIT)
+- rand_core 0.6.4 (Apache-2.0 OR MIT)
+- rand_core 0.9.3 (Apache-2.0 OR MIT)
+- rand_hc 0.2.0 (Apache-2.0 OR MIT)
+- redox_syscall 0.5.12 (MIT)
+- regex 1.11.1 (Apache-2.0 OR MIT)
+- regex-automata 0.4.9 (Apache-2.0 OR MIT)
+- regex-syntax 0.8.5 (Apache-2.0 OR MIT)
+- reqwest 0.12.15 (Apache-2.0 OR MIT)
+- ring 0.17.14 (Apache-2.0 AND ISC)
+- rpassword 7.4.0 (Apache-2.0)
+- rsa 0.9.8 (Apache-2.0 OR MIT)
+- rtoolbox 0.0.3 (Apache-2.0)
+- rustc-demangle 0.1.24 (Apache-2.0 OR MIT)
+- rustc-hash 1.1.0 (Apache-2.0 OR MIT)
+- rustix 0.38.44 (Apache-2.0 OR Apache-2.0 WITH LLVM-exception OR MIT)
+- rustix 1.0.7 (Apache-2.0 OR Apache-2.0 WITH LLVM-exception OR MIT)
+- rustls 0.21.12 (Apache-2.0 OR ISC OR MIT)
+- rustls 0.23.27 (Apache-2.0 OR ISC OR MIT)
+- rustls-native-certs 0.6.3 (Apache-2.0 OR ISC OR MIT)
+- rustls-pemfile 1.0.4 (Apache-2.0 OR ISC OR MIT)
+- rustls-pemfile 2.2.0 (Apache-2.0 OR ISC OR MIT)
+- rustls-pki-types 1.11.0 (Apache-2.0 OR MIT)
+- rustls-webpki 0.101.7 (ISC)
+- rustls-webpki 0.103.2 (ISC)
+- rustversion 1.0.20 (Apache-2.0 OR MIT)
+- ryu 1.0.20 (Apache-2.0 OR BSL-1.0)
+- same-file 1.0.6 (MIT OR Unlicense)
+- schannel 0.1.27 (MIT)
+- scopeguard 1.2.0 (Apache-2.0 OR MIT)
+- sct 0.7.1 (Apache-2.0 OR ISC OR MIT)
+- security-framework 2.11.1 (Apache-2.0 OR MIT)
+- security-framework-sys 2.14.0 (Apache-2.0 OR MIT)
+- serde 1.0.219 (Apache-2.0 OR MIT)
+- serde_derive 1.0.219 (Apache-2.0 OR MIT)
+- serde_json 1.0.140 (Apache-2.0 OR MIT)
+- serde_path_to_error 0.1.17 (Apache-2.0 OR MIT)
+- serde_qs 0.8.5 (Apache-2.0 OR MIT)
+- serde_qs 0.10.1 (Apache-2.0 OR MIT)
+- serde_urlencoded 0.7.1 (Apache-2.0 OR MIT)
+- sha1 0.10.6 (Apache-2.0 OR MIT)
+- sha2 0.10.9 (Apache-2.0 OR MIT)
+- sharded-slab 0.1.7 (MIT)
+- shlex 1.3.0 (Apache-2.0 OR MIT)
+- signal-hook-registry 1.4.5 (Apache-2.0 OR MIT)
+- signature 2.2.0 (Apache-2.0 OR MIT)
+- siphasher 1.0.1 (Apache-2.0 OR MIT)
+- slab 0.4.9 (MIT)
+- slug 0.1.6 (Apache-2.0 OR MIT)
+- smallvec 1.15.0 (Apache-2.0 OR MIT)
+- smart-default 0.6.0 (MIT)
+- smol_str 0.1.24 (Apache-2.0 OR MIT)
+- socket2 0.5.9 (Apache-2.0 OR MIT)
+- spin 0.9.8 (MIT)
+- spki 0.7.3 (Apache-2.0 OR MIT)
+- sqlx 0.8.5 (Apache-2.0 OR MIT)
+- sqlx-core 0.8.5 (Apache-2.0 OR MIT)
+- sqlx-macros 0.8.5 (Apache-2.0 OR MIT)
+- sqlx-macros-core 0.8.5 (Apache-2.0 OR MIT)
+- sqlx-mysql 0.8.5 (Apache-2.0 OR MIT)
+- sqlx-postgres 0.8.5 (Apache-2.0 OR MIT)
+- sqlx-sqlite 0.8.5 (Apache-2.0 OR MIT)
+- stable_deref_trait 1.2.0 (Apache-2.0 OR MIT)
+- stacker 0.1.21 (Apache-2.0 OR MIT)
+- stringprep 0.1.5 (Apache-2.0 OR MIT)
+- strsim 0.11.1 (MIT)
+- subtle 2.6.1 (BSD-3-Clause)
+- syn 1.0.109 (Apache-2.0 OR MIT)
+- syn 2.0.101 (Apache-2.0 OR MIT)
+- sync_wrapper 1.0.2 (Apache-2.0)
+- synstructure 0.13.2 (MIT)
+- system-configuration 0.6.1 (Apache-2.0 OR MIT)
+- system-configuration-sys 0.6.0 (Apache-2.0 OR MIT)
+- tempfile 3.19.1 (Apache-2.0 OR MIT)
+- tera 1.20.0 (MIT)
+- termcolor 1.4.1 (MIT OR Unlicense)
+- thiserror 1.0.69 (Apache-2.0 OR MIT)
+- thiserror 2.0.12 (Apache-2.0 OR MIT)
+- thiserror-impl 1.0.69 (Apache-2.0 OR MIT)
+- thiserror-impl 2.0.12 (Apache-2.0 OR MIT)
+- thread_local 1.1.8 (Apache-2.0 OR MIT)
+- time 0.3.41 (Apache-2.0 OR MIT)
+- time-core 0.1.4 (Apache-2.0 OR MIT)
+- time-macros 0.2.22 (Apache-2.0 OR MIT)
+- tinystr 0.7.6 (Unicode-3.0)
+- tinyvec 1.9.0 (Apache-2.0 OR MIT OR Zlib)
+- tinyvec_macros 0.1.1 (Apache-2.0 OR MIT OR Zlib)
+- tokio 1.45.0 (MIT)
+- tokio-macros 2.5.0 (MIT)
+- tokio-native-tls 0.3.1 (MIT)
+- tokio-rustls 0.24.1 (Apache-2.0 OR MIT)
+- tokio-rustls 0.26.2 (Apache-2.0 OR MIT)
+- tokio-stream 0.1.17 (MIT)
+- tokio-util 0.7.15 (MIT)
+- tower 0.5.2 (MIT)
+- tower-cookies 0.11.0 (MIT)
+- tower-http 0.6.2 (MIT)
+- tower-layer 0.3.3 (MIT)
+- tower-service 0.3.3 (MIT)
+- tower-sessions 0.14.0 (MIT)
+- tower-sessions-core 0.14.0 (MIT)
+- tower-sessions-memory-store 0.14.0 (MIT)
+- tracing 0.1.41 (MIT)
+- tracing-attributes 0.1.28 (MIT)
+- tracing-core 0.1.33 (MIT)
+- tracing-log 0.2.0 (MIT)
+- tracing-subscriber 0.3.19 (MIT)
+- try-lock 0.2.5 (MIT)
+- ts-rs 10.1.0 (MIT)
+- ts-rs-macros 10.1.0 (MIT)
+- typenum 1.18.0 (Apache-2.0 OR MIT)
+- ucd-trie 0.1.7 (Apache-2.0 OR MIT)
+- unic-char-property 0.9.0 (Apache-2.0 OR MIT)
+- unic-char-range 0.9.0 (Apache-2.0 OR MIT)
+- unic-common 0.9.0 (Apache-2.0 OR MIT)
+- unic-segment 0.9.0 (Apache-2.0 OR MIT)
+- unic-ucd-segment 0.9.0 (Apache-2.0 OR MIT)
+- unic-ucd-version 0.9.0 (Apache-2.0 OR MIT)
+- unicase 2.8.1 (Apache-2.0 OR MIT)
+- unicode-bidi 0.3.18 (Apache-2.0 OR MIT)
+- unicode-ident 1.0.18 ((MIT OR Apache-2.0) AND Unicode-3.0)
+- unicode-normalization 0.1.24 (Apache-2.0 OR MIT)
+- unicode-properties 0.1.3 (Apache-2.0 OR MIT)
+- untrusted 0.9.0 (ISC)
+- url 2.5.4 (Apache-2.0 OR MIT)
+- urlencoding 2.1.3 (MIT)
+- utf16_iter 1.0.5 (Apache-2.0 OR MIT)
+- utf8_iter 1.0.4 (Apache-2.0 OR MIT)
+- utf8parse 0.2.2 (Apache-2.0 OR MIT)
+- uuid 0.8.2 (Apache-2.0 OR MIT)
+- uuid 1.16.0 (Apache-2.0 OR MIT)
+- validator 0.19.0 (MIT)
+- validator_derive 0.19.0 (MIT)
+- valuable 0.1.1 (MIT)
+- vcpkg 0.2.15 (Apache-2.0 OR MIT)
+- version_check 0.9.5 (Apache-2.0 OR MIT)
+- waker-fn 1.2.0 (Apache-2.0 OR MIT)
+- walkdir 2.5.0 (MIT OR Unlicense)
+- want 0.3.1 (MIT)
+- wasi 0.9.0+wasi-snapshot-preview1 (Apache-2.0 OR Apache-2.0 WITH LLVM-exception OR MIT)
+- wasi 0.11.0+wasi-snapshot-preview1 (Apache-2.0 OR Apache-2.0 WITH LLVM-exception OR MIT)
+- wasi 0.14.2+wasi-0.2.4 (Apache-2.0 OR Apache-2.0 WITH LLVM-exception OR MIT)
+- wasite 0.1.0 (Apache-2.0 OR BSL-1.0 OR MIT)
+- wasm-bindgen 0.2.100 (Apache-2.0 OR MIT)
+- wasm-bindgen-backend 0.2.100 (Apache-2.0 OR MIT)
+- wasm-bindgen-futures 0.4.50 (Apache-2.0 OR MIT)
+- wasm-bindgen-macro 0.2.100 (Apache-2.0 OR MIT)
+- wasm-bindgen-macro-support 0.2.100 (Apache-2.0 OR MIT)
+- wasm-bindgen-shared 0.2.100 (Apache-2.0 OR MIT)
+- wasm-streams 0.4.2 (Apache-2.0 OR MIT)
+- web-sys 0.3.77 (Apache-2.0 OR MIT)
+- which 4.4.2 (MIT)
+- whoami 1.6.0 (Apache-2.0 OR BSL-1.0 OR MIT)
+- winapi 0.3.9 (Apache-2.0 OR MIT)
+- winapi-i686-pc-windows-gnu 0.4.0 (Apache-2.0 OR MIT)
+- winapi-util 0.1.9 (MIT OR Unlicense)
+- winapi-x86_64-pc-windows-gnu 0.4.0 (Apache-2.0 OR MIT)
+- windows-core 0.61.0 (Apache-2.0 OR MIT)
+- windows-implement 0.60.0 (Apache-2.0 OR MIT)
+- windows-interface 0.59.1 (Apache-2.0 OR MIT)
+- windows-link 0.1.1 (Apache-2.0 OR MIT)
+- windows-registry 0.4.0 (Apache-2.0 OR MIT)
+- windows-result 0.3.2 (Apache-2.0 OR MIT)
+- windows-strings 0.3.1 (Apache-2.0 OR MIT)
+- windows-strings 0.4.0 (Apache-2.0 OR MIT)
+- windows-sys 0.48.0 (Apache-2.0 OR MIT)
+- windows-sys 0.52.0 (Apache-2.0 OR MIT)
+- windows-sys 0.59.0 (Apache-2.0 OR MIT)
+- windows-targets 0.48.5 (Apache-2.0 OR MIT)
+- windows-targets 0.52.6 (Apache-2.0 OR MIT)
+- windows-targets 0.53.0 (Apache-2.0 OR MIT)
+- windows_aarch64_gnullvm 0.48.5 (Apache-2.0 OR MIT)
+- windows_aarch64_gnullvm 0.52.6 (Apache-2.0 OR MIT)
+- windows_aarch64_gnullvm 0.53.0 (Apache-2.0 OR MIT)
+- windows_aarch64_msvc 0.48.5 (Apache-2.0 OR MIT)
+- windows_aarch64_msvc 0.52.6 (Apache-2.0 OR MIT)
+- windows_aarch64_msvc 0.53.0 (Apache-2.0 OR MIT)
+- windows_i686_gnu 0.48.5 (Apache-2.0 OR MIT)
+- windows_i686_gnu 0.52.6 (Apache-2.0 OR MIT)
+- windows_i686_gnu 0.53.0 (Apache-2.0 OR MIT)
+- windows_i686_gnullvm 0.52.6 (Apache-2.0 OR MIT)
+- windows_i686_gnullvm 0.53.0 (Apache-2.0 OR MIT)
+- windows_i686_msvc 0.48.5 (Apache-2.0 OR MIT)
+- windows_i686_msvc 0.52.6 (Apache-2.0 OR MIT)
+- windows_i686_msvc 0.53.0 (Apache-2.0 OR MIT)
+- windows_x86_64_gnu 0.48.5 (Apache-2.0 OR MIT)
+- windows_x86_64_gnu 0.52.6 (Apache-2.0 OR MIT)
+- windows_x86_64_gnu 0.53.0 (Apache-2.0 OR MIT)
+- windows_x86_64_gnullvm 0.48.5 (Apache-2.0 OR MIT)
+- windows_x86_64_gnullvm 0.52.6 (Apache-2.0 OR MIT)
+- windows_x86_64_gnullvm 0.53.0 (Apache-2.0 OR MIT)
+- windows_x86_64_msvc 0.48.5 (Apache-2.0 OR MIT)
+- windows_x86_64_msvc 0.52.6 (Apache-2.0 OR MIT)
+- windows_x86_64_msvc 0.53.0 (Apache-2.0 OR MIT)
+- wit-bindgen-rt 0.39.0 (Apache-2.0 OR Apache-2.0 WITH LLVM-exception OR MIT)
+- write16 1.0.0 (Apache-2.0 OR MIT)
+- writeable 0.5.5 (Unicode-3.0)
+- yoke 0.7.5 (Unicode-3.0)
+- yoke-derive 0.7.5 (Unicode-3.0)
+- zerocopy 0.7.35 (Apache-2.0 OR BSD-2-Clause OR MIT)
+- zerocopy 0.8.25 (Apache-2.0 OR BSD-2-Clause OR MIT)
+- zerocopy-derive 0.7.35 (Apache-2.0 OR BSD-2-Clause OR MIT)
+- zerocopy-derive 0.8.25 (Apache-2.0 OR BSD-2-Clause OR MIT)
+- zerofrom 0.1.6 (Unicode-3.0)
+- zerofrom-derive 0.1.6 (Unicode-3.0)
+- zeroize 1.8.1 (Apache-2.0 OR MIT)
+- zerovec 0.10.4 (Unicode-3.0)
+- zerovec-derive 0.10.3 (Unicode-3.0)
+- zxcvbn 3.1.0 (MIT)
+
+JavaScript dependencies:
+- @alloc/quick-lru@5.2.0 MIT
+- @ampproject/remapping@2.3.0 Apache-2.0
+- @babel/code-frame@7.27.1 MIT
+- @babel/compat-data@7.27.2 MIT
+- @babel/core@7.27.1 MIT
+- @babel/generator@7.27.1 MIT
+- @babel/helper-compilation-targets@7.27.2 MIT
+- @babel/helper-module-imports@7.27.1 MIT
+- @babel/helper-module-transforms@7.27.1 MIT
+- @babel/helper-plugin-utils@7.27.1 MIT
+- @babel/helper-string-parser@7.27.1 MIT
+- @babel/helper-validator-identifier@7.27.1 MIT
+- @babel/helper-validator-option@7.27.1 MIT
+- @babel/helpers@7.27.1 MIT
+- @babel/parser@7.27.2 MIT
+- @babel/plugin-transform-react-jsx-self@7.27.1 MIT
+- @babel/plugin-transform-react-jsx-source@7.27.1 MIT
+- @babel/template@7.27.2 MIT
+- @babel/traverse@7.27.1 MIT
+- @babel/types@7.27.1 MIT
+- @esbuild/linux-x64@0.21.5 MIT
+- @eslint-community/eslint-utils@4.7.0 MIT
+- @eslint-community/regexpp@4.12.1 MIT
+- @eslint/config-array@0.20.0 Apache-2.0
+- @eslint/config-helpers@0.2.2 Apache-2.0
+- @eslint/core@0.13.0 Apache-2.0
+- @eslint/eslintrc@3.3.1 MIT
+- @eslint/js@9.26.0 MIT
+- @eslint/object-schema@2.1.6 Apache-2.0
+- @eslint/plugin-kit@0.2.8 Apache-2.0
+- @fastify/ajv-compiler@3.6.0 MIT
+- @fastify/error@3.4.1 MIT
+- @fastify/fast-json-stringify-compiler@4.3.0 MIT
+- @fastify/merge-json-schemas@0.1.1 MIT
+- @floating-ui/core@1.7.0 MIT
+- @floating-ui/dom@1.7.0 MIT
+- @floating-ui/react-dom@2.1.2 MIT
+- @floating-ui/react@0.26.28 MIT
+- @floating-ui/utils@0.2.9 MIT
+- @fontsource/inter@5.2.5 OFL-1.1
+- @headlessui/react@2.2.2 MIT
+- @humanfs/core@0.19.1 Apache-2.0
+- @humanfs/node@0.16.6 Apache-2.0
+- @humanwhocodes/module-importer@1.0.1 Apache-2.0
+- @humanwhocodes/retry@0.3.1 Apache-2.0
+- @humanwhocodes/retry@0.4.2 Apache-2.0
+- @isaacs/cliui@8.0.2 ISC
+- @jridgewell/gen-mapping@0.3.8 MIT
+- @jridgewell/resolve-uri@3.1.2 MIT
+- @jridgewell/set-array@1.2.1 MIT
+- @jridgewell/sourcemap-codec@1.5.0 MIT
+- @jridgewell/trace-mapping@0.3.25 MIT
+- @modelcontextprotocol/sdk@1.11.0 MIT
+- @nodelib/fs.scandir@2.1.5 MIT
+- @nodelib/fs.stat@2.0.5 MIT
+- @nodelib/fs.walk@1.2.8 MIT
+- @pkgjs/parseargs@0.11.0 MIT
+- @polka/url@1.0.0-next.29 MIT
+- @primer/octicons-react@19.15.1 MIT
+- @react-aria/focus@3.20.2 Apache-2.0
+- @react-aria/interactions@3.25.0 Apache-2.0
+- @react-aria/ssr@3.9.8 Apache-2.0
+- @react-aria/utils@3.28.2 Apache-2.0
+- @react-stately/flags@3.1.1 Apache-2.0
+- @react-stately/utils@3.10.6 Apache-2.0
+- @react-types/shared@3.29.0 Apache-2.0
+- @remix-run/router@1.23.0 MIT
+- @rollup/rollup-linux-x64-gnu@4.40.2 MIT
+- @rollup/rollup-linux-x64-musl@4.40.2 MIT
+- @stripe/react-stripe-js@2.9.0 MIT
+- @stripe/stripe-js@4.10.0 MIT
+- @swc/core-linux-x64-gnu@1.11.24 Apache-2.0 AND MIT
+- @swc/core-linux-x64-musl@1.11.24 Apache-2.0 AND MIT
+- @swc/core@1.11.24 Apache-2.0
+- @swc/counter@0.1.3 Apache-2.0
+- @swc/helpers@0.5.17 Apache-2.0
+- @swc/types@0.1.21 Apache-2.0
+- @tailwindcss/typography@0.5.16 MIT
+- @tanstack/react-virtual@3.13.8 MIT
+- @tanstack/virtual-core@3.13.8 MIT
+- @types/babel__core@7.20.5 MIT
+- @types/babel__generator@7.27.0 MIT
+- @types/babel__template@7.4.4 MIT
+- @types/babel__traverse@7.20.7 MIT
+- @types/debug@4.1.12 MIT
+- @types/estree-jsx@1.0.5 MIT
+- @types/estree@1.0.7 MIT
+- @types/hast@3.0.4 MIT
+- @types/http-proxy@1.17.16 MIT
+- @types/json-schema@7.0.15 MIT
+- @types/mdast@4.0.4 MIT
+- @types/ms@2.1.0 MIT
+- @types/node@22.15.14 MIT
+- @types/prop-types@15.7.14 MIT
+- @types/react-dom@18.3.7 MIT
+- @types/react@18.3.21 MIT
+- @types/unist@2.0.11 MIT
+- @types/unist@3.0.3 MIT
+- @types/zxcvbn@4.4.5 MIT
+- @typescript-eslint/eslint-plugin@8.32.0 MIT
+- @typescript-eslint/parser@8.32.0 MIT
+- @typescript-eslint/scope-manager@8.32.0 MIT
+- @typescript-eslint/type-utils@8.32.0 MIT
+- @typescript-eslint/types@8.32.0 MIT
+- @typescript-eslint/typescript-estree@8.32.0 MIT
+- @typescript-eslint/utils@8.32.0 MIT
+- @typescript-eslint/visitor-keys@8.32.0 MIT
+- @ungap/structured-clone@1.3.0 ISC
+- @vitejs/plugin-react-swc@3.9.0 MIT
+- @vitejs/plugin-react@4.4.1 MIT
+- @zeit/schemas@2.36.0 MIT
+- abstract-logging@2.0.1 MIT
+- accepts@1.3.8 MIT
+- accepts@2.0.0 MIT
+- acorn-jsx@5.3.2 MIT
+- acorn@8.14.1 MIT
+- ajv-formats@2.1.1 MIT
+- ajv-formats@3.0.1 MIT
+- ajv@6.12.6 MIT
+- ajv@8.12.0 MIT
+- ajv@8.17.1 MIT
+- ansi-align@3.0.1 ISC
+- ansi-regex@5.0.1 MIT
+- ansi-regex@6.1.0 MIT
+- ansi-styles@4.3.0 MIT
+- ansi-styles@6.2.1 MIT
+- any-promise@1.3.0 MIT
+- anymatch@3.1.3 ISC
+- arch@2.2.0 MIT
+- arg@5.0.2 MIT
+- argparse@2.0.1 Python-2.0
+- array-flatten@1.1.1 MIT
+- asynckit@0.4.0 MIT
+- atomic-sleep@1.0.0 MIT
+- autoprefixer@10.4.21 MIT
+- avvio@8.4.0 MIT
+- axios@1.9.0 MIT
+- bail@2.0.2 MIT
+- balanced-match@1.0.2 MIT
+- binary-extensions@2.3.0 MIT
+- body-parser@1.20.3 MIT
+- body-parser@2.2.0 MIT
+- boxen@7.0.0 MIT
+- brace-expansion@1.1.11 MIT
+- brace-expansion@2.0.1 MIT
+- braces@3.0.3 MIT
+- browserslist@4.24.5 MIT
+- bytes@3.0.0 MIT
+- bytes@3.1.2 MIT
+- call-bind-apply-helpers@1.0.2 MIT
+- call-bound@1.0.4 MIT
+- callsites@3.1.0 MIT
+- camelcase-css@2.0.1 MIT
+- camelcase@7.0.1 MIT
+- caniuse-lite@1.0.30001717 CC-BY-4.0
+- ccount@2.0.1 MIT
+- chalk-template@0.4.0 MIT
+- chalk@4.1.2 MIT
+- chalk@5.0.1 MIT
+- chalk@5.4.1 MIT
+- character-entities-html4@2.1.0 MIT
+- character-entities-legacy@3.0.0 MIT
+- character-entities@2.0.2 MIT
+- character-reference-invalid@2.0.1 MIT
+- chokidar@3.6.0 MIT
+- cli-boxes@3.0.0 MIT
+- client@0.0.0 UNLICENSED
+- clipboardy@3.0.0 MIT
+- cliui@8.0.1 ISC
+- clsx@2.1.1 MIT
+- color-convert@2.0.1 MIT
+- color-name@1.1.4 MIT
+- combined-stream@1.0.8 MIT
+- comma-separated-tokens@2.0.3 MIT
+- commander@4.1.1 MIT
+- compressible@2.0.18 MIT
+- compression@1.7.4 MIT
+- concat-map@0.0.1 MIT
+- concurrently@9.1.2 MIT
+- content-disposition@0.5.2 MIT
+- content-disposition@0.5.4 MIT
+- content-disposition@1.0.0 MIT
+- content-type@1.0.5 MIT
+- convert-source-map@2.0.0 MIT
+- cookie-signature@1.0.6 MIT
+- cookie-signature@1.2.2 MIT
+- cookie@0.7.1 MIT
+- cors@2.8.5 MIT
+- cross-env@7.0.3 MIT
+- cross-spawn@7.0.6 MIT
+- cssesc@3.0.0 MIT
+- csstype@3.1.3 MIT
+- debug@2.6.9 MIT
+- debug@4.4.0 MIT
+- decode-named-character-reference@1.1.0 MIT
+- deep-extend@0.6.0 MIT
+- deep-is@0.1.4 MIT
+- delayed-stream@1.0.0 MIT
+- depd@2.0.0 MIT
+- dequal@2.0.3 MIT
+- destroy@1.2.0 MIT
+- devlop@1.1.0 MIT
+- didyoumean@1.2.2 Apache-2.0
+- dlv@1.1.3 MIT
+- dunder-proto@1.0.1 MIT
+- eastasianwidth@0.2.0 MIT
+- ee-first@1.1.1 MIT
+- electron-to-chromium@1.5.150 ISC
+- emoji-regex@8.0.0 MIT
+- emoji-regex@9.2.2 MIT
+- encodeurl@1.0.2 MIT
+- encodeurl@2.0.0 MIT
+- es-define-property@1.0.1 MIT
+- es-errors@1.3.0 MIT
+- es-object-atoms@1.1.1 MIT
+- es-set-tostringtag@2.1.0 MIT
+- esbuild@0.21.5 MIT
+- escalade@3.2.0 MIT
+- escape-html@1.0.3 MIT
+- escape-string-regexp@4.0.0 MIT
+- eslint-plugin-react-hooks@5.2.0 MIT
+- eslint-plugin-react-refresh@0.4.20 MIT
+- eslint-scope@8.3.0 BSD-2-Clause
+- eslint-visitor-keys@3.4.3 Apache-2.0
+- eslint-visitor-keys@4.2.0 Apache-2.0
+- eslint@9.26.0 MIT
+- espree@10.3.0 BSD-2-Clause
+- esquery@1.6.0 BSD-3-Clause
+- esrecurse@4.3.0 BSD-2-Clause
+- estraverse@5.3.0 BSD-2-Clause
+- estree-util-is-identifier-name@3.0.0 MIT
+- esutils@2.0.3 BSD-2-Clause
+- etag@1.8.1 MIT
+- eventemitter3@4.0.7 MIT
+- eventsource-parser@3.0.1 MIT
+- eventsource@3.0.6 MIT
+- execa@5.1.1 MIT
+- express-rate-limit@7.5.0 MIT
+- express@4.21.2 MIT
+- express@5.1.0 MIT
+- extend@3.0.2 MIT
+- fast-content-type-parse@1.1.0 MIT
+- fast-decode-uri-component@1.0.1 MIT
+- fast-deep-equal@3.1.3 MIT
+- fast-glob@3.3.3 MIT
+- fast-json-stable-stringify@2.1.0 MIT
+- fast-json-stringify@5.16.1 MIT
+- fast-levenshtein@2.0.6 MIT
+- fast-querystring@1.1.2 MIT
+- fast-redact@3.5.0 MIT
+- fast-uri@2.4.0 MIT
+- fast-uri@3.0.6 BSD-3-Clause
+- fastify@4.29.1 MIT
+- fastq@1.19.1 ISC
+- file-entry-cache@8.0.0 MIT
+- fill-range@7.1.1 MIT
+- finalhandler@1.3.1 MIT
+- finalhandler@2.1.0 MIT
+- find-my-way@8.2.2 MIT
+- find-up@5.0.0 MIT
+- flat-cache@4.0.1 MIT
+- flatted@3.3.3 ISC
+- follow-redirects@1.15.9 MIT
+- foreground-child@3.3.1 ISC
+- form-data@4.0.2 MIT
+- forwarded@0.2.0 MIT
+- fraction.js@4.3.7 MIT
+- fresh@0.5.2 MIT
+- fresh@2.0.0 MIT
+- function-bind@1.1.2 MIT
+- gensync@1.0.0-beta.2 MIT
+- get-caller-file@2.0.5 ISC
+- get-intrinsic@1.3.0 MIT
+- get-proto@1.0.1 MIT
+- get-stream@6.0.1 MIT
+- glob-parent@5.1.2 ISC
+- glob-parent@6.0.2 ISC
+- glob@10.4.5 ISC
+- globals@11.12.0 MIT
+- globals@14.0.0 MIT
+- globals@15.15.0 MIT
+- gopd@1.2.0 MIT
+- graphemer@1.4.0 MIT
+- has-flag@4.0.0 MIT
+- has-symbols@1.1.0 MIT
+- has-tostringtag@1.0.2 MIT
+- hasown@2.0.2 MIT
+- hast-util-to-jsx-runtime@2.3.6 MIT
+- hast-util-whitespace@3.0.0 MIT
+- html-url-attributes@3.0.1 MIT
+- http-errors@2.0.0 MIT
+- http-proxy-middleware@3.0.5 MIT
+- http-proxy@1.18.1 MIT
+- human-signals@2.1.0 Apache-2.0
+- iconv-lite@0.4.24 MIT
+- iconv-lite@0.6.3 MIT
+- ignore@5.3.2 MIT
+- import-fresh@3.3.1 MIT
+- imurmurhash@0.1.4 MIT
+- inherits@2.0.4 ISC
+- ini@1.3.8 ISC
+- inline-style-parser@0.2.4 MIT
+- ipaddr.js@1.9.1 MIT
+- is-alphabetical@2.0.1 MIT
+- is-alphanumerical@2.0.1 MIT
+- is-binary-path@2.1.0 MIT
+- is-core-module@2.16.1 MIT
+- is-decimal@2.0.1 MIT
+- is-docker@2.2.1 MIT
+- is-extglob@2.1.1 MIT
+- is-fullwidth-code-point@3.0.0 MIT
+- is-glob@4.0.3 MIT
+- is-hexadecimal@2.0.1 MIT
+- is-number@7.0.0 MIT
+- is-plain-obj@4.1.0 MIT
+- is-plain-object@5.0.0 MIT
+- is-port-reachable@4.0.0 MIT
+- is-promise@4.0.0 MIT
+- is-stream@2.0.1 MIT
+- is-wsl@2.2.0 MIT
+- isexe@2.0.0 ISC
+- jackspeak@3.4.3 BlueOak-1.0.0
+- jiti@1.21.7 MIT
+- js-tokens@4.0.0 MIT
+- js-yaml@4.1.0 MIT
+- jsesc@3.1.0 MIT
+- json-buffer@3.0.1 MIT
+- json-schema-ref-resolver@1.0.1 MIT
+- json-schema-traverse@0.4.1 MIT
+- json-schema-traverse@1.0.0 MIT
+- json-stable-stringify-without-jsonify@1.0.1 MIT
+- json5@2.2.3 MIT
+- keyv@4.5.4 MIT
+- levn@0.4.1 MIT
+- light-my-request@5.14.0 BSD-3-Clause
+- lilconfig@3.1.3 MIT
+- lines-and-columns@1.2.4 MIT
+- locate-path@6.0.0 MIT
+- lodash.castarray@4.4.0 MIT
+- lodash.isplainobject@4.0.6 MIT
+- lodash.merge@4.6.2 MIT
+- lodash@4.17.21 MIT
+- longest-streak@3.1.0 MIT
+- loose-envify@1.4.0 MIT
+- lru-cache@10.4.3 ISC
+- lru-cache@5.1.1 ISC
+- math-intrinsics@1.1.0 MIT
+- mdast-util-from-markdown@2.0.2 MIT
+- mdast-util-mdx-expression@2.0.1 MIT
+- mdast-util-mdx-jsx@3.2.0 MIT
+- mdast-util-mdxjs-esm@2.0.1 MIT
+- mdast-util-phrasing@4.1.0 MIT
+- mdast-util-to-hast@13.2.0 MIT
+- mdast-util-to-markdown@2.1.2 MIT
+- mdast-util-to-string@4.0.0 MIT
+- media-typer@0.3.0 MIT
+- media-typer@1.1.0 MIT
+- merge-descriptors@1.0.3 MIT
+- merge-descriptors@2.0.0 MIT
+- merge-stream@2.0.0 MIT
+- merge2@1.4.1 MIT
+- methods@1.1.2 MIT
+- micromark-core-commonmark@2.0.3 MIT
+- micromark-factory-destination@2.0.1 MIT
+- micromark-factory-label@2.0.1 MIT
+- micromark-factory-space@2.0.1 MIT
+- micromark-factory-title@2.0.1 MIT
+- micromark-factory-whitespace@2.0.1 MIT
+- micromark-util-character@2.1.1 MIT
+- micromark-util-chunked@2.0.1 MIT
+- micromark-util-classify-character@2.0.1 MIT
+- micromark-util-combine-extensions@2.0.1 MIT
+- micromark-util-decode-numeric-character-reference@2.0.2 MIT
+- micromark-util-decode-string@2.0.1 MIT
+- micromark-util-encode@2.0.1 MIT
+- micromark-util-html-tag-name@2.0.1 MIT
+- micromark-util-normalize-identifier@2.0.1 MIT
+- micromark-util-resolve-all@2.0.1 MIT
+- micromark-util-sanitize-uri@2.0.1 MIT
+- micromark-util-subtokenize@2.1.0 MIT
+- micromark-util-symbol@2.0.1 MIT
+- micromark-util-types@2.0.2 MIT
+- micromark@4.0.2 MIT
+- micromatch@4.0.8 MIT
+- mime-db@1.33.0 MIT
+- mime-db@1.52.0 MIT
+- mime-db@1.54.0 MIT
+- mime-types@2.1.18 MIT
+- mime-types@2.1.35 MIT
+- mime-types@3.0.1 MIT
+- mime@1.6.0 MIT
+- mimic-fn@2.1.0 MIT
+- minimatch@3.1.2 ISC
+- minimatch@9.0.5 ISC
+- minimist@1.2.8 MIT
+- minipass@7.1.2 ISC
+- mrmime@2.0.1 MIT
+- ms@2.0.0 MIT
+- ms@2.1.3 MIT
+- mz@2.7.0 MIT
+- nanoid@3.3.11 MIT
+- natural-compare@1.4.0 MIT
+- negotiator@0.6.3 MIT
+- negotiator@1.0.0 MIT
+- node-releases@2.0.19 MIT
+- normalize-path@3.0.0 MIT
+- normalize-range@0.1.2 MIT
+- npm-run-path@4.0.1 MIT
+- object-assign@4.1.1 MIT
+- object-hash@3.0.0 MIT
+- object-inspect@1.13.4 MIT
+- on-exit-leak-free@2.1.2 MIT
+- on-finished@2.4.1 MIT
+- on-headers@1.0.2 MIT
+- once@1.4.0 ISC
+- onetime@5.1.2 MIT
+- optionator@0.9.4 MIT
+- p-limit@3.1.0 MIT
+- p-locate@5.0.0 MIT
+- package-json-from-dist@1.0.1 BlueOak-1.0.0
+- parent-module@1.0.1 MIT
+- parse-entities@4.0.2 MIT
+- parseurl@1.3.3 MIT
+- path-exists@4.0.0 MIT
+- path-is-inside@1.0.2 (WTFPL OR MIT)
+- path-key@3.1.1 MIT
+- path-parse@1.0.7 MIT
+- path-scurry@1.11.1 BlueOak-1.0.0
+- path-to-regexp@0.1.12 MIT
+- path-to-regexp@3.3.0 MIT
+- path-to-regexp@8.2.0 MIT
+- picocolors@1.1.1 ISC
+- picomatch@2.3.1 MIT
+- pify@2.3.0 MIT
+- pino-abstract-transport@2.0.0 MIT
+- pino-std-serializers@7.0.0 MIT
+- pino@9.6.0 MIT
+- pirates@4.0.7 MIT
+- pkce-challenge@5.0.0 MIT
+- postcss-import@15.1.0 MIT
+- postcss-js@4.0.1 MIT
+- postcss-load-config@4.0.2 MIT
+- postcss-nested@6.2.0 MIT
+- postcss-selector-parser@6.0.10 MIT
+- postcss-selector-parser@6.1.2 MIT
+- postcss-value-parser@4.2.0 MIT
+- postcss@8.5.3 MIT
+- prelude-ls@1.2.1 MIT
+- process-warning@3.0.0 MIT
+- process-warning@4.0.1 MIT
+- prop-types@15.8.1 MIT
+- property-information@7.0.0 MIT
+- proxy-addr@2.0.7 MIT
+- proxy-from-env@1.1.0 MIT
+- punycode@2.3.1 MIT
+- qs@6.13.0 BSD-3-Clause
+- qs@6.14.0 BSD-3-Clause
+- queue-microtask@1.2.3 MIT
+- quick-format-unescaped@4.0.4 MIT
+- range-parser@1.2.0 MIT
+- range-parser@1.2.1 MIT
+- raw-body@2.5.2 MIT
+- raw-body@3.0.0 MIT
+- rc@1.2.8 (BSD-2-Clause OR MIT OR Apache-2.0)
+- react-dom@18.3.1 MIT
+- react-icons@5.5.0 MIT
+- react-is@16.13.1 MIT
+- react-markdown@9.1.0 MIT
+- react-refresh@0.17.0 MIT
+- react-router-dom@6.30.0 MIT
+- react-router@6.30.0 MIT
+- react@18.3.1 MIT
+- read-cache@1.0.0 MIT
+- readdirp@3.6.0 MIT
+- real-require@0.2.0 MIT
+- registry-auth-token@3.3.2 MIT
+- registry-url@3.1.0 MIT
+- remark-parse@11.0.0 MIT
+- remark-rehype@11.1.2 MIT
+- require-directory@2.1.1 MIT
+- require-from-string@2.0.2 MIT
+- requires-port@1.0.0 MIT
+- resolve-from@4.0.0 MIT
+- resolve@1.22.10 MIT
+- ret@0.4.3 MIT
+- reusify@1.1.0 MIT
+- rfdc@1.4.1 MIT
+- rollup@4.40.2 MIT
+- router@2.2.0 MIT
+- run-parallel@1.2.0 MIT
+- rxjs@7.8.2 Apache-2.0
+- safe-buffer@5.1.2 MIT
+- safe-buffer@5.2.1 MIT
+- safe-regex2@3.1.0 MIT
+- safe-stable-stringify@2.5.0 MIT
+- safer-buffer@2.1.2 MIT
+- scheduler@0.23.2 MIT
+- secure-json-parse@2.7.0 BSD-3-Clause
+- semver@6.3.1 ISC
+- semver@7.7.1 ISC
+- send@0.19.0 MIT
+- send@1.2.0 MIT
+- serve-handler@6.1.6 MIT
+- serve-static@1.16.2 MIT
+- serve-static@2.2.0 MIT
+- serve@14.2.4 MIT
+- set-cookie-parser@2.7.1 MIT
+- setprototypeof@1.2.0 ISC
+- shebang-command@2.0.0 MIT
+- shebang-regex@3.0.0 MIT
+- shell-quote@1.8.2 MIT
+- side-channel-list@1.0.0 MIT
+- side-channel-map@1.0.1 MIT
+- side-channel-weakmap@1.0.2 MIT
+- side-channel@1.1.0 MIT
+- signal-exit@3.0.7 ISC
+- signal-exit@4.1.0 ISC
+- sirv@2.0.4 MIT
+- sonic-boom@4.2.0 MIT
+- source-map-js@1.2.1 BSD-3-Clause
+- space-separated-tokens@2.0.2 MIT
+- split2@4.2.0 ISC
+- statuses@2.0.1 MIT
+- string-width@4.2.3 MIT
+- string-width@5.1.2 MIT
+- stringify-entities@4.0.4 MIT
+- strip-ansi@6.0.1 MIT
+- strip-ansi@7.1.0 MIT
+- strip-final-newline@2.0.0 MIT
+- strip-json-comments@2.0.1 MIT
+- strip-json-comments@3.1.1 MIT
+- style-to-js@1.1.16 MIT
+- style-to-object@1.0.8 MIT
+- sucrase@3.35.0 MIT
+- supports-color@7.2.0 MIT
+- supports-color@8.1.1 MIT
+- supports-preserve-symlinks-flag@1.0.0 MIT
+- tabbable@6.2.0 MIT
+- tailwindcss@3.4.17 MIT
+- thenify-all@1.6.0 MIT
+- thenify@3.3.1 MIT
+- thread-stream@3.1.0 MIT
+- to-regex-range@5.0.1 MIT
+- toad-cache@3.7.0 MIT
+- toidentifier@1.0.1 MIT
+- totalist@3.0.1 MIT
+- tree-kill@1.2.2 MIT
+- trim-lines@3.0.1 MIT
+- trough@2.2.0 MIT
+- ts-api-utils@2.1.0 MIT
+- ts-interface-checker@0.1.13 Apache-2.0
+- tslib@2.8.1 0BSD
+- type-check@0.4.0 MIT
+- type-fest@2.19.0 (MIT OR CC0-1.0)
+- type-is@1.6.18 MIT
+- type-is@2.0.1 MIT
+- typescript-eslint@8.32.0 MIT
+- typescript@5.8.3 Apache-2.0
+- undici-types@6.21.0 MIT
+- unified@11.0.5 MIT
+- unist-util-is@6.0.0 MIT
+- unist-util-position@5.0.0 MIT
+- unist-util-stringify-position@4.0.0 MIT
+- unist-util-visit-parents@6.0.1 MIT
+- unist-util-visit@5.0.0 MIT
+- unpipe@1.0.0 MIT
+- update-browserslist-db@1.1.3 MIT
+- update-check@1.5.4 MIT
+- uri-js@4.4.1 BSD-2-Clause
+- use-sync-external-store@1.5.0 MIT
+- util-deprecate@1.0.2 MIT
+- utils-merge@1.0.1 MIT
+- vary@1.1.2 MIT
+- vfile-message@4.0.2 MIT
+- vfile@6.0.3 MIT
+- vite@5.4.19 MIT
+- which@2.0.2 ISC
+- widest-line@4.0.1 MIT
+- word-wrap@1.2.5 MIT
+- wrap-ansi@7.0.0 MIT
+- wrap-ansi@8.1.0 MIT
+- wrappy@1.0.2 ISC
+- y18n@5.0.8 ISC
+- yallist@3.1.1 ISC
+- yaml@2.7.1 ISC
+- yargs-parser@21.1.1 ISC
+- yargs@17.7.2 MIT
+- yocto-queue@0.1.0 MIT
+- zod-to-json-schema@3.24.5 ISC
+- zod@3.24.4 MIT
+- zwitch@2.0.4 MIT
+- zxcvbn@4.4.2 MIT
