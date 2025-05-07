@@ -1,9 +1,11 @@
-pub mod plan_repository;
-pub mod transaction_repository;
-pub mod user_repository;
-pub mod verification_repository;
+mod announcement_repository;
+mod plan_repository;
+mod transaction_repository;
+mod user_repository;
+mod verification_repository;
 
 // Re-export all repositories for convenience
+pub use announcement_repository::*;
 pub use plan_repository::*;
 pub use transaction_repository::*;
 pub use user_repository::*;

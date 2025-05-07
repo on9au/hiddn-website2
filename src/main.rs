@@ -19,13 +19,12 @@ use sqlx::mysql::MySqlPoolOptions;
 use tera::Tera;
 use tokio::sync::RwLock;
 use tracing::{debug, info, warn};
-use utils::{load_announcements, load_docs};
+use utils::load_announcements;
 
 mod config;
+mod db;
 mod handlers;
-mod handlers_admin;
 mod payloads;
-mod repositories;
 mod routes;
 mod sessions;
 mod utils;
@@ -158,9 +157,7 @@ async fn main() {
 
     debug!("Loading documentation and announcements");
 
-    // Load documentation and announcements
-    let docs: Arc<RwLock<HashMap<String, HashMap<String, String>>>> =
-        Arc::new(RwLock::new(load_docs().await));
+    // Load announcements
     let announcements: Arc<RwLock<Vec<AnnouncementPayload>>> =
         Arc::new(RwLock::new(load_announcements().await));
 
@@ -178,7 +175,6 @@ async fn main() {
 
     // Create router
     let app = create_router(
-        docs,
         announcements,
         auth_layer,
         pool,
