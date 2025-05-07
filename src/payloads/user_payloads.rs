@@ -3,7 +3,7 @@ use ts_rs::TS;
 
 #[derive(Clone, Debug, Serialize, TS)]
 #[ts(export)]
-pub struct UserProfilePayload {
+pub struct UserProfile {
     pub email: String,
     pub created_at: u64,
     pub updated_at: u64,

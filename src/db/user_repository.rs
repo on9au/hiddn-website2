@@ -1,4 +1,4 @@
-use crate::payloads::{UserProfileRust, UserProfileSettingsChangePayload};
+use crate::payloads::{UserProfile, UserProfileSettingsChangePayload};
 use anyhow::{Context, Result};
 use sqlx::MySqlPool;
 
@@ -11,9 +11,9 @@ impl UserRepository {
         Self { pool }
     }
 
-    pub async fn get_user_by_id(&self, id: i64) -> Result<Option<UserProfileRust>> {
+    pub async fn get_user_by_id(&self, id: i64) -> Result<Option<UserProfile>> {
         let user = sqlx::query_as!(
-            UserProfileRust,
+            UserProfile,
             r#"
             SELECT 
                 email,
@@ -33,9 +33,9 @@ impl UserRepository {
         Ok(user)
     }
 
-    pub async fn get_user_by_email(&self, email: &str) -> Result<Option<UserProfileRust>> {
+    pub async fn get_user_by_email(&self, email: &str) -> Result<Option<UserProfile>> {
         let user = sqlx::query_as!(
-            UserProfileRust,
+            UserProfile,
             r#"
             SELECT 
                 email,

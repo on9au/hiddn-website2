@@ -14,6 +14,11 @@ build-client:
 	cd client && npm install && npm run build
 	@echo "🔨 Client build completed." 
 
+ts-rs-gen:
+	@echo "🔄 Generating TypeScript to Rust bindings..."
+	cargo test export_bindings
+	@echo "🔄 TypeScript to Rust bindings generated."
+
 sqlx-prepare:
 ifeq ($(DATABASE_URL),)
 	$(error "❌ DATABASE_URL is not set. Make sure it's defined in .env")
@@ -21,25 +26,25 @@ endif
 	@echo "📦 Preparing SQLx offline schema..."
 	sqlx prepare --check -- --bin hiddn-website
 
-dev: $(env)
+dev: $(env) ts-rs-gen
 	make build-client
 	rm -rf static && mkdir -p static && cp -r client/dist/* static
 	RUST_LOG=debug SQLX_OFFLINE=$(SQLX_OFFLINE) cargo run --bin hiddn-website
 
-preview: $(env)
+preview: $(env) ts-rs-gen
 	make build-client
 	rm -rf static && mkdir -p static && cp -r client/dist/* static
 	SQLX_OFFLINE=$(SQLX_OFFLINE) cargo run --release --bin hiddn-website
 
-manager: $(env)
+manager: $(env) ts-rs-gen
 	SQLX_OFFLINE=$(SQLX_OFFLINE) cargo run --release --bin hiddn-cli
 
-build: $(env) build-client sqlx-prepare
+build: $(env) build-client sqlx-prepare ts-rs-gen
 	cargo generate-lockfile
 	SQLX_OFFLINE=$(SQLX_OFFLINE) cargo build --release --bin hiddn-website
 	SQLX_OFFLINE=$(SQLX_OFFLINE) cargo build --release --bin hiddn-cli
 
-docker-build: build
+docker-build: build ts-rs-gen
 	@echo "🐳 Building Docker image..."
 	sudo docker build \
 		--build-arg SQLX_OFFLINE=$(SQLX_OFFLINE) \
@@ -47,7 +52,7 @@ docker-build: build
 		--build-arg VERSION=$(VER) \
 		--tag on9au/hiddn-website:$(VER) .
 
-docker-push: docker-build
+docker-push: docker-build ts-rs-gen
 	@echo "📤 Pushing Docker image..."
 	sudo docker push on9au/hiddn-website:$(VER)
 
