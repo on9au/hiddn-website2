@@ -36,13 +36,9 @@ preview: $(env) ts-rs-gen
 	rm -rf static && mkdir -p static && cp -r client/dist/* static
 	SQLX_OFFLINE=$(SQLX_OFFLINE) cargo run --release --bin hiddn-website
 
-manager: $(env) ts-rs-gen
-	SQLX_OFFLINE=$(SQLX_OFFLINE) cargo run --release --bin hiddn-cli
-
 build: $(env) build-client sqlx-prepare ts-rs-gen
 	cargo generate-lockfile
 	SQLX_OFFLINE=$(SQLX_OFFLINE) cargo build --release --bin hiddn-website
-	SQLX_OFFLINE=$(SQLX_OFFLINE) cargo build --release --bin hiddn-cli
 
 docker-build: build ts-rs-gen
 	@echo "🐳 Building Docker image..."

@@ -40,15 +40,11 @@ rpassword = "7.3.1"
 lettre = "0.11.15"
 tera = "1.20.0"
 anyhow = "1.0.98"
-ts-rs ={ version = "10.1" }
+ts-rs ={ version = "10.1", features = ["chrono-impl"] }
 
 [[bin]]
 name = "hiddn-website"
 path = "src/main.rs"
-
-[[bin]]
-name = "hiddn-cli"
-path = "src/cli.rs"
 
 [profile.release]
 lto = true

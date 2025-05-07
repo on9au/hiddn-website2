@@ -1,4 +1,6 @@
-use std::{collections::HashMap, net::SocketAddr, sync::Arc};
+// use stp, net::SocketArc};
+
+use std::net::SocketAddr;
 
 use argon2::PasswordHasher;
 use axum::{
@@ -11,15 +13,12 @@ use axum_login::{
 use axum_server::tls_rustls::RustlsConfig;
 use config::{GLOBAL_CONFIG, HttpOrHttps};
 use marzban_api::{client::MarzbanAPIClient, models::auth::BodyAdminTokenApiAdminTokenPost};
-use payloads::Announcement;
 use reqwest::StatusCode;
 use routes::create_router;
 use sessions::Backend;
 use sqlx::mysql::MySqlPoolOptions;
 use tera::Tera;
-use tokio::sync::RwLock;
 use tracing::{debug, info, warn};
-use utils::load_announcements;
 
 mod config;
 mod db;
@@ -27,9 +26,6 @@ mod handlers;
 mod payloads;
 mod routes;
 mod sessions;
-mod utils;
-
-type SharedDocs = Arc<RwLock<HashMap<String, HashMap<String, String>>>>;
 
 #[tokio::main]
 async fn main() {
@@ -155,14 +151,6 @@ async fn main() {
 
     info!("Auth layer setup");
 
-    debug!("Loading documentation and announcements");
-
-    // Load announcements
-    let announcements: Arc<RwLock<Vec<Announcement>>> =
-        Arc::new(RwLock::new(load_announcements().await));
-
-    info!("Loaded documentation and announcements");
-
     debug!("Setting up Tera template engine");
 
     // Tera template engine setup
@@ -174,14 +162,7 @@ async fn main() {
     debug!("Setting up router");
 
     // Create router
-    let app = create_router(
-        announcements,
-        auth_layer,
-        pool,
-        marzban_client,
-        stripe_client,
-        tera,
-    );
+    let app = create_router(auth_layer, pool, marzban_client, stripe_client, tera);
 
     info!("Router setup");
 

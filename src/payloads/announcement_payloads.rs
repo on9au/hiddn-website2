@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
@@ -6,7 +7,7 @@ use ts_rs::TS;
 pub struct Announcement {
     pub id: u64,
     pub title: String,
-    pub date: String,
+    pub date: DateTime<Utc>,
     pub content: String,
 }
 

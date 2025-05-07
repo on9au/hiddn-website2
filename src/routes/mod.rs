@@ -1,18 +1,14 @@
-use std::sync::Arc;
-
 use axum::Router;
 use axum_login::{AuthManagerLayer, tower_sessions::MemoryStore};
 use marzban_api::client::MarzbanAPIClient;
 use tera::Tera;
-use tokio::sync::RwLock;
 use tower_http::services::{ServeDir, ServeFile};
 
-use crate::{payloads::Announcement, sessions::Backend};
+use crate::sessions::Backend;
 
 pub mod api;
 
 pub fn create_router(
-    announcements: Arc<RwLock<Vec<Announcement>>>,
     auth_layer: AuthManagerLayer<Backend, MemoryStore>,
     pool: sqlx::MySqlPool,
     marzban_client: MarzbanAPIClient,
@@ -93,14 +89,7 @@ pub fn create_router(
         // API Routes
         .nest(
             "/api",
-            api::routes(
-                announcements,
-                auth_layer,
-                pool,
-                marzban_client,
-                stripe_client,
-                tera,
-            ),
+            api::routes(auth_layer, pool, marzban_client, stripe_client, tera),
         )
         // CSR Frontend
         .nest_service(

@@ -1,3 +1,9 @@
+//! # DB Module
+//!
+//! This module abstracts the database layer of the application, allowing for easy access to various repositories.
+//!
+//! Each submodule represents a different repository, which is responsible for interacting with a specific table in the database.
+
 mod announcement_repository;
 mod plan_repository;
 mod transaction_repository;

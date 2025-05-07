@@ -1,6 +1,7 @@
 use crate::db::UserRepository;
 use axum::{Json, response::IntoResponse};
 
+/// POST `/api/auth/login`
 pub async fn login(/* params */) -> impl IntoResponse {
     // UserRepository::login(...)
     Json("stub: login")
