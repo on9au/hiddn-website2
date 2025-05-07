@@ -25,6 +25,7 @@ mod config;
 mod handlers;
 mod handlers_admin;
 mod payloads;
+mod repositories;
 mod routes;
 mod sessions;
 mod utils;
