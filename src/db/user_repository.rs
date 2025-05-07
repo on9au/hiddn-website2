@@ -1,4 +1,4 @@
-use crate::payloads::{UserProfile, UserProfileSettingsChangePayload};
+use crate::payloads::{UserProfile, UserProfileSettingsChange};
 use anyhow::{Context, Result};
 use sqlx::MySqlPool;
 
@@ -114,7 +114,7 @@ impl UserRepository {
     pub async fn update_settings(
         &self,
         user_id: i64,
-        settings: &UserProfileSettingsChangePayload,
+        settings: &UserProfileSettingsChange,
     ) -> Result<()> {
         if let Some(email_data_reminder) = settings.email_data_reminder {
             sqlx::query!(

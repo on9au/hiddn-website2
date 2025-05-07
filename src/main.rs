@@ -11,7 +11,7 @@ use axum_login::{
 use axum_server::tls_rustls::RustlsConfig;
 use config::{GLOBAL_CONFIG, HttpOrHttps};
 use marzban_api::{client::MarzbanAPIClient, models::auth::BodyAdminTokenApiAdminTokenPost};
-use payloads::AnnouncementPayload;
+use payloads::Announcement;
 use reqwest::StatusCode;
 use routes::create_router;
 use sessions::Backend;
@@ -158,7 +158,7 @@ async fn main() {
     debug!("Loading documentation and announcements");
 
     // Load announcements
-    let announcements: Arc<RwLock<Vec<AnnouncementPayload>>> =
+    let announcements: Arc<RwLock<Vec<Announcement>>> =
         Arc::new(RwLock::new(load_announcements().await));
 
     info!("Loaded documentation and announcements");

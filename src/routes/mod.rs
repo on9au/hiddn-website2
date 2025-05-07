@@ -7,12 +7,12 @@ use tera::Tera;
 use tokio::sync::RwLock;
 use tower_http::services::{ServeDir, ServeFile};
 
-use crate::{payloads::AnnouncementPayload, sessions::Backend};
+use crate::{payloads::Announcement, sessions::Backend};
 
 pub mod api;
 
 pub fn create_router(
-    announcements: Arc<RwLock<Vec<AnnouncementPayload>>>,
+    announcements: Arc<RwLock<Vec<Announcement>>>,
     auth_layer: AuthManagerLayer<Backend, MemoryStore>,
     pool: sqlx::MySqlPool,
     marzban_client: MarzbanAPIClient,

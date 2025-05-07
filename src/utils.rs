@@ -1,9 +1,9 @@
 use chrono::{DateTime, Utc};
 use tokio::fs;
 
-use crate::{config::GLOBAL_CONFIG, payloads::AnnouncementPayload};
+use crate::{config::GLOBAL_CONFIG, payloads::Announcement};
 
-pub async fn load_announcements() -> Vec<AnnouncementPayload> {
+pub async fn load_announcements() -> Vec<Announcement> {
     let mut announcements = Vec::new();
 
     // Read announcements dir
@@ -36,7 +36,7 @@ pub async fn load_announcements() -> Vec<AnnouncementPayload> {
         let file_name = entry.file_name().to_string_lossy().to_lowercase();
         if file_name.ends_with(".md") {
             let content = fs::read_to_string(entry.path()).await.unwrap_or_default();
-            let announcement = AnnouncementPayload {
+            let announcement = Announcement {
                 id: (announcements.len() as u32).into(),
                 title: file_name.trim_end_matches(".md").to_string(),
                 date: DateTime::<Utc>::from(entry.metadata().await.unwrap().modified().unwrap())

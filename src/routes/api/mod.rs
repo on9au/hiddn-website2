@@ -36,10 +36,10 @@ use tera::Tera;
 use tokio::sync::RwLock;
 use tower_http::trace::TraceLayer;
 
-use crate::{payloads::AnnouncementPayload, sessions::Backend};
+use crate::{payloads::Announcement, sessions::Backend};
 
 pub fn routes(
-    announcements: Arc<RwLock<Vec<AnnouncementPayload>>>,
+    announcements: Arc<RwLock<Vec<Announcement>>>,
     auth_layer: AuthManagerLayer<Backend, MemoryStore>,
     pool: sqlx::MySqlPool,
     marzban_client: MarzbanAPIClient,
