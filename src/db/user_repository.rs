@@ -7,6 +7,7 @@ pub struct UserRepository {
 }
 
 impl UserRepository {
+    /// Creates a new `UserRepository` instance.
     pub fn new(pool: MySqlPool) -> Self {
         Self { pool }
     }

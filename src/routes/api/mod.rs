@@ -30,8 +30,6 @@ pub mod plans;
 pub mod stripe_webhook;
 pub mod transactions;
 
-use std::sync::Arc;
-
 use axum::{Extension, Router};
 use axum_login::{AuthManagerLayer, login_required, tower_sessions::MemoryStore};
 use tower_http::trace::TraceLayer;
@@ -57,7 +55,7 @@ pub fn routes(auth_layer: AuthManagerLayer<Backend, MemoryStore>, app_state: App
     Router::new()
         .merge(public_routes)
         .merge(protected_routes)
-        .layer(Extension(Arc::new(app_state)))
+        .layer(Extension(app_state))
         .layer(auth_layer)
         .layer(TraceLayer::new_for_http())
 }

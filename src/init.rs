@@ -1,14 +1,7 @@
 use std::net::SocketAddr;
 
 use anyhow::{Context, Result};
-use axum::{
-    BoxError, Router,
-    body::Body,
-    extract::Request,
-    handler::HandlerWithoutStateExt,
-    http::Uri,
-    response::{IntoResponse, Redirect},
-};
+use axum::{Router, body::Body, extract::Request, response::IntoResponse};
 use axum_login::{
     AuthManagerLayer, AuthManagerLayerBuilder,
     tower_sessions::{Expiry, MemoryStore, SessionManagerLayer, cookie::time::Duration},
@@ -24,7 +17,7 @@ use crate::{
     config::{GLOBAL_CONFIG, HttpOrHttps},
     routes::create_router,
     sessions::Backend,
-    state::AppState,
+    state::AppStateInner,
 };
 use argon2::{PasswordHasher, password_hash::rand_core::OsRng};
 
@@ -206,12 +199,13 @@ pub async fn init() -> Result<()> {
         .context("Failed to setup Tera template engine")?;
 
     // Create app state
-    let app_state = AppState {
+    let app_state = AppStateInner {
         db_pool,
         marzban_client,
         stripe_client,
         tera,
-    };
+    }
+    .into();
 
     // Create router
     let app = create_router(auth_layer, app_state);
