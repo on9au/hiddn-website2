@@ -3,7 +3,7 @@ use ts_rs::TS;
 
 #[derive(Clone, Debug, Serialize, TS)]
 #[ts(export)]
-pub struct PlanDetailsPayload {
+pub struct PlanDetails {
     pub expiration: Option<u64>,
     pub status: super::enums::PlanStatusEnum,
     #[serde(rename = "dataUsed")]
@@ -14,7 +14,7 @@ pub struct PlanDetailsPayload {
 
 #[derive(Clone, Debug, Serialize, TS)]
 #[ts(export)]
-pub struct PlanPayload {
+pub struct Plan {
     pub id: u64,
     pub name: String,
     pub price: f64,
@@ -25,7 +25,7 @@ pub struct PlanPayload {
 
 #[derive(Clone, Debug, Deserialize, TS)]
 #[ts(export)]
-pub struct NewPlanPayload {
+pub struct NewPlan {
     pub name: String,
     pub price: f64,
     pub data_limit: Option<f64>,
@@ -35,13 +35,13 @@ pub struct NewPlanPayload {
 
 #[derive(Clone, Debug, Deserialize, TS)]
 #[ts(export)]
-pub struct CreateOrderPayload {
+pub struct CreateOrder {
     pub plan_id: u64,
 }
 
 #[derive(Clone, Debug, Serialize, TS)]
 #[ts(export)]
-pub struct CreateOrderResponsePayload {
+pub struct CreateOrderResponse {
     pub order_id: u32,
     pub payment_intent_client_secret: String,
 }

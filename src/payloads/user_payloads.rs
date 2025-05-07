@@ -13,7 +13,7 @@ pub struct UserProfile {
 
 #[derive(Clone, Debug, Deserialize, TS)]
 #[ts(export)]
-pub struct UserProfileSettingsChangePayload {
+pub struct UserProfileSettingsChange {
     pub email_expiration_reminder: Option<bool>,
     pub email_data_reminder: Option<bool>,
 }

@@ -3,7 +3,7 @@ use ts_rs::TS;
 
 #[derive(Clone, Debug, Serialize, TS)]
 #[ts(export)]
-pub struct AnnouncementPayload {
+pub struct Announcement {
     pub id: u64,
     pub title: String,
     pub date: String,

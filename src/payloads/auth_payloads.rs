@@ -10,7 +10,7 @@ pub struct LoginPayload {
 
 #[derive(Clone, Debug, Serialize, TS)]
 #[ts(export)]
-pub struct LoginResponsePayload {
+pub struct LoginResponse {
     pub logged_in: bool,
 }
 
@@ -26,7 +26,7 @@ pub struct RegisterPayload {
 
 #[derive(Clone, Debug, Serialize, TS)]
 #[ts(export)]
-pub struct PasswordFeedbackPayload {
+pub struct PasswordFeedback {
     pub warning: Option<String>,
     pub suggestions: Vec<String>,
 }
