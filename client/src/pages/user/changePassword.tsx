@@ -67,7 +67,7 @@ const ChangePassword: React.FC = () => {
 
         try {
             await axios.post(
-                '/api/change_password',
+                '/api/me/change-password',
                 body,
                 { withCredentials: true }
             );

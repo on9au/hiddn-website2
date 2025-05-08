@@ -79,7 +79,7 @@ const Profile: React.FC = () => {
 
     // Handler functions
     const handleChangePassword = () => {
-        navigate('/me/change-password');
+        navigate('/user/change-password');
     };
 
     const handleResetSubscriptionURL = async () => {
