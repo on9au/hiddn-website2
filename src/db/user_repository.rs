@@ -1,5 +1,6 @@
 use crate::payloads::{UserProfile, UserProfileSettingsChange};
 use anyhow::{Context, Result};
+use chrono::{DateTime, Utc};
 use sqlx::MySqlPool;
 
 pub struct UserRepository {
@@ -19,8 +20,8 @@ impl UserRepository {
             r#"
             SELECT 
                 email,
-                created_at as `created_at: u64`,
-                updated_at as `updated_at: u64`,
+                created_at as `created_at: DateTime<Utc>`,
+                updated_at as `updated_at: DateTime<Utc>`,
                 email_expiration_reminder as `email_expiration_reminder: bool`,
                 email_data_reminder as `email_data_reminder: bool`
             FROM users
@@ -42,8 +43,8 @@ impl UserRepository {
             r#"
             SELECT 
                 email,
-                created_at as `created_at: u64`,
-                updated_at as `updated_at: u64`,
+                created_at as `created_at: DateTime<Utc>`,
+                updated_at as `updated_at: DateTime<Utc>`,
                 email_expiration_reminder as `email_expiration_reminder: bool`,
                 email_data_reminder as `email_data_reminder: bool`
             FROM users

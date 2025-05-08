@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { UserProfilePayload } from '../../bindings';
 import { Switch } from '@headlessui/react'; // Assuming you're using Headless UI for switches
+import { UserProfile } from '../../bindings/UserProfile';
 
 type FetchUserStatusEnum =
     | { status: 'loading' }
@@ -27,12 +27,12 @@ const SkeletonProfile: React.FC = () => {
     );
 };
 
-const formatUnixTimestamp = (timestamp: number): string => {
-    return new Date(timestamp * 1000).toLocaleString(undefined, { timeZoneName: 'short' });
+const formatUnixTimestamp = (iso_string: string): string => {
+    return new Date(iso_string).toLocaleString(undefined, { timeZoneName: 'short' });
 }
 
 const Profile: React.FC = () => {
-    const [userProfile, setUserProfile] = useState<UserProfilePayload | null>(null);
+    const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
     const [fetchServerStatus, setFetchServerStatus] = useState<FetchUserStatusEnum>({ status: 'loading' });
     const [emailExpReminder, setEmailExpReminder] = useState<boolean>(false);
     const [emailDataReminder, setEmailDataReminder] = useState<boolean>(false);
@@ -43,7 +43,7 @@ const Profile: React.FC = () => {
 
         const fetchUserProfile = async () => {
             try {
-                const response = await axios.get<UserProfilePayload>('/api/me', {
+                const response = await axios.get<UserProfile>('/api/me', {
                     withCredentials: true,
                 });
                 setUserProfile(response.data);
