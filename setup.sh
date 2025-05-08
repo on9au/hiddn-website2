@@ -41,7 +41,7 @@ fi
 # Install sqlx-cli
 if ! command -v sqlx &>/dev/null; then
     echo "📦 Installing sqlx-cli..."
-    cargo install sqlx-cli --no-default-features --features mysql
+    cargo install sqlx-cli
 else
     echo "✅ sqlx-cli is already installed."
 fi
