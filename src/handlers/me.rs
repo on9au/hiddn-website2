@@ -1,6 +1,7 @@
 use crate::{
     errors::AppResult,
-    payloads::{ChangePasswordPayload, UserProfileSettingsChange},
+    payloads::{ChangePasswordPayload, PasswordFeedback, UserProfileSettingsChange},
+    security,
     sessions::AuthSession,
     state::AppState,
 };
@@ -115,12 +116,48 @@ pub async fn change_password(
 ) -> AppResult<impl IntoResponse> {
     let user = auth_session.user.context("Failed to get user")?;
 
-    // Check if old password is correct
-    let is_valid = app_state
-        .user_repository()
-        .get_password_hash(user.id)
-        .await
-        .context("Failed to get password hash")?;
+    // Check if the old password is correct
+    if !security::verify_password(&payload.old_password, user.password_hash()).await? {
+        return Ok(StatusCode::UNAUTHORIZED.into_response());
+    }
 
-    Ok(Json("stub: change_password"))
+    // Check password strength
+    let (score, warning, suggestions) =
+        security::check_password_strength(&payload.new_password, &[&user.email]);
+
+    if score < zxcvbn::Score::Three {
+        return Ok((
+            StatusCode::CONFLICT,
+            Json(PasswordFeedback {
+                warning,
+                suggestions,
+            }),
+        )
+            .into_response());
+    }
+
+    // Check if both passwords match
+    if payload.new_password != payload.confirm_password {
+        return Ok((
+            StatusCode::CONFLICT,
+            Json(PasswordFeedback {
+                warning: "Passwords do not match".to_string().into(),
+                suggestions: vec![],
+            }),
+        )
+            .into_response());
+    }
+
+    // All checks passed, so we can update the password
+    let new_password_hash = security::hash_password(&payload.new_password)
+        .await
+        .context("Failed to hash new password")?;
+
+    app_state
+        .user_repository()
+        .update_password(user.id, &new_password_hash)
+        .await
+        .context("Failed to update password")?;
+
+    Ok(StatusCode::OK.into_response())
 }

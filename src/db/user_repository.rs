@@ -99,7 +99,24 @@ impl UserRepository {
         Ok(result.last_insert_id() as i64)
     }
 
-    pub async fn update_password(&self, email: &str, password_hash: &str) -> Result<()> {
+    pub async fn update_password(&self, user_id: i64, password_hash: &str) -> Result<()> {
+        sqlx::query!(
+            r#"
+            UPDATE users
+            SET password_hash = ?
+            WHERE id = ?
+            "#,
+            password_hash,
+            user_id
+        )
+        .execute(&self.pool)
+        .await
+        .context("Failed to update password")?;
+
+        Ok(())
+    }
+
+    pub async fn update_password_by_email(&self, email: &str, password_hash: &str) -> Result<()> {
         sqlx::query!(
             r#"
             UPDATE users
