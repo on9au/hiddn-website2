@@ -13,8 +13,8 @@ use crate::handlers::me;
 pub fn routes() -> Router {
     Router::new()
         .route("/", get(me::get_me))
-        .route("/reset_subscription_url", post(me::reset_subscription_url))
-        .route("/update_settings", post(me::update_settings))
-        .route("/delete_account", delete(me::delete_account))
-        .route("/change_password", post(me::change_password))
+        .route("/reset-subscription-url", post(me::reset_subscription_url))
+        .route("/update-settings", post(me::update_settings))
+        .route("/delete-account", delete(me::delete_account))
+        .route("/change-password", post(me::change_password))
 }

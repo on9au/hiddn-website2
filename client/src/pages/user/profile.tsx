@@ -79,7 +79,7 @@ const Profile: React.FC = () => {
 
     // Handler functions
     const handleChangePassword = () => {
-        navigate('/user/change-password');
+        navigate('/me/change-password');
     };
 
     const handleResetSubscriptionURL = async () => {
@@ -90,7 +90,7 @@ const Profile: React.FC = () => {
 
         try {
             await axios.post(
-                '/api/reset_subscription_url',
+                '/me/reset-subscription-url',
                 {},
                 { withCredentials: true }
             );
@@ -105,7 +105,7 @@ const Profile: React.FC = () => {
         try {
             const newValue = !emailExpReminder;
             await axios.post(
-                '/api/update_settings',
+                '/api/me/update-settings',
                 { email_expiration_reminder: newValue },
                 { withCredentials: true }
             );
@@ -120,7 +120,7 @@ const Profile: React.FC = () => {
         try {
             const newValue = !emailDataReminder;
             await axios.post(
-                '/api/update_settings',
+                '/api/me/update-settings',
                 { email_data_reminder: newValue },
                 { withCredentials: true }
             );
