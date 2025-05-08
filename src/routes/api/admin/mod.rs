@@ -11,7 +11,9 @@
 //! - [`transactions`]: Transaction routes
 //! - [`users`]: Me routes
 
-use axum::Router;
+use axum::{Router, routing::get};
+
+use crate::handlers::admin;
 
 pub mod announcements;
 pub mod plans;
@@ -25,4 +27,5 @@ pub fn routes() -> Router {
         .nest("/plans", plans::routes())
         .nest("/transactions", transactions::routes())
         .nest("/users", users::routes())
+        .route("/me", get(admin::me))
 }

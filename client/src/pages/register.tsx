@@ -3,15 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import zxcvbn from 'zxcvbn';
 import { AuthStatus, EmailVerifyStatus } from '../auth';
 import CommonLink from '../components/commonlink';
-import { RegisterPayload, RequestCodePayload, PasswordFeedbackPayload } from '../bindings';
 import Loginbutton from '../components/loginbutton';
 import TextInput from '../components/logintextinput';
 import VerificationInput from '../components/loginpageverificationinput';
+import { RequestCodePayload } from '../bindings/RequestCodePayload';
+import { RegisterPayload } from '../bindings/RegisterPayload';
+import { PasswordFeedback } from '../bindings/PasswordFeedback';
 
 // const apiURL: string = import.meta.env.VITE_API_URL;
 
 const Register: React.FC = () => {
-    useEffect(() => { document.title = 'Register - HiddN'; } );
+    useEffect(() => { document.title = 'Register - HiddN'; });
 
     const navigate = useNavigate();
 
@@ -36,7 +38,7 @@ const Register: React.FC = () => {
 
         const payload: RequestCodePayload = { email };
 
-        const result = await fetch(`api/request_code`, {
+        const result = await fetch(`api/auth/email/request-code`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -72,7 +74,7 @@ const Register: React.FC = () => {
         }
     };
 
-    const handleRegister = async () => {        
+    const handleRegister = async () => {
         if (email === '' || !email.includes('@')) {
             setAuthStatus({ type: 'Error', message: 'Please enter a valid email.' });
             return;
@@ -98,7 +100,7 @@ const Register: React.FC = () => {
             invite_code: inviteCode,
         };
 
-        const result = await fetch(`api/register_user`, {
+        const result = await fetch(`api/auth/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -112,7 +114,7 @@ const Register: React.FC = () => {
             case 200:
                 // Automatically log in user
                 {
-                    const login_result = await fetch(`api/login_user`, {
+                    const login_result = await fetch(`api/auth/login`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -141,7 +143,7 @@ const Register: React.FC = () => {
                 setAuthStatus({ type: 'Error', message: 'Incorrect email verification code.' });
                 break;
             case 409: {
-                const feedback: PasswordFeedbackPayload = await result.json();
+                const feedback: PasswordFeedback = await result.json();
                 setAuthStatus({ type: 'Error', message: 'Password is too weak: ' + feedback.warning || 'Password validation failed.' });
                 setPasswordSuggestions(feedback.suggestions);
                 break;

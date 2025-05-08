@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import zxcvbn from 'zxcvbn';
 import { AuthStatus, EmailVerifyStatus } from '../auth';
 import CommonLink from '../components/commonlink';
-import { ForgotPasswordPayload, RequestCodePayload, PasswordFeedbackPayload } from '../bindings';
 import Loginbutton from '../components/loginbutton';
 import TextInput from '../components/logintextinput';
 import VerificationInput from '../components/loginpageverificationinput';
+import { RequestCodePayload } from '../bindings/RequestCodePayload';
+import { ForgotPasswordPayload } from '../bindings/ForgotPasswordPayload';
+import { PasswordFeedback } from '../bindings/PasswordFeedback';
 
 // const apiURL: string = import.meta.env.VITE_API_URL;
 
@@ -35,7 +37,7 @@ const Forgot: React.FC = () => {
 
         const payload: RequestCodePayload = { email };
 
-        const result = await fetch(`api/request_code`, {
+        const result = await fetch(`api/auth/email/request-code`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -97,7 +99,7 @@ const Forgot: React.FC = () => {
             confirm_password: confirmPassword,
         };
 
-        const result = await fetch(`api/forgot_password`, {
+        const result = await fetch(`api/auth/forgot-password`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -111,7 +113,7 @@ const Forgot: React.FC = () => {
             case 200:
                 // Automatically log in user
                 {
-                    const login_result = await fetch(`api/login_user`, {
+                    const login_result = await fetch(`api/auth/login`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -140,7 +142,7 @@ const Forgot: React.FC = () => {
                 setAuthStatus({ type: 'Error', message: 'Incorrect email verification code.' });
                 break;
             case 409: {
-                const feedback: PasswordFeedbackPayload = await result.json();
+                const feedback: PasswordFeedback = await result.json();
                 setAuthStatus({ type: 'Error', message: 'Password is too weak: ' + feedback.warning || 'Password validation failed.' });
                 setPasswordSuggestions(feedback.suggestions);
                 break;

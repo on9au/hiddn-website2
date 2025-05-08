@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthStatus } from '../auth';
-import { LoginPayload } from '../bindings';
 import CommonLink from '../components/commonlink';
 import Loginbutton from '../components/loginbutton';
 import TextInput from '../components/logintextinput';
+import { LoginPayload } from '../bindings/LoginPayload';
 
 // const apiURL: string = import.meta.env.VITE_API_URL;
 
@@ -41,7 +41,7 @@ const Login: React.FC = () => {
 
         // Log into user, with API endpoint.
         try {
-            const result = await fetch(`api/login_user`, {
+            const result = await fetch(`api/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

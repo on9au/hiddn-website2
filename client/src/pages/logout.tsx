@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Loginbutton from "../components/loginbutton";
 
 const Logout: React.FC = () => {
-    useEffect(() => { document.title = 'Logout - HiddN'; } );
+    useEffect(() => { document.title = 'Logout - HiddN'; });
 
     const [logoutStatus, setLogoutStatus] = React.useState<LogoutStatus>({ type: 'Idle' });
     const navigate = useNavigate();
@@ -13,7 +13,7 @@ const Logout: React.FC = () => {
         // Log out user, with API endpoint.
         setLogoutStatus({ type: 'LoggingOut' });
         try {
-            fetch(`api/logout_user`, {
+            fetch(`api/auth/logout`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -54,7 +54,7 @@ const Logout: React.FC = () => {
             {logoutStatus.type === 'Error' && (
                 <>
                     <p className="mb-4 text-red-500">Logout Error: {logoutStatus.message}</p>
-                    <Loginbutton 
+                    <Loginbutton
                         content="To login page"
                         handleLogin={returnToLogin}
                     />
