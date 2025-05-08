@@ -1,6 +1,8 @@
+use std::collections::HashSet;
+
 use argon2::PasswordHash;
 use argon2::{Argon2, PasswordVerifier};
-use axum_login::{AuthUser, AuthnBackend, UserId};
+use axum_login::{AuthUser, AuthnBackend, AuthzBackend, UserId};
 use sqlx::{MySqlPool, query_as};
 
 use crate::payloads::LoginPayload;
@@ -140,5 +142,31 @@ impl AuthnBackend for Backend {
         .await?;
 
         Ok(user)
+    }
+}
+
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+pub struct Permission {
+    pub is_admin: bool,
+}
+
+impl From<bool> for Permission {
+    fn from(is_admin: bool) -> Self {
+        Self { is_admin }
+    }
+}
+
+#[async_trait::async_trait]
+impl AuthzBackend for Backend {
+    type Permission = Permission;
+
+    async fn get_user_permissions(
+        &self,
+        user: &Self::User,
+    ) -> Result<HashSet<Self::Permission>, Self::Error> {
+        // For now, we will just return the is_admin field as a permission
+        return Ok(HashSet::from([Permission {
+            is_admin: user.is_admin,
+        }]));
     }
 }

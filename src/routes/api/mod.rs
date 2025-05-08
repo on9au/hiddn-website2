@@ -12,14 +12,17 @@
 //!
 //! - [`stripe`]: Stripe (webhook) routes
 //!
-//! Protected:
+//! Protected (User-Restricted):
 //!
-//! - [`admin`]: Admin routes
 //! - [`announcements`]: Announcement routes
 //! - [`app`]: App routes
 //! - [`me`]: Me routes
 //! - [`plans`]: Plan routes
 //! - [`transactions`]: Transaction routes
+//!
+//! Protected (Admin-Restricted):
+//!
+//! - [`admin`]: Admin routes
 
 pub mod admin;
 pub mod announcements;
@@ -31,7 +34,9 @@ pub mod stripe_webhook;
 pub mod transactions;
 
 use axum::{Extension, Router};
-use axum_login::{AuthManagerLayer, login_required, tower_sessions::MemoryStore};
+use axum_login::{
+    AuthManagerLayer, login_required, permission_required, tower_sessions::MemoryStore,
+};
 use tower_http::trace::TraceLayer;
 
 use crate::{sessions::Backend, state::AppState};
@@ -42,9 +47,8 @@ pub fn routes(auth_layer: AuthManagerLayer<Backend, MemoryStore>, app_state: App
         .nest("/auth", auth::routes())
         .nest("/stripe", stripe_webhook::routes());
 
-    // Protected routes which will have the auth_layer applied.
-    let protected_routes = Router::new()
-        .nest("/admin", admin::routes())
+    // Protected routes which will require authentication (login_required!).
+    let user_protected_routes = Router::new()
         .nest("/announcements", announcements::routes())
         .nest("/app", app::routes())
         .nest("/me", me::routes())
@@ -52,9 +56,15 @@ pub fn routes(auth_layer: AuthManagerLayer<Backend, MemoryStore>, app_state: App
         .nest("/transactions", transactions::routes())
         .route_layer(login_required!(Backend));
 
+    // Admin protected routes which will require admin authentication (permission_required!).
+    let admin_protected_routes = Router::new()
+        .nest("/admin", admin::routes())
+        .route_layer(permission_required!(Backend, true));
+
     Router::new()
         .merge(public_routes)
-        .merge(protected_routes)
+        .merge(user_protected_routes)
+        .merge(admin_protected_routes)
         .layer(Extension(app_state))
         .layer(auth_layer)
         .layer(TraceLayer::new_for_http())
