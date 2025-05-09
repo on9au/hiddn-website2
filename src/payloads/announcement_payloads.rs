@@ -5,7 +5,7 @@ use ts_rs::TS;
 #[derive(Clone, Debug, Serialize, TS)]
 #[ts(export)]
 pub struct Announcement {
-    pub id: u64,
+    pub id: u32,
     pub title: String,
     pub date: DateTime<Utc>,
     pub content: String,

@@ -60,6 +60,28 @@ impl AnnouncementRepository {
         Ok(announcements)
     }
 
+    /// Get the latest announcement.
+    pub async fn get_latest_announcement(&self) -> Result<Option<Announcement>> {
+        let announcement = sqlx::query_as!(
+            Announcement,
+            r#"
+            SELECT 
+                id,
+                title,
+                content,
+                created_at as `date: DateTime<Utc>`
+            FROM announcements
+            ORDER BY created_at DESC
+            LIMIT 1
+            "#
+        )
+        .fetch_optional(&self.pool)
+        .await
+        .context("Failed to fetch latest announcement")?;
+
+        Ok(announcement)
+    }
+
     /// Get a single announcement by its ID.
     pub async fn get_announcement_by_id(&self, id: i64) -> Result<Option<Announcement>> {
         let announcement = sqlx::query_as!(
@@ -93,7 +115,7 @@ impl AnnouncementRepository {
             title,
             content
         )
-        .fetch_one(&self.pool)
+        .execute(&self.pool)
         .await
         .context("Failed to create announcement")?;
 

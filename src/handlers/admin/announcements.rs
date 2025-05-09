@@ -1,8 +1,25 @@
-use crate::errors::AppResult;
-use axum::{Json, response::IntoResponse};
+use crate::{errors::AppResult, payloads::AdminCreateAnnouncement, state::AppState};
+use axum::{Extension, Json, response::IntoResponse};
 
-pub async fn admin_post_announcement(/* params */) -> AppResult<impl IntoResponse> {
-    Ok(Json("stub: admin_post_announcement"))
+/// POST `/api/admin/announcements/`
+pub async fn admin_post_announcement(
+    Extension(app_state): Extension<AppState>,
+    Json(payload): Json<AdminCreateAnnouncement>,
+) -> AppResult<impl IntoResponse> {
+    let title = payload.title;
+    let content = payload.content;
+    app_state
+        .announcement_repository()
+        .create_announcement(title, content)
+        .await?;
+
+    let latest_announcement = app_state
+        .announcement_repository()
+        .get_latest_announcement()
+        .await?
+        .unwrap(); // we just created it, so it should exist
+
+    Ok(Json(latest_announcement))
 }
 
 pub async fn admin_delete_announcement(/* params */) -> AppResult<impl IntoResponse> {

@@ -1,4 +1,4 @@
-use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
+use chrono::{DateTime, TimeZone, Utc};
 use marzban_api::models::user::UserResponse;
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
@@ -31,7 +31,7 @@ impl From<UserResponse> for PlanDetails {
 #[derive(Clone, Debug, Serialize, TS)]
 #[ts(export)]
 pub struct Plan {
-    pub id: u64,
+    pub id: u32,
     pub name: String,
     pub price: f64,
     pub data_limit: Option<f64>,
@@ -52,7 +52,7 @@ pub struct NewPlan {
 #[derive(Clone, Debug, Deserialize, TS)]
 #[ts(export)]
 pub struct CreateOrder {
-    pub plan_id: u64,
+    pub plan_id: u32,
 }
 
 #[derive(Clone, Debug, Serialize, TS)]

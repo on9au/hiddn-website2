@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { AdminCreateAnnouncement, AnnouncementPayload } from '../../bindings';
 import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
+import { Announcement } from '../../bindings/Announcement';
+import { AdminCreateAnnouncement } from '../../bindings/AdminCreateAnnouncement';
 
 const AdminAnnouncementsEditor: React.FC = () => {
-    const [announcements, setAnnouncements] = useState<AnnouncementPayload[]>([]);
+    const [announcements, setAnnouncements] = useState<Announcement[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [newAnnouncement, setNewAnnouncement] = useState<AdminCreateAnnouncement>({ title: '', content: '' });
@@ -110,8 +111,8 @@ const AdminAnnouncementsEditor: React.FC = () => {
                                     className="w-full p-2 mb-4 border rounded dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
                                 />
                                 <div className="mt-2 prose max-w-none dark:prose-invert">
-                                            <ReactMarkdown>{newAnnouncement.content}</ReactMarkdown>
-                                        </div>
+                                    <ReactMarkdown>{newAnnouncement.content}</ReactMarkdown>
+                                </div>
                                 <button
                                     onClick={handleCreateAnnouncement}
                                     className="px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700"
