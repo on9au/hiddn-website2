@@ -90,7 +90,7 @@ const Profile: React.FC = () => {
 
         try {
             await axios.post(
-                '/me/reset-subscription-url',
+                '/api/me/reset-subscription-url',
                 {},
                 { withCredentials: true }
             );
