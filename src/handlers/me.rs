@@ -1,6 +1,6 @@
 use crate::{
     errors::AppResult,
-    payloads::{ChangePasswordPayload, PasswordFeedback, UserProfileSettingsChange},
+    payloads::{ChangePasswordPayload, PasswordFeedback, PlanDetails, UserProfileSettingsChange},
     security,
     sessions::AuthSession,
     state::AppState,
@@ -24,6 +24,44 @@ pub async fn get_me(
         .context("User not found")?;
 
     Ok(Json(user_profile).into_response())
+}
+
+/// GET `/api/me/plan-details`
+pub async fn get_plan_details(
+    auth_session: AuthSession,
+    Extension(app_state): Extension<AppState>,
+) -> AppResult<impl IntoResponse> {
+    let user = auth_session.user.context("Failed to get user")?;
+
+    let marzban_username = match app_state
+        .user_repository()
+        .get_marzban_username(user.id)
+        .await
+        .context("Failed to get user's marzban username")?
+    {
+        Some(marzban_username) => marzban_username,
+        None => {
+            // No Marzban user = No subscription.
+            // Just ignore the request.
+            return Ok(Json(()).into_response());
+        }
+    };
+
+    let marzban_user = app_state
+        .marzban_client()
+        .get_user(&marzban_username)
+        .await
+        .context("Failed to get Marzban user")?;
+
+    // If the plan has been expired for more than 14 days, assume the plan doesn't exist.
+    // If expire is None, the expiration date is 'never'.
+    if let Some(expire) = marzban_user.expire {
+        if expire < (chrono::Utc::now() - chrono::Duration::days(14)).timestamp() as u64 {
+            return Ok(Json(()).into_response());
+        }
+    }
+
+    Ok(Json(std::convert::Into::<PlanDetails>::into(marzban_user)).into_response())
 }
 
 /// POST `/api/me/reset-subscription-url`

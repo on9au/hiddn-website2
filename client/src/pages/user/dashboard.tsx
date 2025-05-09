@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { FaArrowUp, FaArrowRight } from 'react-icons/fa';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
-import { AnnouncementPayload, PlanDetailsPayload } from '../../bindings';
 import { useNavigate } from 'react-router-dom';
 import { DownloadIcon } from '@primer/octicons-react';
+import { PlanDetails } from '../../bindings/PlanDetails';
+import { Announcement } from '../../bindings/Announcement';
 
 const SkeletonDashboard: React.FC = () => {
     return (
@@ -41,22 +42,23 @@ const SkeletonDashboard: React.FC = () => {
     );
 };
 
-const formatBytes = (bytes: number, decimals = 2): string => {
-    if (bytes === 0) return '0 Bytes';
+const formatBytes = (bytes: bigint, decimals = 2): string => {
+    const bytes_n = Number(bytes);
+    if (bytes_n === 0) return '0 Bytes';
     const k = 1024;
     const dm = decimals < 0 ? 0 : decimals;
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    const i = Math.floor(Math.log(bytes_n) / Math.log(k));
+    return parseFloat((bytes_n / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
-const formatUnixTimestamp = (timestamp: number): string => {
-    return new Date(timestamp * 1000).toLocaleString(undefined, { timeZoneName: 'short' });
+const formatUnixTimestamp = (timestamp: string): string => {
+    return new Date(timestamp).toLocaleString(undefined, { timeZoneName: 'short' });
 }
 
 const Dashboard: React.FC = () => {
-    const [planDetails, setPlanDetails] = useState<PlanDetailsPayload | null>(null);
-    const [announcements, setAnnouncements] = useState<AnnouncementPayload[]>([]);
+    const [planDetails, setPlanDetails] = useState<PlanDetails | null>(null);
+    const [announcements, setAnnouncements] = useState<Announcement[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
@@ -64,7 +66,7 @@ const Dashboard: React.FC = () => {
     useEffect(() => {
         const fetchPlanDetails = async () => {
             try {
-                const response = await axios.get<PlanDetailsPayload>('/api/plan_details', {
+                const response = await axios.get<PlanDetails>('/api/me/plan-details', {
                     withCredentials: true,
                 });
                 setPlanDetails(response.data);
@@ -115,7 +117,7 @@ const Dashboard: React.FC = () => {
 
     // Calculate data usage percentage
     const dataUsagePercentage = planDetails
-        ? planDetails.dataLimit ? (planDetails.dataUsed / planDetails.dataLimit) * 100 : 0
+        ? planDetails.dataLimit ? (Number(planDetails.dataUsed) / Number(planDetails.dataLimit)) * 100 : 0
         : 0;
 
     return (
@@ -146,10 +148,10 @@ const Dashboard: React.FC = () => {
                                     {/* Data Usage Progress Bar */}
                                     <div className="mb-4">
                                         <p className="mb-1 text-base text-gray-700 dark:text-gray-300">
-                                            Data Usage: {formatBytes(planDetails.dataUsed)}{planDetails.dataLimit && ` / ${formatBytes(planDetails.dataLimit)}`}
+                                            Data Usage: {formatBytes(planDetails.dataUsed)}{planDetails.dataLimit?.toString() && ` / ${formatBytes(planDetails.dataLimit)}`}
                                         </p>
                                         {
-                                            planDetails.dataLimit && (
+                                            Number(planDetails.dataLimit) && (
                                                 <>
                                                     <div className="w-full h-4 bg-gray-300 rounded-full dark:bg-gray-700">
                                                         <div

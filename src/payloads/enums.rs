@@ -1,3 +1,4 @@
+use marzban_api::models::user::UserStatus;
 use serde::Serialize;
 use sqlx::prelude::Type;
 use ts_rs::TS;
@@ -25,4 +26,16 @@ pub enum PlanStatusEnum {
     Limited,
     Expired,
     OnHold,
+}
+
+impl From<UserStatus> for PlanStatusEnum {
+    fn from(status: UserStatus) -> Self {
+        match status {
+            UserStatus::Active => Self::Active,
+            UserStatus::Disabled => Self::Disabled,
+            UserStatus::Limited => Self::Limited,
+            UserStatus::Expired => Self::Expired,
+            UserStatus::OnHold => Self::OnHold,
+        }
+    }
 }
