@@ -1,14 +1,19 @@
+use crate::sessions::AuthSession;
 use crate::{errors::AppResult, state::AppState};
+use anyhow::Context;
 use axum::extract::Path;
 use axum::http::StatusCode;
 use axum::{Extension, Json, response::IntoResponse};
 
 pub async fn get_transactions(
+    auth_session: AuthSession,
     Extension(app_state): Extension<AppState>,
 ) -> AppResult<impl IntoResponse> {
+    let user = auth_session.user.context("Failed to get user")?;
+
     let txs = app_state
         .transaction_repository()
-        .get_transactions()
+        .get_transactions_by_user_id(user.id)
         .await?;
     Ok(Json(txs))
 }
