@@ -122,9 +122,9 @@ impl AnnouncementRepository {
         Ok(())
     }
 
-    /// Delete an announcement by its ID.
-    pub async fn delete_announcement(&self, id: i64) -> Result<()> {
-        sqlx::query!(
+    /// Delete an announcement by its ID. Returns true if the announcement was deleted, false if it didn't exist.
+    pub async fn delete_announcement(&self, id: i64) -> Result<bool> {
+        let result = sqlx::query!(
             r#"
             DELETE FROM announcements
             WHERE id = ?
@@ -135,6 +135,6 @@ impl AnnouncementRepository {
         .await
         .context("Failed to delete announcement")?;
 
-        Ok(())
+        Ok(result.rows_affected() > 0)
     }
 }
