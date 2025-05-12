@@ -72,7 +72,7 @@ const AdminPlanManager: React.FC = () => {
             setNewPlan({
                 name: '',
                 price: '0',
-                data_limit: null,
+                data_limit: 0,
                 duration_days: 0,
                 description: '',
             });
