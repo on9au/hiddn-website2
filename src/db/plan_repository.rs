@@ -80,4 +80,20 @@ impl PlanRepository {
 
         Ok(id as u32)
     }
+
+    /// Deletes a plan by its ID.
+    /// Returns true if the plan was deleted, false if it didn't exist.
+    pub async fn delete_plan(&self, id: u32) -> Result<bool> {
+        let result = sqlx::query!(
+            r#"
+            DELETE FROM plans
+            WHERE id = ?
+            "#,
+            id
+        )
+        .execute(&self.pool)
+        .await?;
+
+        Ok(result.rows_affected() > 0)
+    }
 }

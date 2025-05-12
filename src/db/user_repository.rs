@@ -1,4 +1,4 @@
-use crate::payloads::{UserProfile, UserProfileSettingsChange};
+use crate::payloads::{AdminUser, UserProfile, UserProfileSettingsChange};
 use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
 use sqlx::MySqlPool;
@@ -13,7 +13,57 @@ impl UserRepository {
         Self { pool }
     }
 
-    /// Get all users (sorted by ID).
+    /// Get all users. Returns a list of `AdminUser` structs.
+    ///
+    /// Intended for admin use only.
+    pub async fn get_all_users(&self) -> Result<Vec<AdminUser>> {
+        let users = sqlx::query_as!(
+            AdminUser,
+            r#"
+            SELECT 
+                id as `id: u32`,
+                email as `email: String`,
+                marzban_username,
+                is_admin as `admin: bool`,
+                created_at as `created_at: DateTime<Utc>`,
+                updated_at as `updated_at: DateTime<Utc>`
+            FROM users
+            "#,
+        )
+        .fetch_all(&self.pool)
+        .await
+        .context("Failed to fetch all users")?;
+
+        Ok(users)
+    }
+
+    /// Get a single user by their ID. Returns a `AdminUser` struct.
+    ///
+    /// Intended for admin use only.
+    pub async fn get_user_admin(&self, id: i64) -> Result<Option<AdminUser>> {
+        let user = sqlx::query_as!(
+            AdminUser,
+            r#"
+            SELECT 
+                id as `id: u32`,
+                email as `email: String`,
+                marzban_username,
+                is_admin as `admin: bool`,
+                created_at as `created_at: DateTime<Utc>`,
+                updated_at as `updated_at: DateTime<Utc>`
+            FROM users
+            WHERE id = ?
+            "#,
+            id
+        )
+        .fetch_optional(&self.pool)
+        .await
+        .context("Failed to fetch user")?;
+
+        Ok(user)
+    }
+
+    /// Get a single user by their ID.
     pub async fn get_user_by_id(&self, id: i64) -> Result<Option<UserProfile>> {
         let user = sqlx::query_as!(
             UserProfile,
@@ -171,6 +221,37 @@ impl UserRepository {
         Ok(())
     }
 
+    /// Update user's entry from AdminUserModify.
+    ///
+    /// Intended for admin use only.
+    pub async fn update_user_admin(
+        &self,
+        user_id: i64,
+        marzban_username: Option<String>,
+        email: &str,
+        is_admin: bool,
+    ) -> Result<()> {
+        sqlx::query!(
+            r#"
+            UPDATE users
+            SET email = ?, is_admin = ?, marzban_username = ?, updated_at = NOW()
+            WHERE id = ?
+            "#,
+            email,
+            is_admin,
+            marzban_username,
+            user_id
+        )
+        .execute(&self.pool)
+        .await
+        .context("Failed to update user")?;
+
+        Ok(())
+    }
+
+    /// Delete a user by their ID.
+    ///
+    /// Returns true if the user was deleted, false otherwise.
     pub async fn delete_user(&self, id: i64) -> Result<bool> {
         let result = sqlx::query!("DELETE FROM users WHERE id = ?", id)
             .execute(&self.pool)
