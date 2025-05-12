@@ -137,7 +137,7 @@ pub async fn cancel_transaction(
             // Update the transaction in the database
             app_state
                 .transaction_repository()
-                .change_transaction_status(tx.id as i64, UserTransactionStatus::Canceled)
+                .change_transaction_status(id as i64, UserTransactionStatus::Canceled)
                 .await?;
 
             Ok(StatusCode::OK.into_response())

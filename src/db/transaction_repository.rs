@@ -105,7 +105,7 @@ impl TransactionRepository {
             SET status = ?
             WHERE id = ?
             "#,
-            status as i16,
+            status,
             transaction_id
         )
         .execute(&self.pool)
