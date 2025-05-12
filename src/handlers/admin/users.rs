@@ -71,15 +71,6 @@ pub async fn admin_update_user(
     Path(id): Path<u32>,
     Json(payload): Json<AdminUserModify>,
 ) -> AppResult<impl IntoResponse> {
-    // Check if the user exists
-    if app_state
-        .user_repository()
-        .user_exists(&payload.email)
-        .await?
-    {
-        return Ok(StatusCode::NOT_FOUND.into_response());
-    }
-
     // Update the user
     app_state
         .user_repository()
