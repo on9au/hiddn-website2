@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use crate::payloads::{CreateOrder, UserTransactionStatus};
+use crate::payloads::{CreateOrder, CreateOrderResponse, UserTransactionStatus};
 use crate::sessions::AuthSession;
 use crate::{errors::AppResult, state::AppState};
 use anyhow::Context;
@@ -146,6 +146,7 @@ pub async fn cancel_transaction(
         None => Ok((StatusCode::NOT_FOUND, "Transaction not found").into_response()),
     }
 }
+
 /// POST `/api/transactions/`
 pub async fn create_transaction(
     auth_session: AuthSession,
@@ -190,5 +191,23 @@ pub async fn create_transaction(
 
     let payment_intent_status: UserTransactionStatus = payment_intent.status.into();
 
-    Ok(Json("stub: create_transaction").into_response())
+    // Add the transaction to the database
+    let transaction_id = app_state
+        .transaction_repository()
+        .create_transaction(
+            user.id,
+            plan.id as i64,
+            payment_intent.id.to_string(),
+            plan_price,
+            payment_intent_status,
+        )
+        .await?;
+
+    Ok(Json(CreateOrderResponse {
+        order_id: transaction_id,
+        payment_intent_client_secret: payment_intent
+            .client_secret
+            .context("Failed to get client secret")?, // Should not unwrap usually
+    })
+    .into_response())
 }

@@ -113,4 +113,30 @@ impl TransactionRepository {
 
         Ok(())
     }
+
+    /// Create a new transaction.
+    pub async fn create_transaction(
+        &self,
+        user_id: i64,
+        plan_id: i64,
+        stripe_payment_intent_id: String,
+        amount: i64,
+        payment_status: UserTransactionStatus,
+    ) -> Result<u32> {
+        let transaction = sqlx::query!(
+            r#"
+            INSERT INTO transactions (user_id, plan_id, stripe_payment_intent_id, amount, status, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, NOW(), NOW())
+            "#,
+            user_id,
+            plan_id,
+            stripe_payment_intent_id,
+            amount,
+            payment_status,
+        )
+        .execute(&self.pool)
+        .await?;
+
+        Ok(transaction.last_insert_id() as u32)
+    }
 }
