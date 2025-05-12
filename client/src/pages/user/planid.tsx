@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { CreateOrderResponsePayload, PlanPayload } from '../../bindings';
 import { FaShoppingCart } from 'react-icons/fa';
+import { Plan } from '../../bindings/Plan';
+import { CreateOrderResponse } from '../../bindings/CreateOrderResponse';
 
 const SkeletonPlanID: React.FC = () => {
     return (
@@ -21,7 +22,7 @@ const PlanID: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
 
-    const [plan, setPlan] = useState<PlanPayload | null>(null);
+    const [plan, setPlan] = useState<Plan | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [isOrdering, setIsOrdering] = useState<boolean>(false);
@@ -29,7 +30,7 @@ const PlanID: React.FC = () => {
     useEffect(() => {
         const fetchPlanDetails = async () => {
             try {
-                const response = await axios.get<PlanPayload>(`/api/plans/${id}`, {
+                const response = await axios.get<Plan>(`/api/plans/${id}`, {
                     withCredentials: true,
                 });
                 setPlan(response.data);
@@ -66,7 +67,7 @@ const PlanID: React.FC = () => {
 
         setIsOrdering(true);
         try {
-            const response = await axios.post<CreateOrderResponsePayload>('/api/orders', {
+            const response = await axios.post<CreateOrderResponse>('/api/transactions', {
                 plan_id: plan.id,
             }, {
                 withCredentials: true,
@@ -102,7 +103,7 @@ const PlanID: React.FC = () => {
                             {plan.name}
                         </h2>
                         <p className="mb-2 text-xl text-gray-700 dark:text-gray-300">
-                            <strong>Price:</strong> ${plan.price.toFixed(2)}
+                            <strong>Price:</strong> ${Number(plan.price).toFixed(2)}
                         </p>
                         {plan.data_limit !== null && (
                             <p className="mb-2 text-xl text-gray-700 dark:text-gray-300">
@@ -110,7 +111,7 @@ const PlanID: React.FC = () => {
                             </p>
                         )}
                         <p className="mb-4 text-xl text-gray-700 dark:text-gray-300">
-                            <strong>Duration:</strong> {plan.duration_days} days
+                            <strong>Duration:</strong> {Number(plan.duration_days)} days
                         </p>
                         {plan.description && (
                             <p className="mb-6 text-base text-center text-gray-700 dark:text-gray-300">

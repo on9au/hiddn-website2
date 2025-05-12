@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { NewPlanPayload, PlanPayload } from '../../bindings';
 import { useNavigate } from 'react-router-dom';
+import { NewPlan } from '../../bindings/NewPlan';
+import { Plan } from '../../bindings/Plan';
 // import { useNavigate } from 'react-router-dom';
 
 const AdminPlanManager: React.FC = () => {
-    const [plans, setPlans] = useState<PlanPayload[]>([]);
+    const [plans, setPlans] = useState<Plan[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [newPlan, setNewPlan] = useState<NewPlanPayload>({
+    const [newPlan, setNewPlan] = useState<NewPlan>({
         name: '',
-        price: 0,
+        price: '0',
         data_limit: 0,
-        duration_days: 0,
+        duration_days: BigInt(0),
         description: '',
     });
     const navigate = useNavigate();
@@ -22,7 +23,7 @@ const AdminPlanManager: React.FC = () => {
 
         const fetchPlans = async () => {
             try {
-                const response = await axios.get<PlanPayload[]>('/api/plans', {
+                const response = await axios.get<Plan[]>('/api/plans', {
                     withCredentials: true,
                 });
                 setPlans(response.data);
@@ -44,7 +45,7 @@ const AdminPlanManager: React.FC = () => {
             alert('Name is required.');
             return;
         }
-        if (newPlan.price < 0) {
+        if (Number(newPlan.price) < 0) {
             alert('Price must be greater or equal to 0.');
             return;
         }
@@ -62,7 +63,7 @@ const AdminPlanManager: React.FC = () => {
                 return;
             }
         }
-        
+
         try {
             const response = await axios.post('/api/admin/plans', newPlan, {
                 withCredentials: true,
@@ -70,9 +71,9 @@ const AdminPlanManager: React.FC = () => {
             setPlans([...plans, response.data]);
             setNewPlan({
                 name: '',
-                price: 0,
-                data_limit: undefined,
-                duration_days: 0,
+                price: '0',
+                data_limit: null,
+                duration_days: BigInt(0),
                 description: '',
             });
         } catch (err) {
@@ -135,14 +136,14 @@ const AdminPlanManager: React.FC = () => {
                         type="number"
                         placeholder="Price"
                         value={newPlan.price}
-                        onChange={(e) => setNewPlan({ ...newPlan, price: parseFloat(e.target.value) })}
+                        onChange={(e) => setNewPlan({ ...newPlan, price: String(parseFloat(e.target.value)) })}
                         className="w-full p-2 mb-4 border rounded dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
                     />
                     <p>Data Limit (GB)</p>
                     <input
                         type="number"
                         placeholder="Data Limit (GB)"
-                        value={newPlan.data_limit}
+                        value={newPlan.data_limit ?? ''}
                         onChange={(e) => setNewPlan({ ...newPlan, data_limit: parseFloat(e.target.value) })}
                         className="w-full p-2 mb-4 border rounded dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
                     />
@@ -150,14 +151,14 @@ const AdminPlanManager: React.FC = () => {
                     <input
                         type="number"
                         placeholder="Duration (days)"
-                        value={newPlan.duration_days}
-                        onChange={(e) => setNewPlan({ ...newPlan, duration_days: parseInt(e.target.value) })}
+                        value={newPlan.duration_days.toString()}
+                        onChange={(e) => setNewPlan({ ...newPlan, duration_days: BigInt(e.target.value) })}
                         className="w-full p-2 mb-4 border rounded dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
                     />
                     <p>Description</p>
                     <textarea
                         placeholder="Description"
-                        value={newPlan.description}
+                        value={newPlan.description ?? ''}
                         onChange={(e) => setNewPlan({ ...newPlan, description: e.target.value })}
                         className="w-full p-2 mb-4 border rounded dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
                     />
@@ -182,7 +183,7 @@ const AdminPlanManager: React.FC = () => {
                                         {plan.name}
                                     </h2>
                                     <p className="mb-2 text-base text-gray-700 dark:text-gray-300">
-                                        <strong>Price:</strong> ${plan.price.toFixed(2)}
+                                        <strong>Price:</strong> ${Number(plan.price).toFixed(2)}
                                     </p>
                                     {plan.data_limit !== null && (
                                         <p className="mb-2 text-base text-gray-700 dark:text-gray-300">
@@ -190,7 +191,7 @@ const AdminPlanManager: React.FC = () => {
                                         </p>
                                     )}
                                     <p className="mb-2 text-base text-gray-700 dark:text-gray-300">
-                                        <strong>Duration:</strong> {plan.duration_days} days
+                                        <strong>Duration:</strong> {Number(plan.duration_days)} days
                                     </p>
                                     {plan.description && (
                                         <p className="mb-4 text-base text-gray-700 dark:text-gray-300">

@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { PlanPayload, UserTransactionPayload, UserTransactionStatusEnum } from '../../bindings';
 import { loadStripe } from '@stripe/stripe-js';
 import {
     Elements,
@@ -11,13 +10,16 @@ import {
     useElements,
     PaymentElement,
 } from '@stripe/react-stripe-js';
+import { UserTransaction } from '../../bindings/UserTransaction';
+import { UserTransactionStatus } from '../../bindings/UserTransactionStatus';
+import { Plan } from '../../bindings/Plan';
 // import { FaShoppingCart } from 'react-icons/fa';
 
 const stripePromise = loadStripe('pk_test_51OaHvaHUfFNGnc8iKFFnkMOlcEjBFbnWz1ceTfBNK4lCwzLlHqOmXczBNP5mf0hVd69EtOgeUgcdXyUUSajKWOD400ek5bnGEe'); // Load Stripe public key from environment variables
 
 const TransactionID: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const [transaction, setTransaction] = useState<UserTransactionPayload | null>(null);
+    const [transaction, setTransaction] = useState<UserTransaction | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -31,7 +33,7 @@ const TransactionID: React.FC = () => {
         } else {
             const fetchClientSecret = async () => {
                 try {
-                    const response = await axios.get<string>(`/api/transaction/${id}/secret`, {
+                    const response = await axios.get<string>(`/api/transactions/${id}/secret`, {
                         withCredentials: true,
                     });
                     setClientSecret(response.data);
@@ -50,7 +52,7 @@ const TransactionID: React.FC = () => {
     useEffect(() => {
         const fetchTransaction = async () => {
             try {
-                const response = await axios.get<UserTransactionPayload>(`/api/transaction/${id}`, {
+                const response = await axios.get<UserTransaction>(`/api/transactions/${id}`, {
                     withCredentials: true,
                 });
                 setTransaction(response.data);
@@ -89,7 +91,7 @@ const TransactionID: React.FC = () => {
         if (!confirmCancel) return;
 
         try {
-            await axios.post(`/api/transaction/${transaction.id}/cancel`, {}, {
+            await axios.post(`/api/transactions/${transaction.id}/cancel`, {}, {
                 withCredentials: true,
             });
             alert("Transaction canceled successfully.");
@@ -125,7 +127,7 @@ const TransactionID: React.FC = () => {
 };
 
 interface TransactionFormProps {
-    transaction: UserTransactionPayload;
+    transaction: UserTransaction;
     clientSecret: string | null;
     onCancel: () => void;
 }
@@ -192,29 +194,29 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onCancel
     };
 
     // Helper function to format date
-    const formatDate = (dateStr: number) => {
-        const date = new Date(dateStr * 1000);
+    const formatDate = (dateStr: string) => {
+        const date = new Date(dateStr);
         return date.toLocaleString();
     };
 
     // Helper function to display status
-    const renderStatus = (status: UserTransactionStatusEnum) => {
+    const renderStatus = (status: UserTransactionStatus) => {
         switch (status) {
-            case UserTransactionStatusEnum.RequiresPaymentMethod:
+            case "RequiresPaymentMethod":
                 return <span className="px-2 py-1 text-sm text-yellow-700 bg-yellow-100 rounded dark:text-yellow-300 dark:bg-yellow-900">Unpaid</span>;
-            case UserTransactionStatusEnum.Processing:
+            case "Processing":
                 return <span className="px-2 py-1 text-sm text-blue-700 bg-blue-100 rounded dark:text-blue-300 dark:bg-blue-900">Processing</span>;
-            case UserTransactionStatusEnum.Succeeded:
+            case "Succeeded":
                 return <span className="px-2 py-1 text-sm text-green-700 bg-green-100 rounded dark:text-green-300 dark:bg-green-900">Completed</span>;
-            case UserTransactionStatusEnum.RequiresAction:
+            case "RequiresAction":
                 return <span className="px-2 py-1 text-sm text-red-700 bg-red-100 rounded dark:text-red-300 dark:bg-red-900">Action Required</span>;
-            case UserTransactionStatusEnum.RequiresConfirmation:
+            case "RequiresConfirmation":
                 return <span className="px-2 py-1 text-sm text-yellow-700 bg-yellow-100 rounded dark:text-yellow-300 dark:bg-yellow-900">Confirmation Required</span>;
-            case UserTransactionStatusEnum.RequiresCapture:
+            case "RequiresCapture":
                 return <span className="px-2 py-1 text-sm text-yellow-700 bg-yellow-100 rounded dark:text-yellow-300 dark:bg-yellow-900">Capture Required</span>;
-            case UserTransactionStatusEnum.Canceled:
+            case "Canceled":
                 return <span className="px-2 py-1 text-sm text-gray-700 bg-gray-100 rounded dark:text-gray-300 dark:bg-gray-900">Canceled</span>;
-            case UserTransactionStatusEnum.Refunded:
+            case "Refunded":
                 return <span className="px-2 py-1 text-sm text-gray-700 bg-gray-100 rounded dark:text-gray-300 dark:bg-gray-900">Refunded</span>;
             default:
                 return <span className="px-2 py-1 text-sm text-gray-700 bg-gray-100 rounded dark:text-gray-300 dark:bg-gray-900">Unknown</span>;
@@ -224,7 +226,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onCancel
     // Helper function to get plan name
     const getPlanName = async (planId: number) => {
         try {
-            const response = await axios.get<PlanPayload>(`/api/plans/${planId}`, { withCredentials: true });
+            const response = await axios.get<Plan>(`/api/plans/${planId}`, { withCredentials: true });
             return response.data.name;
         } catch (err) {
             console.error('Failed to get plan name:', err);
@@ -268,7 +270,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onCancel
 
                 {/* Conditionally render payment form based on transaction status */}
 
-                {transaction.status === UserTransactionStatusEnum.RequiresPaymentMethod && !success && (
+                {transaction.status === "RequiresPaymentMethod" && !success && (
                     <>
                         <div className="mb-6">
                             <hr className="border-gray-300 dark:border-gray-600" />
@@ -358,7 +360,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onCancel
                 )}
 
                 {/* Cancel Transaction Button */}
-                {transaction.status === UserTransactionStatusEnum.RequiresPaymentMethod && !success && (
+                {transaction.status === "RequiresPaymentMethod" && !success && (
                     <div className="mt-6">
                         <button
                             className="px-4 py-2 text-white bg-red-500 rounded-md hover:bg-red-600 focus:outline-none"

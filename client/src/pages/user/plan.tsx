@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { PlanPayload } from '../../bindings';
 import { useNavigate } from 'react-router-dom';
+import { Plan as PlanPayload } from '../../bindings/Plan';
 
 const SkeletonPlan: React.FC = () => {
     return (
@@ -69,7 +69,7 @@ const Plan: React.FC = () => {
                                     {plan.name}
                                 </h2>
                                 <p className="mb-2 text-base text-gray-700 dark:text-gray-300">
-                                    <strong>Price:</strong> ${plan.price.toFixed(2)}
+                                    <strong>Price:</strong> ${Number(plan.price).toFixed(2)}
                                 </p>
                                 {plan.data_limit !== null && (
                                     <p className="mb-2 text-base text-gray-700 dark:text-gray-300">
@@ -77,7 +77,7 @@ const Plan: React.FC = () => {
                                     </p>
                                 )}
                                 <p className="mb-2 text-base text-gray-700 dark:text-gray-300">
-                                    <strong>Duration:</strong> {plan.duration_days} days
+                                    <strong>Duration:</strong> {Number(plan.duration_days)} days
                                 </p>
                                 {plan.description && (
                                     <p className="mb-4 text-base text-gray-700 dark:text-gray-300">

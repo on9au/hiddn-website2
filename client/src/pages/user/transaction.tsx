@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { UserTransactionPayload, UserTransactionStatusEnum } from '../../bindings';
 import { useNavigate } from 'react-router-dom';
+import { UserTransaction } from '../../bindings/UserTransaction';
+import { UserTransactionStatus } from '../../bindings/UserTransactionStatus';
 
 type FetchTransactionsEnum =
     | { status: 'loading' }
@@ -58,7 +59,7 @@ const SkeletonTransaction: React.FC = () => {
 };
 
 const Transaction: React.FC = () => {
-    const [transactions, setTransactions] = useState<UserTransactionPayload[]>([]);
+    const [transactions, setTransactions] = useState<UserTransaction[]>([]);
     const [fetchStatus, setFetchStatus] = useState<FetchTransactionsEnum>({ status: 'loading' });
     const navigate = useNavigate();
 
@@ -67,7 +68,7 @@ const Transaction: React.FC = () => {
 
         const fetchTransactions = async () => {
             try {
-                const response = await axios.get<UserTransactionPayload[]>('/api/transactions', {
+                const response = await axios.get<UserTransaction[]>('/api/transactions', {
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -104,23 +105,23 @@ const Transaction: React.FC = () => {
     }, [navigate]);
 
     // Function to get status styles
-    const getStatusStyle = (status: UserTransactionStatusEnum) => {
+    const getStatusStyle = (status: UserTransactionStatus) => {
         switch (status) {
-            case UserTransactionStatusEnum.RequiresPaymentMethod:
+            case "Pending":
                 return <td className="px-4 py-2 font-semibold text-yellow-700 border-b">Unpaid</td>;
-            case UserTransactionStatusEnum.Processing:
+            case "Processing":
                 return <td className="px-4 py-2 font-semibold text-blue-700 border-b">Processing</td>;
-            case UserTransactionStatusEnum.Succeeded:
+            case "Succeeded":
                 return <td className="px-4 py-2 font-semibold text-green-700 border-b">Completed</td>;
-            case UserTransactionStatusEnum.RequiresAction:
+            case "RequiresAction":
                 return <td className="px-4 py-2 font-semibold text-red-700 border-b">Action Required</td>;
-            case UserTransactionStatusEnum.RequiresConfirmation:
+            case "RequiresConfirmation":
                 return <td className="px-4 py-2 font-semibold text-yellow-700 border-b">Confirmation Required</td>;
-            case UserTransactionStatusEnum.RequiresCapture:
+            case "RequiresCapture":
                 return <td className="px-4 py-2 font-semibold text-yellow-700 border-b">Capture Required</td>;
-            case UserTransactionStatusEnum.Canceled:
+            case "Canceled":
                 return <td className="px-4 py-2 font-semibold text-gray-700 border-b">Canceled</td>;
-            case UserTransactionStatusEnum.Refunded:
+            case "Refunded":
                 return <td className="px-4 py-2 font-semibold text-gray-700 border-b">Refunded</td>;
             default:
                 return <td className="px-4 py-2 font-semibold text-gray-700 border-b">Unknown</td>;
@@ -168,10 +169,10 @@ const Transaction: React.FC = () => {
                                                 {transaction.id}
                                             </td>
                                             <td className="px-4 py-2 text-gray-700 border-b dark:text-gray-300">
-                                                ${transaction.amount.toFixed(2)}
+                                                ${Number(transaction.amount).toFixed(2)}
                                             </td>
                                             <td className="px-4 py-2 text-gray-700 border-b dark:text-gray-300">
-                                                {new Date(transaction.created_at * 1000).toLocaleString(undefined, { timeZoneName: 'short' })}
+                                                {new Date(transaction.created_at).toLocaleString(undefined, { timeZoneName: 'short' })}
                                             </td>
                                             {getStatusStyle(transaction.status)}
                                         </tr>

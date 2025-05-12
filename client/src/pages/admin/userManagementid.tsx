@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
-import { AdminUser, AdminUserModify } from '../../bindings';
+import { AdminUser } from '../../bindings/AdminUser';
+import { AdminUserModify } from '../../bindings/AdminUserModify';
 
 const UserManagementId: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -43,7 +44,7 @@ const UserManagementId: React.FC = () => {
     const handleUpdateUser = async () => {
         const payload: AdminUserModify = {
             email: email,
-            marzban_username: marzbanUsername.trim() === '' ? undefined : marzbanUsername,
+            marzban_username: marzbanUsername.trim() === '' ? null : marzbanUsername,
             admin: isAdmin,
         }
 

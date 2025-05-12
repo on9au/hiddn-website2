@@ -9,6 +9,7 @@ use ts_rs::TS;
 #[sqlx(type_name = "ENUM")]
 #[sqlx(rename_all = "snake_case")]
 pub enum UserTransactionStatus {
+    Pending,
     Canceled,
     Processing,
     RequiresAction,

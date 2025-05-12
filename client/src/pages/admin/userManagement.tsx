@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
-import { AdminUser } from '../../bindings';
+import { AdminUser } from '../../bindings/AdminUser';
 
 const AdminUserManagement: React.FC = () => {
     const [users, setUsers] = useState<AdminUser[]>([]);
@@ -80,7 +80,7 @@ const AdminUserManagement: React.FC = () => {
                 return;
             }
         }
-        
+
         try {
             await axios.delete(`/api/admin/users/${id}`, { withCredentials: true });
             alert('User deleted successfully.');
