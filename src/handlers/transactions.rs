@@ -186,7 +186,7 @@ pub async fn create_transaction(
 
     let payment_intent = PaymentIntent::create(app_state.stripe_client(), payment_intent)
         .await
-        .expect("Failed to create payment intent");
+        .context("Failed to create payment intent")?;
 
     let payment_intent_status: UserTransactionStatus = payment_intent.status.into();
 

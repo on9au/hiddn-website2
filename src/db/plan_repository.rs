@@ -2,6 +2,7 @@ use crate::payloads::NewPlan;
 use crate::payloads::plan_payloads::Plan;
 use anyhow::Result;
 use chrono::{DateTime, Utc};
+use num_traits::FromPrimitive;
 use sqlx::MySqlPool;
 use sqlx::types::BigDecimal;
 pub struct PlanRepository {

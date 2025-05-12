@@ -17,5 +17,5 @@ pub fn routes() -> Router {
         .route("/{:id}", get(get_transaction_by_id))
         .route("/{:id}/secret", get(get_transaction_secret))
         .route("/{:id}/complete", get(complete_transaction))
-        .route("/{:id}/cancel", get(cancel_transaction))
+        .route("/{:id}/cancel", post(cancel_transaction))
 }

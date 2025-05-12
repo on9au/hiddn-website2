@@ -107,7 +107,7 @@ const Transaction: React.FC = () => {
     // Function to get status styles
     const getStatusStyle = (status: UserTransactionStatus) => {
         switch (status) {
-            case "Pending":
+            case "RequiresPaymentMethod":
                 return <td className="px-4 py-2 font-semibold text-yellow-700 border-b">Unpaid</td>;
             case "Processing":
                 return <td className="px-4 py-2 font-semibold text-blue-700 border-b">Processing</td>;
