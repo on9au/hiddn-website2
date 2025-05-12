@@ -66,7 +66,7 @@ pub async fn stripe_webhook(
                     EventType::PaymentIntentPaymentFailed => {
                         UserTransactionStatus::RequiresPaymentMethod
                     }
-                    EventType::PaymentIntentCanceled => UserTransactionStatus::Canceled,
+                    EventType::PaymentIntentCanceled => UserTransactionStatus::Cancelled,
                     EventType::PaymentIntentRequiresAction => UserTransactionStatus::RequiresAction,
                     EventType::PaymentIntentRequiresCapture => {
                         UserTransactionStatus::RequiresCapture

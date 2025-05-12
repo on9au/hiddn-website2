@@ -10,7 +10,7 @@ use ts_rs::TS;
 #[sqlx(rename_all = "snake_case")]
 pub enum UserTransactionStatus {
     Pending,
-    Canceled,
+    Cancelled,
     Processing,
     RequiresAction,
     RequiresCapture,
@@ -23,7 +23,7 @@ pub enum UserTransactionStatus {
 impl From<PaymentIntentStatus> for UserTransactionStatus {
     fn from(status: PaymentIntentStatus) -> Self {
         match status {
-            PaymentIntentStatus::Canceled => Self::Canceled,
+            PaymentIntentStatus::Canceled => Self::Cancelled,
             PaymentIntentStatus::Processing => Self::Processing,
             PaymentIntentStatus::RequiresAction => Self::RequiresAction,
             PaymentIntentStatus::RequiresCapture => Self::RequiresCapture,

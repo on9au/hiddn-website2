@@ -120,7 +120,7 @@ const AdminTransaction: React.FC = () => {
                 return <td className="px-4 py-2 font-semibold text-yellow-700 border-b">Confirmation Required</td>;
             case "RequiresCapture":
                 return <td className="px-4 py-2 font-semibold text-yellow-700 border-b">Capture Required</td>;
-            case "Canceled":
+            case "Cancelled":
                 return <td className="px-4 py-2 font-semibold text-gray-700 border-b">Canceled</td>;
             case "Refunded":
                 return <td className="px-4 py-2 font-semibold text-gray-700 border-b">Refunded</td>;
