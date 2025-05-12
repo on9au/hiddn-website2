@@ -24,7 +24,7 @@ impl PlanRepository {
                 name as `name: String`,
                 price as `price: BigDecimal`,
                 data_limit as `data_limit: Option<f64>`,
-                duration_days as `duration_days: u64`,
+                duration_days as `duration_days: u32`,
                 description as `description: String`,
                 created_at as `created_at: DateTime<Utc>`,
                 updated_at as `updated_at: DateTime<Utc>`
@@ -47,7 +47,7 @@ impl PlanRepository {
                 name as `name: String`,
                 price as `price: BigDecimal`,
                 data_limit as `data_limit: Option<f64>`,
-                duration_days as `duration_days: u64`,
+                duration_days as `duration_days: u32`,
                 description as `description: String`,
                 created_at as `created_at: DateTime<Utc>`,
                 updated_at as `updated_at: DateTime<Utc>`

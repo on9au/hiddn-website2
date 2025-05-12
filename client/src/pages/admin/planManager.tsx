@@ -13,7 +13,7 @@ const AdminPlanManager: React.FC = () => {
         name: '',
         price: '0',
         data_limit: 0,
-        duration_days: BigInt(0),
+        duration_days: 0,
         description: '',
     });
     const navigate = useNavigate();
@@ -73,7 +73,7 @@ const AdminPlanManager: React.FC = () => {
                 name: '',
                 price: '0',
                 data_limit: null,
-                duration_days: BigInt(0),
+                duration_days: 0,
                 description: '',
             });
         } catch (err) {
@@ -152,7 +152,7 @@ const AdminPlanManager: React.FC = () => {
                         type="number"
                         placeholder="Duration (days)"
                         value={newPlan.duration_days.toString()}
-                        onChange={(e) => setNewPlan({ ...newPlan, duration_days: BigInt(e.target.value) })}
+                        onChange={(e) => setNewPlan({ ...newPlan, duration_days: parseInt(e.target.value) })}
                         className="w-full p-2 mb-4 border rounded dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
                     />
                     <p>Description</p>
