@@ -74,6 +74,10 @@ pub async fn stripe_webhook(
                     EventType::PaymentIntentProcessing => UserTransactionStatus::Processing,
                     _ => return Ok(StatusCode::OK.into_response()),
                 };
+                debug!(
+                    "PaymentIntent {} status changed to {:?}",
+                    payment_intent_id, new_status
+                );
                 // Update transaction status in DB
                 if let Err(e) = app_state
                     .transaction_repository()

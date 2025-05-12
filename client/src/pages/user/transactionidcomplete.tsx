@@ -99,8 +99,8 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction }) => {
                 return <span className="px-2 py-1 text-sm text-yellow-700 bg-yellow-100 rounded dark:text-yellow-300 dark:bg-yellow-900">Confirmation Required</span>;
             case "RequiresCapture":
                 return <span className="px-2 py-1 text-sm text-yellow-700 bg-yellow-100 rounded dark:text-yellow-300 dark:bg-yellow-900">Capture Required</span>;
-            case "Canceled":
-                return <span className="px-2 py-1 text-sm text-gray-700 bg-gray-100 rounded dark:text-gray-300 dark:bg-gray-900">Canceled</span>;
+            case "Cancelled":
+                return <span className="px-2 py-1 text-sm text-gray-700 bg-gray-100 rounded dark:text-gray-300 dark:bg-gray-900">Cancelled</span>;
             case "Refunded":
                 return <span className="px-2 py-1 text-sm text-gray-700 bg-gray-100 rounded dark:text-gray-300 dark:bg-gray-900">Refunded</span>;
             default:
