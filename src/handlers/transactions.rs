@@ -8,6 +8,7 @@ use axum::{Extension, Json, response::IntoResponse};
 use num_traits::cast::ToPrimitive;
 use std::str::FromStr;
 use stripe::{CancelPaymentIntent, CreatePaymentIntent, PaymentIntent, PaymentIntentId};
+use tracing::debug;
 
 /// GET `/api/transactions`
 pub async fn get_transactions(
@@ -139,6 +140,8 @@ pub async fn cancel_transaction(
                 .transaction_repository()
                 .change_transaction_status(id as i64, UserTransactionStatus::Cancelled)
                 .await?;
+
+            debug!("Transaction {} cancelled", id);
 
             Ok(StatusCode::OK.into_response())
         }
