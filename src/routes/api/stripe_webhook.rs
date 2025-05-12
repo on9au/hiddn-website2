@@ -8,7 +8,7 @@ use axum::{Router, routing::post};
 
 use crate::handlers::stripe_webhook;
 
-/// # `/api/auth/` API Routes
+/// # `/api/stripe/` API Routes
 pub fn routes() -> Router {
     Router::new().route("/", post(stripe_webhook::stripe_webhook))
 }
