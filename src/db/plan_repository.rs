@@ -1,7 +1,9 @@
+use crate::payloads::NewPlan;
 use crate::payloads::plan_payloads::Plan;
 use anyhow::Result;
+use chrono::{DateTime, Utc};
 use sqlx::MySqlPool;
-
+use sqlx::types::BigDecimal;
 pub struct PlanRepository {
     pool: MySqlPool,
 }
@@ -13,10 +15,69 @@ impl PlanRepository {
     }
 
     pub async fn get_plans(&self) -> Result<Vec<Plan>> {
-        Ok(vec![])
+        let plans = sqlx::query_as!(
+            Plan,
+            r#"
+            SELECT 
+                id as `id: u32`,
+                enabled as `enabled: bool`,
+                name as `name: String`,
+                price as `price: BigDecimal`,
+                data_limit as `data_limit: Option<f64>`,
+                duration_days as `duration_days: u64`,
+                description as `description: String`,
+                created_at as `created_at: DateTime<Utc>`,
+                updated_at as `updated_at: DateTime<Utc>`
+            FROM plans
+            "#,
+        )
+        .fetch_all(&self.pool)
+        .await?;
+
+        Ok(plans)
     }
 
-    pub async fn get_plan_by_id(&self, _id: u32) -> Result<Option<Plan>> {
-        Ok(None)
+    pub async fn get_plan_by_id(&self, id: u32) -> Result<Option<Plan>> {
+        let plan = sqlx::query_as!(
+            Plan,
+            r#"
+            SELECT 
+                id as `id: u32`,
+                enabled as `enabled: bool`,
+                name as `name: String`,
+                price as `price: BigDecimal`,
+                data_limit as `data_limit: Option<f64>`,
+                duration_days as `duration_days: u64`,
+                description as `description: String`,
+                created_at as `created_at: DateTime<Utc>`,
+                updated_at as `updated_at: DateTime<Utc>`
+            FROM plans
+            WHERE id = ?
+            "#,
+            id
+        )
+        .fetch_optional(&self.pool)
+        .await?;
+
+        Ok(plan)
+    }
+
+    pub async fn create_plan(&self, plan: &NewPlan) -> Result<u32> {
+        let id = sqlx::query!(
+            r#"
+            INSERT INTO plans (name, price, data_limit, duration_days, description)
+            VALUES (?, ?, ?, ?, ?)
+            "#,
+            plan.name,
+            plan.price,
+            plan.data_limit,
+            plan.duration_days,
+            plan.description
+        )
+        .execute(&self.pool)
+        .await?
+        .last_insert_id();
+
+        Ok(id as u32)
     }
 }

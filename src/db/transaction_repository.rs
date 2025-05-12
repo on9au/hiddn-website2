@@ -92,4 +92,25 @@ impl TransactionRepository {
 
         Ok(transaction)
     }
+
+    /// Change the status of a transaction.
+    pub async fn change_transaction_status(
+        &self,
+        transaction_id: i64,
+        status: UserTransactionStatus,
+    ) -> Result<()> {
+        sqlx::query!(
+            r#"
+            UPDATE transactions
+            SET status = ?
+            WHERE id = ?
+            "#,
+            status as i16,
+            transaction_id
+        )
+        .execute(&self.pool)
+        .await?;
+
+        Ok(())
+    }
 }

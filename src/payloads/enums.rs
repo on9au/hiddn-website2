@@ -1,6 +1,7 @@
 use marzban_api::models::user::UserStatus;
 use serde::Serialize;
 use sqlx::prelude::Type;
+use stripe::PaymentIntentStatus;
 use ts_rs::TS;
 
 #[derive(Clone, Debug, Serialize, Type, TS)]
@@ -16,6 +17,20 @@ pub enum UserTransactionStatus {
     RequiresPaymentMethod,
     Succeeded,
     Refunded,
+}
+
+impl From<PaymentIntentStatus> for UserTransactionStatus {
+    fn from(status: PaymentIntentStatus) -> Self {
+        match status {
+            PaymentIntentStatus::Canceled => Self::Canceled,
+            PaymentIntentStatus::Processing => Self::Processing,
+            PaymentIntentStatus::RequiresAction => Self::RequiresAction,
+            PaymentIntentStatus::RequiresCapture => Self::RequiresCapture,
+            PaymentIntentStatus::RequiresConfirmation => Self::RequiresConfirmation,
+            PaymentIntentStatus::RequiresPaymentMethod => Self::RequiresPaymentMethod,
+            PaymentIntentStatus::Succeeded => Self::Succeeded,
+        }
+    }
 }
 
 #[derive(Clone, Debug, Serialize, TS)]

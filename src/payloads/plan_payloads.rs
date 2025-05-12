@@ -1,6 +1,7 @@
 use chrono::{DateTime, TimeZone, Utc};
 use marzban_api::models::user::UserResponse;
 use serde::{Deserialize, Serialize};
+use sqlx::types::BigDecimal;
 use ts_rs::TS;
 
 #[derive(Clone, Debug, Serialize, TS)]
@@ -32,18 +33,21 @@ impl From<UserResponse> for PlanDetails {
 #[ts(export)]
 pub struct Plan {
     pub id: u32,
+    pub enabled: bool,
     pub name: String,
-    pub price: f64,
-    pub data_limit: Option<f64>,
+    pub price: BigDecimal,
+    pub data_limit: Option<f64>, // in GB
     pub duration_days: u64,
     pub description: Option<String>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
 }
 
 #[derive(Clone, Debug, Deserialize, TS)]
 #[ts(export)]
 pub struct NewPlan {
     pub name: String,
-    pub price: f64,
+    pub price: BigDecimal,
     pub data_limit: Option<f64>,
     pub duration_days: u64,
     pub description: Option<String>,
