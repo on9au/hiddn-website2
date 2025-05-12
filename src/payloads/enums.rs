@@ -4,7 +4,7 @@ use sqlx::prelude::Type;
 use stripe::PaymentIntentStatus;
 use ts_rs::TS;
 
-#[derive(Clone, Debug, Serialize, Type, TS)]
+#[derive(Clone, Debug, Copy, Serialize, Type, TS)]
 #[ts(export)]
 #[sqlx(type_name = "ENUM")]
 #[sqlx(rename_all = "snake_case")]

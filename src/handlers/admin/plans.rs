@@ -12,7 +12,7 @@ pub async fn admin_create_plan(
     // Return the plan as JSON
     let plan = app_state
         .plan_repository()
-        .get_plan_by_id(id)
+        .get_plan_by_id(id as i64)
         .await?
         .context("Failed to get plan")?;
     Ok(Json(plan).into_response())

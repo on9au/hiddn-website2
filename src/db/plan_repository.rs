@@ -2,7 +2,6 @@ use crate::payloads::NewPlan;
 use crate::payloads::plan_payloads::Plan;
 use anyhow::Result;
 use chrono::{DateTime, Utc};
-use num_traits::FromPrimitive;
 use sqlx::MySqlPool;
 use sqlx::types::BigDecimal;
 pub struct PlanRepository {
@@ -24,7 +23,7 @@ impl PlanRepository {
                 enabled as `enabled: bool`,
                 name as `name: String`,
                 price as `price: BigDecimal`,
-                data_limit as `data_limit: Option<f64>`,
+                data_limit as `data_limit: u32`,
                 duration_days as `duration_days: u32`,
                 description as `description: String`,
                 created_at as `created_at: DateTime<Utc>`,
@@ -38,7 +37,7 @@ impl PlanRepository {
         Ok(plans)
     }
 
-    pub async fn get_plan_by_id(&self, id: u32) -> Result<Option<Plan>> {
+    pub async fn get_plan_by_id(&self, id: i64) -> Result<Option<Plan>> {
         let plan = sqlx::query_as!(
             Plan,
             r#"
@@ -47,7 +46,7 @@ impl PlanRepository {
                 enabled as `enabled: bool`,
                 name as `name: String`,
                 price as `price: BigDecimal`,
-                data_limit as `data_limit: Option<f64>`,
+                data_limit as `data_limit: u32`,
                 duration_days as `duration_days: u32`,
                 description as `description: String`,
                 created_at as `created_at: DateTime<Utc>`,

@@ -11,7 +11,11 @@ pub async fn get_plan_by_id(
     Extension(app_state): Extension<AppState>,
     axum::extract::Path(id): axum::extract::Path<u32>,
 ) -> AppResult<impl IntoResponse> {
-    match app_state.plan_repository().get_plan_by_id(id).await? {
+    match app_state
+        .plan_repository()
+        .get_plan_by_id(id as i64)
+        .await?
+    {
         Some(plan) => Ok(Json(plan).into_response()),
         None => Ok((StatusCode::NOT_FOUND, "Plan not found").into_response()),
     }

@@ -36,7 +36,7 @@ pub struct Plan {
     pub enabled: bool,
     pub name: String,
     pub price: BigDecimal,
-    pub data_limit: Option<f64>, // in GB
+    pub data_limit: u32, // in GB
     pub duration_days: u32,
     pub description: Option<String>,
     pub created_at: DateTime<Utc>,
@@ -48,7 +48,7 @@ pub struct Plan {
 pub struct NewPlan {
     pub name: String,
     pub price: BigDecimal,
-    pub data_limit: Option<f64>,
+    pub data_limit: u32,
     pub duration_days: u32,
     pub description: Option<String>,
 }

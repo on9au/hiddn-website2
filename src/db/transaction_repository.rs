@@ -114,6 +114,22 @@ impl TransactionRepository {
         Ok(())
     }
 
+    /// Change the status of a transaction by payment_intent_id.
+    pub async fn change_transaction_status_by_payment_intent(
+        &self,
+        payment_intent_id: &str,
+        status: UserTransactionStatus,
+    ) -> Result<()> {
+        sqlx::query!(
+            r#"UPDATE transactions SET status = ? WHERE stripe_payment_intent_id = ?"#,
+            status as i16,
+            payment_intent_id
+        )
+        .execute(&self.pool)
+        .await?;
+        Ok(())
+    }
+
     /// Create a new transaction.
     pub async fn create_transaction(
         &self,

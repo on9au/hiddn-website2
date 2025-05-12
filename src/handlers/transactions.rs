@@ -157,7 +157,7 @@ pub async fn create_transaction(
     // Get the plan
     let plan = match app_state
         .plan_repository()
-        .get_plan_by_id(payload.plan_id)
+        .get_plan_by_id(payload.plan_id as i64)
         .await?
     {
         Some(plan) => plan,
