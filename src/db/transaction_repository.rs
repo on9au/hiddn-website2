@@ -105,7 +105,7 @@ impl TransactionRepository {
             SET status = ?
             WHERE id = ?
             "#,
-            status as i16,
+            status,
             transaction_id
         )
         .execute(&self.pool)
@@ -122,7 +122,7 @@ impl TransactionRepository {
     ) -> Result<()> {
         sqlx::query!(
             r#"UPDATE transactions SET status = ? WHERE stripe_payment_intent_id = ?"#,
-            status as i16,
+            status,
             payment_intent_id
         )
         .execute(&self.pool)
@@ -136,7 +136,7 @@ impl TransactionRepository {
         user_id: i64,
         plan_id: i64,
         stripe_payment_intent_id: String,
-        amount: i64,
+        amount: BigDecimal,
         payment_status: UserTransactionStatus,
     ) -> Result<u32> {
         let transaction = sqlx::query!(

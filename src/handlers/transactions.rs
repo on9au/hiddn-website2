@@ -167,7 +167,7 @@ pub async fn create_transaction(
         None => return Ok((StatusCode::NOT_FOUND, "Plan not found").into_response()),
     };
 
-    let plan_price: i64 = (plan.price * 100_i32)
+    let plan_price: i64 = (plan.price.clone() * 100_i32)
         .to_i64()
         .context("Failed to convert plan price")?;
 
@@ -200,7 +200,7 @@ pub async fn create_transaction(
             user.id,
             plan.id as i64,
             payment_intent.id.to_string(),
-            plan_price,
+            plan.price,
             payment_intent_status,
         )
         .await?;
