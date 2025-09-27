@@ -1,5 +1,8 @@
 # HiddN Website
 
+>[!NOTE]
+>I made this ages ago initially as a private project, and decided to make this public to showcase my website skills. This is not intended to be used in production
+
 please use rust typeshare cli
 
 ## First time setup after build/docker-compose up
